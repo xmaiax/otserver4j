@@ -11,17 +11,17 @@ public class OTJException extends Exception {
     INSERT_ACCOUNT_NUMBER(2, "Please insert the account number."),
     INSERT_PASSWORD(4, "Please insert the password."),
     INCORRECT_PASSWORD(5, "Incorrect password.");
-    private int code;
+    private Integer code;
     private String message;
-    CommonError(int code, String message) {
+    CommonError(Integer code, String message) {
       this.code = code;
       this.message = message;
     }
   }
-  private int code;
+  private Integer code;
   public OTJException(String message) {
     super(message); this.code = BigInteger.ONE.intValue(); }
-  public OTJException(int code, String message) {
+  public OTJException(Integer code, String message) {
     super(message); this.code = code; }
   public OTJException(CommonError commonError) {
     super(commonError.getMessage());

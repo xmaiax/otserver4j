@@ -108,20 +108,25 @@ class ConnectionThread extends Thread {
 
   private Server server;
 
-  private void handleReceivedPacket(
-      Iterator<SelectionKey> selectedKeysIterator) throws IOException {
+  private void handleReceivedPacket(Iterator<SelectionKey> selectedKeysIterator) throws IOException {
+    SocketChannel socketChannel = null;
     while(selectedKeysIterator.hasNext()) {
       final SelectionKey key = selectedKeysIterator.next();
       if(key.isAcceptable()) {
-        final SocketChannel socketChannel = this.server.getServerSocketChannel().accept();
+        socketChannel = this.server.getServerSocketChannel().accept();
         socketChannel.configureBlocking(Boolean.FALSE);
         socketChannel.register(this.server.getSelector(),
           SelectionKey.OP_READ | SelectionKey.OP_WRITE);
       }
       else if(key.isReadable() || key.isWritable()) {
-        final SocketChannel socketChannel = (SocketChannel) key.channel();
+        socketChannel = (SocketChannel) key.channel();
         final ByteBuffer buffer = ByteBuffer.allocate(Packet.MAX_SIZE);
-        socketChannel.read(buffer);
+        try { socketChannel.read(buffer); }
+        catch(IOException ioex) {
+          log.error("Error on read packet, closing the connection.", ioex);
+          socketChannel.close();
+          return;
+        }
         buffer.position(BigInteger.ZERO.intValue());
         final Integer packetSize = Packet.readInt16(buffer);
         if(packetSize > BigInteger.ZERO.intValue()) {
@@ -144,13 +149,12 @@ class ConnectionThread extends Thread {
             //...
           }
           Packet packet = null;
-          try {
-            packet = protocol.executeProtocol(buffer);
-          }
+          try { packet = protocol.executeProtocol(buffer); }
           catch(OTJException otjex) {
             packet = Packet.createGenericErrorPacket(10, otjex.getMessage());
           }
-          if(!(protocol instanceof DummyProtocol)) packet.send(socketChannel);
+          if(!(protocol instanceof DummyProtocol) && packet != null)
+            packet.send(socketChannel);
         }
       }
       selectedKeysIterator.remove();
@@ -162,7 +166,8 @@ class ConnectionThread extends Thread {
     while(this.server.getIsRunning()) {
       try {
         this.server.getSelector().select();
-        this.handleReceivedPacket(this.server.getSelector().selectedKeys().iterator());
+        this.handleReceivedPacket(
+          this.server.getSelector().selectedKeys().iterator());
       }
       catch(IOException ioex) {
         log.error("Error on handling connection: {}", ioex.getMessage(), ioex);

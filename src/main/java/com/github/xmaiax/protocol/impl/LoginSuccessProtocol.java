@@ -16,7 +16,7 @@ public class LoginSuccessProtocol implements TibiaProtocol {
   @Override
   public Packet executeProtocol(ByteBuffer buffer) throws OTJException {
     log.info("Successful login attemp!");
-    return Packet.createGenericErrorPacket(1, "Unimplemented login, sorry...");
+    return null;
   }
 
 }

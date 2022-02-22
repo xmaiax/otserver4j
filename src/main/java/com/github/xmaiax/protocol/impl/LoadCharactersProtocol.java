@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component @Slf4j
 public class LoadCharactersProtocol implements TibiaProtocol {
 
-  public static int SKIP_CLIENT_UNUSED_INFO = 0x0c;
+  public static Integer SKIP_CLIENT_UNUSED_INFO = 0x0c;
 
   @Value("${otserver.host}") private String host;
   @Value("${otserver.port}") private Integer port;
@@ -85,7 +85,7 @@ public class LoadCharactersProtocol implements TibiaProtocol {
         this.writeHostPort2Packet(characterListPacket);
       });
     }
-    int premiumDuration = 0;
+    Integer premiumDuration = 0;
     if(account.getPremiumExpiration() != null && account.getPremiumExpiration()
         .after(Calendar.getInstance()))
       premiumDuration = (int) TimeUnit.DAYS.convert(account.getPremiumExpiration()

@@ -20,7 +20,7 @@ public interface TibiaProtocol {
     private String type;
     OperatingSystem(String type) { this.type = type; }
     @Override public String toString() { return this.type; }
-    public static OperatingSystem fromCode(int code) {
+    public static OperatingSystem fromCode(Integer code) {
       switch(code) {
         case 0x01: return UNIX_LIKE;
         case 0x02: return WINDOWS;
@@ -34,12 +34,12 @@ public interface TibiaProtocol {
     LOAD_CHARACTER_LIST(0x01),
     LOGIN_SUCCESS(0x0a),
     INVALID(-1);
-    private int code;
-    LoginRequestType(int code) {
+    private Integer code;
+    LoginRequestType(Integer code) {
       this.code = code;
     }
     @Override public String toString() { return this.name(); }
-    public static LoginRequestType fromCode(int code) {
+    public static LoginRequestType fromCode(Integer code) {
       return Arrays.asList(LoginRequestType.values()).stream()
         .filter(lrt -> lrt.getCode() == code || lrt == INVALID)
           .findFirst().get();
