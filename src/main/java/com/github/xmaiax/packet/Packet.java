@@ -12,8 +12,8 @@ import lombok.Getter;
 @Getter
 public class Packet {
 
-  public static final Integer MAX_SIZE = 0xffff, CHARACTERS_LIST_START = 0x64,
-    LOGIN_CODE_OK = 0x14, LOGIN_CODE_NOK = 0x0a,
+  public static final Integer MAX_SIZE = 0xffff,
+    CHARACTERS_LIST_START = 0x64, LOGIN_CODE_OK = 0x14, LOGIN_CODE_NOK = 0x0a,
     PROCESSING_LOGIN_CODE_OK = 0x0a, PROCESSING_LOGIN_CODE_NOK = 0x14;
 
   public static int readByte(ByteBuffer input) {

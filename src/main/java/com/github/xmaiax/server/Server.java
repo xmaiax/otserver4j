@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.github.xmaiax.errors.OTJException;
+import com.github.xmaiax.errors.LoginException;
 import com.github.xmaiax.packet.Packet;
 import com.github.xmaiax.protocol.Protocol;
 import com.github.xmaiax.protocol.Protocol.LoginRequestType;
@@ -143,11 +143,9 @@ class ConnectionThread extends Thread {
           else protocol = this.server.getInGameProtocol();
           Packet packet = null;
           try { packet = protocol.execute(buffer); }
-          catch(OTJException otjex) {
-            packet = Packet.createGenericErrorPacket(10, otjex.getMessage());
-          }
-          if(protocol != null && packet != null)
-            packet.send(socketChannel);
+          catch(LoginException otjex) {
+            packet = Packet.createGenericErrorPacket(otjex.getCode(), otjex.getMessage()); }
+          if(protocol != null && packet != null) packet.send(socketChannel);
         }
       }
       selectedKeysIterator.remove();

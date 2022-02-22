@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.github.xmaiax.errors.OTJException;
-import com.github.xmaiax.errors.OTJException.CommonError;
+import com.github.xmaiax.errors.LoginException;
+import com.github.xmaiax.errors.LoginException.CommonError;
 import com.github.xmaiax.packet.Packet;
 import com.github.xmaiax.protocol.Protocol;
 import com.github.xmaiax.structure.Account;
@@ -46,17 +46,17 @@ public class LoadCharactersProtocol implements Protocol {
   }
 
   @Override
-  public Packet execute(ByteBuffer buffer) throws OTJException {
+  public Packet execute(ByteBuffer buffer) throws LoginException {
     final OperatingSystem os = OperatingSystem.fromCode(Packet.readInt16(buffer));
     final Integer clientVersion = Packet.readInt16(buffer);
     Packet.skip(buffer, SKIP_CLIENT_UNUSED_INFO);
     final int accountNumber = Packet.readInt32(buffer);
-    if(accountNumber < 1) throw new OTJException(CommonError.INSERT_ACCOUNT_NUMBER);
+    if(accountNumber < 1) throw new LoginException(CommonError.INSERT_ACCOUNT_NUMBER);
     final String password = Packet.readString(buffer);
     if(password == null || password.isEmpty())
-      throw new OTJException(CommonError.INSERT_PASSWORD);
+      throw new LoginException(CommonError.INSERT_PASSWORD);
     if(!this.version.equals(clientVersion))
-      throw new OTJException(3, String.format("Expected client %s, got client %s.",
+      throw new LoginException(3, String.format("Expected client %s, got client %s.",
         this.formatClientVersion(this.version), formatClientVersion(clientVersion)));
     log.info("Login attemp from account number '{}' [OS: {}]", accountNumber, os);
 

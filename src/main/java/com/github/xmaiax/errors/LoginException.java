@@ -5,8 +5,9 @@ import java.math.BigInteger;
 import lombok.Getter;
 
 @Getter
-public class OTJException extends Exception {
+public class LoginException extends Exception {
   private static final long serialVersionUID = -1L;
+  public static final int UNEXPECTED_ERROR_CODE = 0x0a;
   @Getter public static enum CommonError {
     INSERT_ACCOUNT_NUMBER(2, "Please insert the account number."),
     INSERT_PASSWORD(4, "Please insert the password."),
@@ -19,11 +20,11 @@ public class OTJException extends Exception {
     }
   }
   private Integer code;
-  public OTJException(String message) {
+  public LoginException(String message) {
     super(message); this.code = BigInteger.ONE.intValue(); }
-  public OTJException(Integer code, String message) {
+  public LoginException(Integer code, String message) {
     super(message); this.code = code; }
-  public OTJException(CommonError commonError) {
+  public LoginException(CommonError commonError) {
     super(commonError.getMessage());
     this.code = commonError.getCode();
   }

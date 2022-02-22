@@ -3,7 +3,7 @@ package com.github.xmaiax.protocol;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import com.github.xmaiax.errors.OTJException;
+import com.github.xmaiax.errors.LoginException;
 import com.github.xmaiax.packet.Packet;
 
 import lombok.Getter;
@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 
 public interface Protocol {
 
-  Packet execute(ByteBuffer buffer) throws OTJException;
+  Packet execute(ByteBuffer buffer) throws LoginException;
 
   @Getter
   public static enum OperatingSystem {
