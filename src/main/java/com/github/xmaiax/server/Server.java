@@ -142,7 +142,7 @@ class ConnectionThread extends Thread {
           }
           else protocol = this.server.getInGameProtocol();
           Packet packet = null;
-          try { packet = protocol.execute(buffer); }
+          try { packet = protocol.execute(buffer, key); }
           catch(LoginException otjex) {
             packet = Packet.createGenericErrorPacket(otjex.getCode(), otjex.getMessage()); }
           if(protocol != null && packet != null) packet.send(socketChannel);

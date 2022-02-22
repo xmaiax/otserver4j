@@ -1,6 +1,7 @@
 package com.github.xmaiax.protocol;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
 import java.util.Arrays;
 
 import com.github.xmaiax.errors.LoginException;
@@ -12,7 +13,7 @@ import lombok.experimental.Accessors;
 
 public interface Protocol {
 
-  Packet execute(ByteBuffer buffer) throws LoginException;
+  Packet execute(ByteBuffer buffer, SelectionKey key) throws LoginException;
 
   @Getter
   public static enum OperatingSystem {

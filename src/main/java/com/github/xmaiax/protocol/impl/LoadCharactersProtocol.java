@@ -2,6 +2,7 @@ package com.github.xmaiax.protocol.impl;
 
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
@@ -46,7 +47,7 @@ public class LoadCharactersProtocol implements Protocol {
   }
 
   @Override
-  public Packet execute(ByteBuffer buffer) throws LoginException {
+  public Packet execute(ByteBuffer buffer, SelectionKey key) throws LoginException {
     final OperatingSystem os = OperatingSystem.fromCode(Packet.readInt16(buffer));
     final Integer clientVersion = Packet.readInt16(buffer);
     Packet.skip(buffer, SKIP_CLIENT_UNUSED_INFO);
