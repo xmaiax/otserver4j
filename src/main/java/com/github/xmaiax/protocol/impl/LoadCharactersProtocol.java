@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
 import com.github.xmaiax.errors.OTJException;
 import com.github.xmaiax.errors.OTJException.CommonError;
 import com.github.xmaiax.packet.Packet;
-import com.github.xmaiax.protocol.TibiaProtocol;
-import com.github.xmaiax.security.MD5Utils;
+import com.github.xmaiax.protocol.Protocol;
 import com.github.xmaiax.structure.Account;
+import com.github.xmaiax.utils.MD5Utils;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Component @Slf4j
-public class LoadCharactersProtocol implements TibiaProtocol {
+public class LoadCharactersProtocol implements Protocol {
 
   public static Integer SKIP_CLIENT_UNUSED_INFO = 0x0c;
 
@@ -46,7 +46,7 @@ public class LoadCharactersProtocol implements TibiaProtocol {
   }
 
   @Override
-  public Packet executeProtocol(ByteBuffer buffer) throws OTJException {
+  public Packet execute(ByteBuffer buffer) throws OTJException {
     final OperatingSystem os = OperatingSystem.fromCode(Packet.readInt16(buffer));
     final Integer clientVersion = Packet.readInt16(buffer);
     Packet.skip(buffer, SKIP_CLIENT_UNUSED_INFO);
@@ -62,26 +62,26 @@ public class LoadCharactersProtocol implements TibiaProtocol {
 
     //TODO: Usar accountNumber + password para carregar lista de personagens + dias de premmy
     final Calendar premiumExpiration = Calendar.getInstance();
-    premiumExpiration.add(Calendar.DAY_OF_MONTH, 13);
+    premiumExpiration.add(Calendar.DAY_OF_MONTH, 15);
     final Account account = new Account()
       .setAccountNumber(accountNumber)
       .setPasswordMD5(MD5Utils.getInstance().str2md5(password))
       .setPremiumExpiration(premiumExpiration)
       .setCharacters(Arrays.asList(new Account.CharacterOption[] {
-        new Account.CharacterOption().setName("Maia").set_class("Necromancer"),
-        new Account.CharacterOption().setName("Stefane").set_class("Wizard"),
+        new Account.CharacterOption().setName("Maia").setProfession("Necromancer"),
+        new Account.CharacterOption().setName("Stefane").setProfession("Wizard"),
       }));
 
     final Packet characterListPacket = new Packet();
     characterListPacket.writeByte(Packet.LOGIN_CODE_OK);
-    characterListPacket.writeString(new TibiaProtocol.MOTD()
+    characterListPacket.writeString(new Protocol.MOTD()
       .setMessage(this.motd).toString());
     characterListPacket.writeByte(Packet.CHARACTERS_LIST_START);
     if(account.getCharacters() != null) {
       characterListPacket.writeByte(account.getCharacters().size());
       account.getCharacters().forEach(ch -> {
         characterListPacket.writeString(ch.getName());
-        characterListPacket.writeString(ch.get_class());
+        characterListPacket.writeString(ch.getProfession());
         this.writeHostPort2Packet(characterListPacket);
       });
     }

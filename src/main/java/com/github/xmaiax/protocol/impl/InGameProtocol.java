@@ -6,15 +6,15 @@ import org.springframework.stereotype.Component;
 
 import com.github.xmaiax.errors.OTJException;
 import com.github.xmaiax.packet.Packet;
-import com.github.xmaiax.protocol.TibiaProtocol;
+import com.github.xmaiax.protocol.Protocol;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Component @Slf4j
-public class InGameProtocol implements TibiaProtocol {
+public class InGameProtocol implements Protocol {
   
   @Override
-  public Packet executeProtocol(ByteBuffer buffer) throws OTJException {
+  public Packet execute(ByteBuffer buffer) throws OTJException {
     log.info("oi");
     return null;
   }

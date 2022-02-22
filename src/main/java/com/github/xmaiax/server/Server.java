@@ -20,9 +20,8 @@ import org.springframework.stereotype.Component;
 
 import com.github.xmaiax.errors.OTJException;
 import com.github.xmaiax.packet.Packet;
-import com.github.xmaiax.protocol.TibiaProtocol;
-import com.github.xmaiax.protocol.TibiaProtocol.LoginRequestType;
-import com.github.xmaiax.protocol.impl.DummyProtocol;
+import com.github.xmaiax.protocol.Protocol;
+import com.github.xmaiax.protocol.Protocol.LoginRequestType;
 import com.github.xmaiax.protocol.impl.InGameProtocol;
 import com.github.xmaiax.protocol.impl.LoadCharactersProtocol;
 import com.github.xmaiax.protocol.impl.LoginSuccessProtocol;
@@ -39,8 +38,7 @@ public class Server {
   private LoadCharactersProtocol loadCharactersProtocol;
   private LoginSuccessProtocol loginSuccessProtocol;
   private InGameProtocol inGameProtocol;
-  private DummyProtocol dummyProtocol;
-  
+
   private Integer port;
   private Integer version;
   private Boolean isRunning;
@@ -69,12 +67,10 @@ public class Server {
       @Value("${otserver.version}") Integer version,
       LoadCharactersProtocol loadCharactersProtocol,
       LoginSuccessProtocol loginSuccessProtocol,
-      InGameProtocol inGameProtocol,
-      DummyProtocol dummyProtocol) {
+      InGameProtocol inGameProtocol) {
     this.loadCharactersProtocol = loadCharactersProtocol;
     this.loginSuccessProtocol = loginSuccessProtocol;
     this.inGameProtocol = inGameProtocol;
-    this.dummyProtocol = dummyProtocol;
     this.port = port;
     this.version = version;
     this.validateHost(host);
@@ -138,22 +134,19 @@ class ConnectionThread extends Thread {
           log.info("New received packet [Size={}, Type=0x{}]{}", packetSize,
             String.format("%2s", Integer.toHexString(rawType)).replace(' ', '0'),
               loggedPlayer == null ? "" : String.format("from %s.", loggedPlayer.getName()));
-          TibiaProtocol protocol = this.server.getDummyProtocol();
-          if(loggedPlayer == null)
-            switch(LoginRequestType.fromCode(rawType)) {
-              case LOAD_CHARACTER_LIST: protocol = this.server.getLoadCharactersProtocol(); break;
-              case LOGIN_SUCCESS: protocol = this.server.getLoginSuccessProtocol(); break;
-              default: break;
-            }
-          else {
-            //...
+          Protocol protocol = null;
+          if(loggedPlayer == null) switch(LoginRequestType.fromCode(rawType)) {
+            case LOAD_CHARACTER_LIST: protocol = this.server.getLoadCharactersProtocol(); break;
+            case LOGIN_SUCCESS: protocol = this.server.getLoginSuccessProtocol(); break;
+            default: break;
           }
+          else protocol = this.server.getInGameProtocol();
           Packet packet = null;
-          try { packet = protocol.executeProtocol(buffer); }
+          try { packet = protocol.execute(buffer); }
           catch(OTJException otjex) {
             packet = Packet.createGenericErrorPacket(10, otjex.getMessage());
           }
-          if(!(protocol instanceof DummyProtocol) && packet != null)
+          if(protocol != null && packet != null)
             packet.send(socketChannel);
         }
       }

@@ -10,7 +10,7 @@ public class Account {
   @Accessors(chain = true)
   public static class CharacterOption {
     private String name;
-    private String _class;
+    private String profession;
   }
   private Integer accountNumber;
   private String passwordMD5;

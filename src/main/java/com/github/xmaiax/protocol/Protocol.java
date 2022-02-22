@@ -10,9 +10,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-public interface TibiaProtocol {
+public interface Protocol {
 
-  Packet executeProtocol(ByteBuffer buffer) throws OTJException;
+  Packet execute(ByteBuffer buffer) throws OTJException;
 
   @Getter
   public static enum OperatingSystem {

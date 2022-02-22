@@ -1,4 +1,4 @@
-package com.github.xmaiax.security;
+package com.github.xmaiax.utils;
 
 import java.security.MessageDigest;
 
