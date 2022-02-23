@@ -44,7 +44,7 @@ public class Packet {
     return new Packet().writeByte(code).writeString(message);
   }
 
-  private int size;
+  private int size = 0;
   private byte[] buffer = new byte[MAX_SIZE - 2];
 
   public Packet writeByte(byte _byte) {

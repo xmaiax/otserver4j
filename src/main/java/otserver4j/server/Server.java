@@ -137,20 +137,27 @@ class ConnectionThread extends Thread {
               loggedPlayer == null ? "" : String.format("from %s.", loggedPlayer.getName()));
           Protocol protocol = null;
           if(loggedPlayer == null) switch(LoginRequestType.fromCode(rawType)) {
-            case LOAD_CHARACTER_LIST: protocol = this.server.getLoadCharactersProtocol(); break;
-            case LOGIN_SUCCESS: protocol = this.server.getLoginSuccessProtocol(); break;
+            case LOAD_CHARACTER_LIST:
+              protocol = this.server.getLoadCharactersProtocol(); break;
+            case LOGIN_SUCCESS:
+              protocol = this.server.getLoginSuccessProtocol(); break;
             default: break;
           }
           else protocol = this.server.getInGameProtocol();
-          Packet packet = null;
-          try { packet = protocol.execute(buffer, key); }
+          try {
+            final Packet packet = protocol.execute(buffer, key);
+            if(protocol != null && packet != null)
+              packet.send(socketChannel);
+            if(loggedPlayer == null)
+              socketChannel.close();
+          }
           catch(LoginException otjex) {
-            packet = Packet.createGenericErrorPacket(otjex.getCode(), otjex.getMessage());
+            Packet.createGenericErrorPacket(otjex.getCode(),
+              otjex.getMessage()).send(socketChannel);
           }
           catch(GenericException ge) {
             //TODO: Tratativa de falhas in-game
           }
-          if(protocol != null && packet != null) packet.send(socketChannel);
         }
       }
       selectedKeysIterator.remove();
