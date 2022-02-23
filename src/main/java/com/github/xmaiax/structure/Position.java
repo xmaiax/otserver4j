@@ -1,9 +1,7 @@
 package com.github.xmaiax.structure;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
-@Data @Accessors(chain = true)
+@lombok.Data
+@lombok.experimental.Accessors(chain = true)
 public class Position {
   private Integer x;
   private Integer y;

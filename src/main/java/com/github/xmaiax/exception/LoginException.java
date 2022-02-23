@@ -1,11 +1,11 @@
-package com.github.xmaiax.errors;
+package com.github.xmaiax.exception;
 
 import java.math.BigInteger;
 
 import lombok.Getter;
 
 @Getter
-public class LoginException extends Exception {
+public final class LoginException extends GenericException {
   private static final long serialVersionUID = -1L;
   public static final int UNEXPECTED_ERROR_CODE = 0x0a;
   @Getter public static enum CommonError {

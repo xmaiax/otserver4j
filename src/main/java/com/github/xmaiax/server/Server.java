@@ -18,7 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.github.xmaiax.errors.LoginException;
+import com.github.xmaiax.exception.GenericException;
+import com.github.xmaiax.exception.LoginException;
 import com.github.xmaiax.packet.Packet;
 import com.github.xmaiax.protocol.Protocol;
 import com.github.xmaiax.protocol.Protocol.LoginRequestType;
@@ -144,7 +145,11 @@ class ConnectionThread extends Thread {
           Packet packet = null;
           try { packet = protocol.execute(buffer, key); }
           catch(LoginException otjex) {
-            packet = Packet.createGenericErrorPacket(otjex.getCode(), otjex.getMessage()); }
+            packet = Packet.createGenericErrorPacket(otjex.getCode(), otjex.getMessage());
+          }
+          catch(GenericException ge) {
+            //TODO: Tratativa de falhas in-game
+          }
           if(protocol != null && packet != null) packet.send(socketChannel);
         }
       }

@@ -1,5 +1,6 @@
 package com.github.xmaiax.utils;
 
+//TODO: Implementar lógica de cálculo de level e experiência
 public class ExperienceUtils {
   private ExperienceUtils() { }
   private static final ExperienceUtils INSTANCE = new ExperienceUtils();

@@ -6,7 +6,7 @@ import java.nio.channels.SelectionKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.github.xmaiax.errors.LoginException;
+import com.github.xmaiax.exception.LoginException;
 import com.github.xmaiax.packet.Packet;
 import com.github.xmaiax.protocol.Protocol;
 import com.github.xmaiax.structure.Player;
