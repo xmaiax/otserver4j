@@ -154,7 +154,7 @@ class ConnectionThread extends Thread {
           catch(LoginException otjex) {
             Packet.createGenericErrorPacket(protocol instanceof ProcessingLoginProtocol ?
               Packet.PROCESSING_LOGIN_CODE_NOK : Packet.LOGIN_CODE_NOK,
-              otjex.getMessage()).send(socketChannel);
+                otjex.getMessage()).send(socketChannel);
           }
           catch(GenericException ge) {
             //TODO: Tratativa de falhas in-game

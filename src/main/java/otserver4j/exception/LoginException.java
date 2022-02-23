@@ -5,6 +5,7 @@ public final class LoginException extends GenericException {
   @lombok.Getter public static enum CommonError {
     INSERT_ACCOUNT_NUMBER("Please insert the account number."),
     INSERT_PASSWORD("Please insert the password."),
+    ACCOUNT_DOES_NOT_EXIST("Account does not exist."),
     INCORRECT_PASSWORD("Incorrect password.");
     private String message;
     CommonError(String message) {
