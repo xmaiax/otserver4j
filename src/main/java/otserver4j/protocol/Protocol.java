@@ -34,7 +34,7 @@ public interface Protocol {
   public static enum LoginRequestType {
     LOAD_CHARACTER_LIST(0x01),
     LOGIN_SUCCESS(0x0a),
-    INVALID(-1);
+    ALREADY_LOGGED(-1);
     private Integer code;
     LoginRequestType(Integer code) {
       this.code = code;
@@ -42,7 +42,7 @@ public interface Protocol {
     @Override public String toString() { return this.name(); }
     public static LoginRequestType fromCode(Integer code) {
       return Arrays.asList(LoginRequestType.values()).stream()
-        .filter(lrt -> lrt.getCode() == code || lrt == INVALID)
+        .filter(lrt -> lrt.getCode() == code || lrt == ALREADY_LOGGED)
           .findFirst().get();
     }
   }

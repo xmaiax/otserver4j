@@ -11,14 +11,13 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
 import otserver4j.exception.LoginException;
 import otserver4j.exception.LoginException.CommonError;
 import otserver4j.packet.Packet;
 import otserver4j.protocol.Protocol;
 import otserver4j.structure.Account;
 import otserver4j.utils.MD5Utils;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Component @Slf4j
 public class LoadCharactersProtocol implements Protocol {
@@ -57,7 +56,7 @@ public class LoadCharactersProtocol implements Protocol {
     if(password == null || password.isEmpty())
       throw new LoginException(CommonError.INSERT_PASSWORD);
     if(!this.version.equals(clientVersion))
-      throw new LoginException(3, String.format("Expected client %s, got client %s.",
+      throw new LoginException(String.format("Expected client %s, got client %s.",
         this.formatClientVersion(this.version), formatClientVersion(clientVersion)));
     log.info("Login attemp from account number '{}' [OS: {}]", accountNumber, os);
 

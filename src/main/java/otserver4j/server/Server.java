@@ -153,7 +153,7 @@ class ConnectionThread extends Thread {
           }
           catch(LoginException otjex) {
             log.error(otjex.getMessage());
-            Packet.createGenericErrorPacket(otjex.getCode(),
+            Packet.createGenericErrorPacket(LoginRequestType.fromCode(rawType).getCode(),
               otjex.getMessage()).send(socketChannel);
           }
           catch(GenericException ge) {

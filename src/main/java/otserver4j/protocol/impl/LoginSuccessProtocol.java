@@ -32,7 +32,7 @@ public class LoginSuccessProtocol implements Protocol {
     log.info("Successful login attemp from account number '{}': {}",
       accountNumber, selectedCharacterName);
     key.attach(new Player().setName(selectedCharacterName));
-    return null; // Retornar SpawnProtocol.successfulLoginPacket
+    throw new LoginException("Unimplemented logic..."); // Retornar SpawnProtocol.successfulLoginPacket
   }
 
 }
