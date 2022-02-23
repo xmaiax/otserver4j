@@ -9,8 +9,8 @@
   <artifactId>otserver4j</artifactId>
   <packaging>jar</packaging>
   <version>mk-i</version>
-  <name>OTJServer</name>
-  <description>Open Tibia Java Server</description>
+  <name>OTServer4J</name>
+  <description>Open Tibia Server for Java</description>
 
   <url>https://github.com/xmaiax/otjserver.git</url>
   <developers>
