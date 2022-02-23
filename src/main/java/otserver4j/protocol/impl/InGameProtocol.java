@@ -1,13 +1,13 @@
-package com.github.xmaiax.protocol.impl;
+package otserver4j.protocol.impl;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 
 import org.springframework.stereotype.Component;
 
-import com.github.xmaiax.exception.InGameException;
-import com.github.xmaiax.packet.Packet;
-import com.github.xmaiax.protocol.Protocol;
+import otserver4j.exception.InGameException;
+import otserver4j.packet.Packet;
+import otserver4j.protocol.Protocol;
 
 import lombok.extern.slf4j.Slf4j;
 

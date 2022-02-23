@@ -1,4 +1,4 @@
-package com.github.xmaiax;
+package otserver4j;
 
 @lombok.extern.slf4j.Slf4j
 @org.springframework.boot.autoconfigure.SpringBootApplication

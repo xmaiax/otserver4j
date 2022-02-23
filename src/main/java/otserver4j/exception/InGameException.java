@@ -1,4 +1,4 @@
-package com.github.xmaiax.exception;
+package otserver4j.exception;
 
 public final class InGameException extends GenericException {
   private static final long serialVersionUID = -1L;

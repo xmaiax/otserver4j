@@ -1,4 +1,4 @@
-package com.github.xmaiax.protocol.impl;
+package otserver4j.protocol.impl;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -6,10 +6,10 @@ import java.nio.channels.SelectionKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.github.xmaiax.exception.LoginException;
-import com.github.xmaiax.packet.Packet;
-import com.github.xmaiax.protocol.Protocol;
-import com.github.xmaiax.structure.Player;
+import otserver4j.exception.LoginException;
+import otserver4j.packet.Packet;
+import otserver4j.protocol.Protocol;
+import otserver4j.structure.Player;
 
 import lombok.extern.slf4j.Slf4j;
 

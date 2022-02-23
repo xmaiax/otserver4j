@@ -1,4 +1,4 @@
-package com.github.xmaiax.packet;
+package otserver4j.packet;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;

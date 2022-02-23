@@ -1,4 +1,4 @@
-package com.github.xmaiax.structure;
+package otserver4j.structure;
 
 import lombok.Data;
 import lombok.ToString;

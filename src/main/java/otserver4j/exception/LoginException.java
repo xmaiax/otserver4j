@@ -1,4 +1,4 @@
-package com.github.xmaiax.exception;
+package otserver4j.exception;
 
 import java.math.BigInteger;
 

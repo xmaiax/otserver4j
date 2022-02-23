@@ -1,4 +1,4 @@
-package com.github.xmaiax.server;
+package otserver4j.server;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -18,15 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.github.xmaiax.exception.GenericException;
-import com.github.xmaiax.exception.LoginException;
-import com.github.xmaiax.packet.Packet;
-import com.github.xmaiax.protocol.Protocol;
-import com.github.xmaiax.protocol.Protocol.LoginRequestType;
-import com.github.xmaiax.protocol.impl.InGameProtocol;
-import com.github.xmaiax.protocol.impl.LoadCharactersProtocol;
-import com.github.xmaiax.protocol.impl.LoginSuccessProtocol;
-import com.github.xmaiax.structure.Player;
+import otserver4j.exception.GenericException;
+import otserver4j.exception.LoginException;
+import otserver4j.packet.Packet;
+import otserver4j.protocol.Protocol;
+import otserver4j.protocol.Protocol.LoginRequestType;
+import otserver4j.protocol.impl.InGameProtocol;
+import otserver4j.protocol.impl.LoadCharactersProtocol;
+import otserver4j.protocol.impl.LoginSuccessProtocol;
+import otserver4j.structure.Player;
 
 import lombok.Getter;
 import lombok.Setter;

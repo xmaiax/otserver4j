@@ -1,4 +1,4 @@
-package com.github.xmaiax.utils;
+package otserver4j.utils;
 
 import java.security.MessageDigest;
 

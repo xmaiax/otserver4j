@@ -1,4 +1,4 @@
-package com.github.xmaiax.utils;
+package otserver4j.utils;
 
 //TODO: Implementar lógica de cálculo de level e experiência
 public class ExperienceUtils {

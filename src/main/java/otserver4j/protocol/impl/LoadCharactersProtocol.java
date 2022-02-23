@@ -1,4 +1,4 @@
-package com.github.xmaiax.protocol.impl;
+package otserver4j.protocol.impl;
 
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -11,12 +11,12 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.github.xmaiax.exception.LoginException;
-import com.github.xmaiax.exception.LoginException.CommonError;
-import com.github.xmaiax.packet.Packet;
-import com.github.xmaiax.protocol.Protocol;
-import com.github.xmaiax.structure.Account;
-import com.github.xmaiax.utils.MD5Utils;
+import otserver4j.exception.LoginException;
+import otserver4j.exception.LoginException.CommonError;
+import otserver4j.packet.Packet;
+import otserver4j.protocol.Protocol;
+import otserver4j.structure.Account;
+import otserver4j.utils.MD5Utils;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,11 +1,11 @@
-package com.github.xmaiax.protocol;
+package otserver4j.protocol;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.util.Arrays;
 
-import com.github.xmaiax.exception.GenericException;
-import com.github.xmaiax.packet.Packet;
+import otserver4j.exception.GenericException;
+import otserver4j.packet.Packet;
 
 import lombok.Getter;
 import lombok.Setter;
