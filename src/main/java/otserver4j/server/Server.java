@@ -152,6 +152,7 @@ class ConnectionThread extends Thread {
               socketChannel.close();
           }
           catch(LoginException otjex) {
+            log.error(otjex.getMessage());
             Packet.createGenericErrorPacket(otjex.getCode(),
               otjex.getMessage()).send(socketChannel);
           }
