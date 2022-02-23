@@ -25,7 +25,7 @@ import otserver4j.protocol.Protocol;
 import otserver4j.protocol.Protocol.LoginRequestType;
 import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.LoadCharactersProtocol;
-import otserver4j.protocol.impl.LoginSuccessProtocol;
+import otserver4j.protocol.impl.ProcessingLoginProtocol;
 import otserver4j.structure.Player;
 
 import lombok.Getter;
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Server {
 
   private LoadCharactersProtocol loadCharactersProtocol;
-  private LoginSuccessProtocol loginSuccessProtocol;
+  private ProcessingLoginProtocol loginSuccessProtocol;
   private InGameProtocol inGameProtocol;
 
   private Integer port;
@@ -67,7 +67,7 @@ public class Server {
       @Value("${otserver.port}") Integer port,
       @Value("${otserver.version}") Integer version,
       LoadCharactersProtocol loadCharactersProtocol,
-      LoginSuccessProtocol loginSuccessProtocol,
+      ProcessingLoginProtocol loginSuccessProtocol,
       InGameProtocol inGameProtocol) {
     this.loadCharactersProtocol = loadCharactersProtocol;
     this.loginSuccessProtocol = loginSuccessProtocol;
@@ -152,8 +152,8 @@ class ConnectionThread extends Thread {
               socketChannel.close();
           }
           catch(LoginException otjex) {
-            log.error(otjex.getMessage());
-            Packet.createGenericErrorPacket(LoginRequestType.fromCode(rawType).getCode(),
+            Packet.createGenericErrorPacket(protocol instanceof ProcessingLoginProtocol ?
+              Packet.PROCESSING_LOGIN_CODE_NOK : Packet.LOGIN_CODE_NOK,
               otjex.getMessage()).send(socketChannel);
           }
           catch(GenericException ge) {

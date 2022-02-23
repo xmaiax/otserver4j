@@ -14,7 +14,7 @@ import otserver4j.structure.Player;
 import lombok.extern.slf4j.Slf4j;
 
 @Component @Slf4j
-public class LoginSuccessProtocol implements Protocol {
+public class ProcessingLoginProtocol implements Protocol {
 
   @Value("${otserver.version}") private Integer version;
 
