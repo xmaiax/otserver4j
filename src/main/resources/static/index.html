@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>OTJServer</title>
+    <title>OTServer4j</title>
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <link href="webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
@@ -15,7 +15,7 @@
   </head>
 
   <body class="container">
-    <div ng-app="otjserverApp" ng-controller="otjserverController" class="application">
+    <div ng-app="otserver4jApp" ng-controller="otserver4jController" class="application">
       <h1>{{ helloMessage }}</h1>
     </div>
   </body>
@@ -25,7 +25,7 @@
   <script src="webjars/angularjs/angular.min.js"></script>
   <script type="text/javascript">
 
-    angular.module('otjserverApp', []).controller('otjserverController', ($scope) => {
+    angular.module('otserver4jApp', []).controller('otserver4jController', ($scope) => {
       $scope.helloMessage = "It's working!!"
     })
 
