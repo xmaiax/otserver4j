@@ -1,11 +1,21 @@
 package otserver4j.structure;
 
+import java.util.Calendar;
+import java.util.Map;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import otserver4j.structure.Item.ItemWithQuantity;
 
 @Data @Accessors(chain = true)
-public class Player {
+public class PlayerCharacter {
+
+  @Data @Accessors(chain = true)
+  public static class Attribute {
+    private Integer value;
+    private Integer maxValue;
+  }
 
   @Data @Accessors(chain = true)
   public static class Skill {
@@ -31,6 +41,7 @@ public class Player {
 
   @Getter
   public static enum Profession {
+    ROOKIE     (0x00, "Rookie",      100, 5,  25, 5,  250, 5,  100),
     NECROMANCER(0x01, "Necromancer", 100, 10, 50, 20, 300, 10, 150),
     WARRIOR    (0x02, "Warrior",     200, 25, 20, 5,  450, 15, 100),
     MONK       (0x03, "Monk",        175, 20, 25, 10, 400, 10, 125),
@@ -64,8 +75,8 @@ public class Player {
   @Getter
   public static enum Slot {
     HEAD(0x01), NECK(0x02), BACKPACK(0x03), CHEST(0x04),
-    RIGHT_HAND(0x05), LEFT_HAND(0x06), LEGS(0x07), FEET(0x08),
-    RING(0x09), EXTRA(0x0a), LAST(0x0b), INVALID(-1);
+    SHIELD(0x05), WEAPON(0x06), LEGS(0x07), FEET(0x08),
+    RING(0x09), ACCESSORY(0x0a), LAST(0x0b), INVALID(-1);
     private Integer code;
     Slot(Integer code) { this.code = code; }
     public static Slot fromCode(Integer code) {
@@ -80,12 +91,15 @@ public class Player {
   private Long experience;
   private Byte percentNextLevel;
   private Profession profession;
-  private Integer life, maxLife, mana, maxMana;
-  private Integer capacity, maxCapacity, soul;
+  private Attribute life, mana, capacity;
+  //private Short soul;
   private Position position;
   private Direction direction;
+  private Map<Slot, ItemWithQuantity> inventory;
   private Outfit outfit;
   private Skill magicSkill, fistSkill, clubSkill, swordSkill,
     axeSkill, distanceSkill, shieldSkill, fishingSkill;
+  private Integer icons;
+  private Calendar lastLogin;
 
 }

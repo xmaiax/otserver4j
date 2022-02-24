@@ -30,7 +30,7 @@ import otserver4j.protocol.Protocol.LoginRequestType;
 import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.LoadCharactersProtocol;
 import otserver4j.protocol.impl.ProcessingLoginProtocol;
-import otserver4j.structure.Player;
+import otserver4j.structure.PlayerCharacter;
 
 @Component @Getter @Slf4j
 public class Server {
@@ -127,10 +127,9 @@ class ConnectionThread extends Thread {
         final Integer packetSize = Packet.readInt16(buffer);
         if(packetSize > BigInteger.ZERO.intValue()) {
           final Integer rawType = Packet.readByte(buffer);
-          Player loggedPlayer = null;
-          if(key.attachment() != null) {
-            loggedPlayer = (Player) key.attachment();
-          }
+          PlayerCharacter loggedPlayer = null;
+          if(key.attachment() != null)
+            loggedPlayer = (PlayerCharacter) key.attachment();
           log.info("New received packet [Size={}, Type=0x{}]{}", packetSize,
             String.format("%2s", Integer.toHexString(rawType)).replace(' ', '0'),
               loggedPlayer == null ? "" : String.format("from %s.", loggedPlayer.getName()));
