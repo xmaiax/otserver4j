@@ -8,21 +8,23 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.exception.LoginException;
-import otserver4j.exception.LoginException.CommonError;
 import otserver4j.packet.Packet;
 import otserver4j.protocol.Protocol;
+import otserver4j.service.AccountService;
 import otserver4j.structure.Account;
-import otserver4j.utils.MD5Utils;
 
 @Component @Slf4j
 public class LoadCharactersProtocol implements Protocol {
 
   public static Integer SKIP_CLIENT_UNUSED_INFO = 0x0c;
+
+  @Autowired private AccountService accService;
 
   @Value("${otserver.host}") private String host;
   @Value("${otserver.port}") private Integer port;
@@ -33,7 +35,7 @@ public class LoadCharactersProtocol implements Protocol {
     return String.format(Locale.US, "%s", Float.valueOf(version) / 100.0f);
   }
 
-  private void writeHostPort2Packet(Packet packet) {
+  private void writeHostPort2Packet(Packet packet) throws LoginException {
     try {
       Arrays.stream(java.net.InetAddress.getByName(this.host).getHostAddress().split("[.]"))
         .forEach(ipPart -> packet.writeByte(Integer.valueOf(ipPart)));
@@ -41,7 +43,7 @@ public class LoadCharactersProtocol implements Protocol {
     }
     catch (UnknownHostException uhe) {
       log.error("Unable to reach host '{}': ", this.host, uhe);
-      System.exit(-1);
+      throw new LoginException(String.format("Unable to reach host '%s'.", this.host));
     }
   }
 
@@ -51,27 +53,12 @@ public class LoadCharactersProtocol implements Protocol {
     final Integer clientVersion = Packet.readInt16(buffer);
     Packet.skip(buffer, SKIP_CLIENT_UNUSED_INFO);
     final int accountNumber = Packet.readInt32(buffer);
-    if(accountNumber < 1) throw new LoginException(CommonError.INSERT_ACCOUNT_NUMBER);
     final String password = Packet.readString(buffer);
-    if(password == null || password.isEmpty())
-      throw new LoginException(CommonError.INSERT_PASSWORD);
     if(!this.version.equals(clientVersion))
       throw new LoginException(String.format("Expected client %s, got client %s.",
         this.formatClientVersion(this.version), formatClientVersion(clientVersion)));
+    final Account account = this.accService.findAccount(accountNumber, password);
     log.info("Login attemp from account number '{}' [OS: {}]", accountNumber, os);
-
-    //TODO: Usar accountNumber + password para carregar lista de personagens + dias de premmy
-    final Calendar premiumExpiration = Calendar.getInstance();
-    premiumExpiration.add(Calendar.DAY_OF_MONTH, 15);
-    final Account account = new Account()
-      .setAccountNumber(accountNumber)
-      .setPasswordMD5(MD5Utils.getInstance().str2md5(password))
-      .setPremiumExpiration(premiumExpiration)
-      .setCharacters(Arrays.asList(new Account.CharacterOption[] {
-        new Account.CharacterOption().setName("Maia").setProfession("Necromancer"),
-        new Account.CharacterOption().setName("Stefane").setProfession("Wizard"),
-      }));
-
     final Packet characterListPacket = new Packet();
     characterListPacket.writeByte(Packet.LOGIN_CODE_OK);
     characterListPacket.writeString(new Protocol.MOTD()
@@ -83,8 +70,7 @@ public class LoadCharactersProtocol implements Protocol {
         characterListPacket.writeString(ch.getName());
         characterListPacket.writeString(ch.getProfession());
         this.writeHostPort2Packet(characterListPacket);
-      });
-    }
+      }); }
     Integer premiumDuration = 0;
     if(account.getPremiumExpiration() != null && account.getPremiumExpiration()
         .after(Calendar.getInstance()))

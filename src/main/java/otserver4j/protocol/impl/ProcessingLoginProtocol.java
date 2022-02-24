@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import otserver4j.exception.LoginException;
 import otserver4j.packet.Packet;
 import otserver4j.protocol.Protocol;
+import otserver4j.service.AccountService;
+import otserver4j.service.PlayerCharacterService;
+import otserver4j.structure.Account;
+import otserver4j.structure.Chat.MessageType;
 import otserver4j.structure.FX;
 import otserver4j.structure.GameMap;
-import otserver4j.structure.Item;
 import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.Light;
 import otserver4j.structure.PlayerCharacter;
@@ -25,7 +27,6 @@ import otserver4j.structure.PlayerCharacter.Attribute;
 import otserver4j.structure.PlayerCharacter.Skill;
 import otserver4j.structure.PlayerCharacter.Slot;
 import otserver4j.structure.Position;
-import otserver4j.structure.Chat.MessageType;
 import otserver4j.utils.ExperienceUtils;
 import otserver4j.utils.LightUtils;
 
@@ -35,22 +36,20 @@ public class ProcessingLoginProtocol implements Protocol {
   public static final FX SPAWN_EFFECT = FX.SPAWN;
   public static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
+  @Autowired private AccountService accService;
+  @Autowired private PlayerCharacterService pcService;
+
   @Autowired private GameMap gameMap;
 
   @Value("${otserver.version}") private Integer version;
 
-  private Packet writePosition(Position position, Packet packet) {
+  public static Packet writePosition(Position position, Packet packet) {
     return packet.writeInt16(position.getX())
       .writeInt16(position.getY()).writeByte(position.getZ());
   }
 
-  //TODO: Implementar essa dor na bunda aqui
-  private Packet writeMapInfo(Long indetifier, Position position, Packet packet) {
-    return this.writePosition(position, packet);
-  }
-
   private Packet writeSpawnEffect(Position position, Packet packet) {
-    return this.writePosition(position, packet.writeByte(Packet.CODE_SPAWN_FX))
+    return writePosition(position, packet.writeByte(Packet.CODE_SPAWN_FX))
       .writeByte(SPAWN_EFFECT.getCode());
   }
 
@@ -121,23 +120,20 @@ public class ProcessingLoginProtocol implements Protocol {
     if(!this.version.equals(Packet.readInt16(buffer)))
       throw new LoginException("Wrong version number.");
     Packet.skip(buffer, 1);
-    final Integer accountNumber = Packet.readInt32(buffer);
+    final int accountNumber = Packet.readInt32(buffer);
     final String selectedCharacterName = Packet.readString(buffer);
+    if(selectedCharacterName == null || selectedCharacterName.isBlank())
+      throw new LoginException("Invalid selected character.");
     final String password = Packet.readString(buffer);
-    if(password == null || password.isBlank())
-      throw new LoginException("Nice try, a**hole!");
+    final Account account = this.accService.findAccount(accountNumber, password);
+    if(account.getCharacters().stream().noneMatch(c -> c.getName().equals(selectedCharacterName)))
+      throw new LoginException(String.format("No character found with name "
+        + "'%s' in the given account.", selectedCharacterName));
+    final PlayerCharacter player = this.pcService.findPlayerCharacter(
+      accountNumber, selectedCharacterName);
     log.info("Successful login attemp from account number '{}': {}",
       accountNumber, selectedCharacterName);
-
-    final PlayerCharacter player = new PlayerCharacter()
-       .setName(selectedCharacterName)
-       .setIdentifier((long) accountNumber)
-       .setPosition(new Position().setX(1).setY(2).setZ((byte) 0x03))
-       .setInventory(Collections.singletonMap(Slot.BACKPACK,
-         new ItemWithQuantity().setItem(Item.BACKPACK)));
-
     key.attach(player);
-
     return this.writeIcons(player,
            this.writePlayerLight(player,
            this.writeLoginMessages(player,
@@ -150,7 +146,7 @@ public class ProcessingLoginProtocol implements Protocol {
              player.getExperience(), player.getMagicSkill(),
            this.writeInventory(player.getInventory(),
            this.writeSpawnEffect(player.getPosition(), 
-           this.writeMapInfo(player.getIdentifier(), player.getPosition(),
+           this.gameMap.writeMapInfo(player.getIdentifier(), player.getPosition(),
       new Packet().writeByte(Packet.PROCESSING_LOGIN_CODE_OK).writeInt32(player.getIdentifier())
         .writeInt16(Packet.CLIENT_RENDER_CODE).writeByte(Packet.ERROR_REPORT_FLAG)))))))))));
   }
