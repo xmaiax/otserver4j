@@ -1,4 +1,4 @@
-package otserver4j.server;
+package otserver4j.tcp;
 
 import java.io.IOException;
 import java.math.BigInteger;
