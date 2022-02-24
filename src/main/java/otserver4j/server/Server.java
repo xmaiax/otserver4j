@@ -18,7 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import otserver4j.exception.GenericException;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
+import otserver4j.exception.InGameException;
 import otserver4j.exception.LoginException;
 import otserver4j.packet.Packet;
 import otserver4j.protocol.Protocol;
@@ -27,11 +31,6 @@ import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.LoadCharactersProtocol;
 import otserver4j.protocol.impl.ProcessingLoginProtocol;
 import otserver4j.structure.Player;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
 
 @Component @Getter @Slf4j
 public class Server {
@@ -156,7 +155,7 @@ class ConnectionThread extends Thread {
               Packet.PROCESSING_LOGIN_CODE_NOK : Packet.LOGIN_CODE_NOK,
                 otjex.getMessage()).send(socketChannel);
           }
-          catch(GenericException ge) {
+          catch(InGameException ge) {
             //TODO: Tratativa de falhas in-game
           }
         }
