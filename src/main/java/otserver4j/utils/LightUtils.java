@@ -3,6 +3,7 @@ package otserver4j.utils;
 import otserver4j.structure.GameMap;
 import otserver4j.structure.Light;
 import otserver4j.structure.PlayerCharacter;
+import otserver4j.structure.Position;
 
 //TODO: Implementar lógica de cálculo de iluminação
 public class LightUtils {
@@ -14,7 +15,7 @@ public class LightUtils {
     return new Light();
   }
 
-  public Light fromWorld(GameMap gameMap) {
+  public Light fromWorld(GameMap gameMap, Position position) {
     return new Light();
   }
 

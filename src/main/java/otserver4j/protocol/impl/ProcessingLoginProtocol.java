@@ -87,8 +87,8 @@ public class ProcessingLoginProtocol implements Protocol {
         .writeByte(skill.getLevel()).writeByte(skill.getPercent())); return packet;
   }
 
-  private Packet writeWorldLight(Packet packet) {
-    final Light light = LightUtils.getInstance().fromWorld(this.gameMap);
+  private Packet writeWorldLight(Position position, Packet packet) {
+    final Light light = LightUtils.getInstance().fromWorld(this.gameMap, position);
     return packet.writeByte(Packet.CODE_WORLD_LIGHT)
       .writeByte(light.getRadius()).writeByte(light.getColor());
   }
@@ -138,7 +138,7 @@ public class ProcessingLoginProtocol implements Protocol {
            this.writePlayerLight(player,
            this.writeLoginMessages(player,
            this.writePlayerLight(player,
-           this.writeWorldLight(
+           this.writeWorldLight(player.getPosition(),
            this.writeSkills(player.getFistSkill(), player.getClubSkill(),
              player.getSwordSkill(), player.getAxeSkill(), player.getDistanceSkill(),
              player.getShieldSkill(), player.getFishingSkill(),
