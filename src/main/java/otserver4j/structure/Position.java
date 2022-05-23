@@ -19,4 +19,7 @@ public class Position {
     }
     return this;
   }
+  public Position copy() {
+    return new Position().setX(this.getX()).setY(this.getY()).setZ(this.getZ());
+  }
 }

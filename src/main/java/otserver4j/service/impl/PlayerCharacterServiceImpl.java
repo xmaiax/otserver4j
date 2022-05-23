@@ -27,7 +27,7 @@ public class PlayerCharacterServiceImpl implements PlayerCharacterService {
     final Calendar lastLogin = Calendar.getInstance();
     lastLogin.add(Calendar.DAY_OF_YEAR, -10);
     return new PlayerCharacter()
-      .setIdentifier((long) accountNumber)
+      .setIdentifier(0x04030201L)
       .setName(characterName)
       .setLevel(3)
       .setExperience(4567L)

@@ -48,6 +48,11 @@ public class ProcessingLoginProtocol implements Protocol {
       .writeInt16(position.getY()).writeByte(position.getZ());
   }
 
+  private Packet writePlayerMapInfo(PlayerCharacter player, Packet packet) {
+    return this.gameMap.writeMapInfo(player.getIdentifier(), player.getPosition(),
+      packet.writeByte(Packet.CODE_MAP_INFO));
+  }
+
   private Packet writeSpawnEffect(Position position, Packet packet) {
     return writePosition(position, packet.writeByte(Packet.CODE_SPAWN_FX))
       .writeByte(SPAWN_EFFECT.getCode());
@@ -145,8 +150,8 @@ public class ProcessingLoginProtocol implements Protocol {
            this.writeStats(player.getLife(), player.getMana(), player.getCapacity(),
              player.getExperience(), player.getMagicSkill(),
            this.writeInventory(player.getInventory(),
-           this.writeSpawnEffect(player.getPosition(), 
-           this.gameMap.writeMapInfo(player.getIdentifier(), player.getPosition(),
+           this.writeSpawnEffect(player.getPosition(),
+           this.writePlayerMapInfo(player,
       new Packet().writeByte(Packet.PROCESSING_LOGIN_CODE_OK).writeInt32(player.getIdentifier())
         .writeInt16(Packet.CLIENT_RENDER_CODE).writeByte(Packet.ERROR_REPORT_FLAG)))))))))));
   }

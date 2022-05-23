@@ -130,7 +130,7 @@ class ConnectionThread extends Thread {
           PlayerCharacter loggedPlayer = null;
           if(key.attachment() != null)
             loggedPlayer = (PlayerCharacter) key.attachment();
-          log.info("New received packet [Size={}, Type=0x{}]{}", packetSize,
+          log.debug("New received packet [Size={}, Type=0x{}]{}", packetSize,
             String.format("%2s", Integer.toHexString(rawType)).replace(' ', '0'),
               loggedPlayer == null ? "" : String.format("from %s.", loggedPlayer.getName()));
           Protocol protocol = null;
