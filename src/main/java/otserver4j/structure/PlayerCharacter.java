@@ -19,7 +19,6 @@ public class PlayerCharacter {
 
   @Data @Accessors(chain = true)
   public static class Skill {
-    private SkillType type;
     private byte level = 0;
     private byte percent = 0;
   }
@@ -92,7 +91,6 @@ public class PlayerCharacter {
   private Byte percentNextLevel;
   private Profession profession;
   private Attribute life, mana, capacity;
-  //private Short soul;
   private Position position;
   private Direction direction;
   private Map<Slot, ItemWithQuantity> inventory;

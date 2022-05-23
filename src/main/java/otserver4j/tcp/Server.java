@@ -156,6 +156,7 @@ class ConnectionThread extends Thread {
           }
           catch(InGameException ge) {
             //TODO: Tratativa de falhas in-game
+            log.error("Deu ruim pra carai: {}", ge.getMessage());
           }
         }
       }
