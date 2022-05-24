@@ -13,11 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component @Slf4j
 public class InGameProtocol implements Protocol {
-  
+
   @Override
   public Packet execute(ByteBuffer buffer, SelectionKey key) throws InGameException {
     log.info("oi");
     return null;
   }
-  
+
 }

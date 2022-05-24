@@ -74,8 +74,8 @@ public class PlayerCharacter {
   @Getter
   public static enum Slot {
     HEAD(0x01), NECK(0x02), BACKPACK(0x03), CHEST(0x04),
-    SHIELD(0x05), WEAPON(0x06), LEGS(0x07), FEET(0x08),
-    RING(0x09), ACCESSORY(0x0a), LAST(0x0b), INVALID(-1);
+    SHIELD(0x05), WEAPON(0x06), LEGS(0x07), RING(0x08),
+    FEET(0x09), AMMUNITION(0x0a), INVALID(-1);
     private Integer code;
     Slot(Integer code) { this.code = code; }
     public static Slot fromCode(Integer code) {

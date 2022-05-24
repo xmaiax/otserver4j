@@ -54,13 +54,13 @@ public class ProcessingLoginProtocol implements Protocol {
   }
 
   private Packet writeSpawnEffect(Position position, Packet packet) {
-    return writePosition(position, packet.writeByte(Packet.CODE_SPAWN_FX))
-      .writeByte(SPAWN_EFFECT.getCode());
+    packet.writeByte(Packet.CODE_SPAWN_FX);
+    writePosition(position, packet);
+    return packet.writeByte(SPAWN_EFFECT.getCode());
   }
 
   private Packet writeInventory(Map<Slot, ItemWithQuantity> inventory, Packet packet) {
-    Arrays.stream(Slot.values()).filter(s -> !Slot.INVALID.equals(s) ||
-        !Slot.LAST.equals(s)).forEach(slot -> {
+    Arrays.stream(Slot.values()).filter(s -> !Slot.INVALID.equals(s)).forEach(slot -> {
       final boolean haveItem = inventory.containsKey(slot);
       packet.writeByte(haveItem ?
         Packet.CODE_INVENTORY_SLOT_FILLED : Packet.CODE_INVENTORY_SLOT_EMPTY);
@@ -71,18 +71,24 @@ public class ProcessingLoginProtocol implements Protocol {
         if(itemWithQt.getItem().getStackable())
           packet.writeByte(itemWithQt.getQuantity());
       }
-    }); return packet;
+    });
+    return packet;
   }
 
   private Packet writeStats(Attribute life, Attribute mana, Attribute capacity,
       Long experience, Skill magicSkill, Packet packet) {
-    return packet.writeByte(Packet.CODE_STATS)
-      .writeInt16(life.getValue()).writeInt16(life.getMaxValue())
-      .writeInt16(capacity.getValue()).writeInt32(experience)
-      .writeByte(ExperienceUtils.getInstance().levelFromExp(experience))
-      .writeByte(ExperienceUtils.getInstance().nextLevelPercent(experience))
-      .writeInt16(mana.getValue()).writeInt16(mana.getMaxValue())
-      .writeByte(magicSkill.getLevel()).writeByte(magicSkill.getPercent());
+    packet.writeByte(Packet.CODE_STATS);
+    packet.writeInt16(life.getValue());
+    packet.writeInt16(life.getMaxValue());
+    packet.writeInt16(capacity.getValue());
+    packet.writeInt32(experience);
+    packet.writeByte(ExperienceUtils.getInstance().levelFromExp(experience));
+    packet.writeByte(ExperienceUtils.getInstance().nextLevelPercent(experience));
+    packet.writeInt16(mana.getValue());
+    packet.writeInt16(mana.getMaxValue());
+    packet.writeByte(magicSkill.getLevel());
+    packet.writeByte(magicSkill.getPercent());
+    return packet;
   }
 
   private Packet writeSkills(Skill fist, Skill club, Skill sword, Skill axe,
@@ -139,21 +145,27 @@ public class ProcessingLoginProtocol implements Protocol {
     log.info("Successful login attemp from account number '{}': {}",
       accountNumber, selectedCharacterName);
     key.attach(player);
-    return this.writeIcons(player,
-           this.writePlayerLight(player,
-           this.writeLoginMessages(player,
-           this.writePlayerLight(player,
-           this.writeWorldLight(player.getPosition(),
-           this.writeSkills(player.getFistSkill(), player.getClubSkill(),
-             player.getSwordSkill(), player.getAxeSkill(), player.getDistanceSkill(),
-             player.getShieldSkill(), player.getFishingSkill(),
-           this.writeStats(player.getLife(), player.getMana(), player.getCapacity(),
-             player.getExperience(), player.getMagicSkill(),
-           this.writeInventory(player.getInventory(),
-           this.writeSpawnEffect(player.getPosition(),
-           this.writePlayerMapInfo(player,
-      new Packet().writeByte(Packet.PROCESSING_LOGIN_CODE_OK).writeInt32(player.getIdentifier())
-        .writeInt16(Packet.CLIENT_RENDER_CODE).writeByte(Packet.ERROR_REPORT_FLAG)))))))))));
+    final Packet packet = new Packet()
+      .writeByte(Packet.PROCESSING_LOGIN_CODE_OK)
+      .writeInt32(player.getIdentifier())
+      .writeInt16(Packet.CLIENT_RENDER_CODE)
+      .writeByte(Packet.ERROR_REPORT_FLAG);
+    this.writePlayerMapInfo(player, packet);
+    this.writeSpawnEffect(player.getPosition(), packet);
+    this.writeInventory(player.getInventory(), packet);
+    this.writeStats(
+      player.getLife(), player.getMana(),
+      player.getCapacity(), player.getExperience(),
+      player.getMagicSkill(), packet);
+    this.writeSkills(
+      player.getFistSkill(), player.getClubSkill(),
+      player.getSwordSkill(), player.getAxeSkill(),
+      player.getDistanceSkill(), player.getShieldSkill(),
+      player.getFishingSkill(), packet);
+    this.writeWorldLight(player.getPosition(), packet);
+    this.writePlayerLight(player, packet);
+    this.writeLoginMessages(player, packet);
+    return this.writeIcons(player, packet);
   }
 
 }

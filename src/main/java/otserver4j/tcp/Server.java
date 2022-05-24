@@ -132,9 +132,10 @@ class ConnectionThread extends Thread {
             loggedPlayer = (PlayerCharacter) key.attachment();
           log.debug("New received packet [Size={}, Type=0x{}]{}", packetSize,
             String.format("%2s", Integer.toHexString(rawType)).replace(' ', '0'),
-              loggedPlayer == null ? "" : String.format("from %s.", loggedPlayer.getName()));
+              loggedPlayer == null ? "" : String.format(" from %s.", loggedPlayer.getName()));
           Protocol protocol = null;
-          if(loggedPlayer == null) switch(LoginRequestType.fromCode(rawType)) {
+          final LoginRequestType loginRequestType = LoginRequestType.fromCode(rawType);
+          if(loggedPlayer == null) switch(loginRequestType) {
             case LOAD_CHARACTER_LIST:
               protocol = this.server.getLoadCharactersProtocol(); break;
             case LOGIN_SUCCESS:
@@ -146,7 +147,7 @@ class ConnectionThread extends Thread {
             final Packet packet = protocol.execute(buffer, key);
             if(protocol != null && packet != null)
               packet.send(socketChannel);
-            if(loggedPlayer == null)
+            if(loggedPlayer == null && !LoginRequestType.LOGIN_SUCCESS.equals(loginRequestType))
               socketChannel.close();
           }
           catch(LoginException otjex) {
