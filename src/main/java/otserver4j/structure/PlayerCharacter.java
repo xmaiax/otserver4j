@@ -1,12 +1,14 @@
 package otserver4j.structure;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import otserver4j.structure.Item.ItemWithQuantity;
+import otserver4j.structure.Status.Condition;
 import otserver4j.structure.Status.Skull;
 
 @Data @Accessors(chain = true)
@@ -99,11 +101,8 @@ public class PlayerCharacter {
   private Skill magicSkill, fistSkill, clubSkill, swordSkill,
     axeSkill, distanceSkill, shieldSkill, fishingSkill;
   private Integer speed;
+  private List<Condition> conditions;
   private Skull skull;
   private Calendar lastLogin;
-
-  public Integer getIcons() {
-    return 0x00;
-  }
 
 }

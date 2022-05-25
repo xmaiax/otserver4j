@@ -1,8 +1,22 @@
 package otserver4j.structure;
 
+import java.util.List;
+
 import lombok.Getter;
 
 public interface Status {
+
+  @Getter
+  public static enum Condition {
+    POISONED(0b00000001), ON_FIRE(0b00000010), STRUCK_BY_ENERGY(0b00000100),
+    DRUNK(0b00001000), MAGIC_SHIELD_BUFF(0b00010000), PARALYZED(0b00100000),
+    HASTE_BUFF(0b01000000), IN_BATTLE(0b10000000);
+    private Integer code;
+    Condition(Integer code) { this.code = code; }
+    public static Integer getIconCodeFromStatuses(List<Condition> conditions) {
+      return conditions.stream().mapToInt(condition -> condition.getCode()).sum();
+    }
+  }
 
   @Getter
   public static enum Skull {

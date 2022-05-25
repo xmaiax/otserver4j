@@ -27,6 +27,7 @@ import otserver4j.structure.PlayerCharacter.Attribute;
 import otserver4j.structure.PlayerCharacter.Skill;
 import otserver4j.structure.PlayerCharacter.Slot;
 import otserver4j.structure.Position;
+import otserver4j.structure.Status.Condition;
 import otserver4j.utils.ExperienceUtils;
 import otserver4j.utils.LightUtils;
 
@@ -123,7 +124,8 @@ public class ProcessingLoginProtocol implements Protocol {
   }
 
   private Packet writeIcons(PlayerCharacter player, Packet packet) {
-    return packet.writeByte(Packet.CODE_ICONS).writeByte(player.getIcons());
+    return packet.writeByte(Packet.CODE_ICONS).writeByte(
+      Condition.getIconCodeFromStatuses(player.getConditions()));
   }
 
   @Override

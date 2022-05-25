@@ -1,5 +1,6 @@
 package otserver4j.service.impl;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 
@@ -16,8 +17,9 @@ import otserver4j.structure.PlayerCharacter.Outfit;
 import otserver4j.structure.PlayerCharacter.Profession;
 import otserver4j.structure.PlayerCharacter.Skill;
 import otserver4j.structure.PlayerCharacter.Slot;
-import otserver4j.structure.Status.Skull;
 import otserver4j.structure.Position;
+import otserver4j.structure.Status.Condition;
+import otserver4j.structure.Status.Skull;
 
 @Service
 public class PlayerCharacterServiceImpl implements PlayerCharacterService {
@@ -56,7 +58,8 @@ public class PlayerCharacterServiceImpl implements PlayerCharacterService {
       .setShieldSkill(new Skill().setLevel((byte) 20).setPercent((byte) 90))
       .setFishingSkill(new Skill().setLevel((byte) 22).setPercent((byte) 95))
       .setSpeed(0xff88)
-      .setSkull(Skull.RED)
+      .setConditions(Arrays.asList(new Condition[] { }))
+      .setSkull(Skull.NONE)
       .setLastLogin(lastLogin);
   }
 
