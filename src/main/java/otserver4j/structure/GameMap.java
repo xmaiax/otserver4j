@@ -33,8 +33,8 @@ public class GameMap extends HashMap<String, TileWithItems> {
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
     for(int i = 0; i < 251; i++) {
       packet.writeByte(106);
-      packet.writeByte(0); // Ground objects
-      if(i == 118) { // Player position
+      packet.writeByte(0);
+      if(i == 118) {
         packet.writeByte(97);
         packet.writeByte(0);
         packet.writeByte(0);

@@ -30,6 +30,7 @@ import otserver4j.protocol.Protocol.LoginRequestType;
 import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.LoadCharactersProtocol;
 import otserver4j.protocol.impl.ProcessingLoginProtocol;
+import otserver4j.structure.Action;
 import otserver4j.structure.PlayerCharacter;
 
 @Component @Getter @Slf4j
@@ -118,9 +119,7 @@ class ConnectionThread extends Thread {
       else if(key.isReadable() || key.isWritable()) {
         socketChannel = (SocketChannel) key.channel();
         final ByteBuffer buffer = ByteBuffer.allocate(Packet.MAX_SIZE);
-        try {
-          socketChannel.read(buffer);
-        }
+        try { socketChannel.read(buffer); }
         catch(IOException ioex) {
           log.error("Error on read packet, closing the connection.", ioex);
           socketChannel.close();
@@ -136,22 +135,28 @@ class ConnectionThread extends Thread {
           log.debug("New received packet [Size={}, Type=0x{}]{}", packetSize,
             String.format("%2s", Integer.toHexString(rawType)).replace(' ', '0'),
               loggedPlayer == null ? "" : String.format(" from %s.", loggedPlayer.getName()));
+          Boolean thenDisconnect = Boolean.FALSE;
           Protocol protocol = null;
-          final LoginRequestType loginRequestType = LoginRequestType.fromCode(rawType);
-          if(loggedPlayer == null) switch(loginRequestType) {
-            case LOAD_CHARACTER_LIST:
-              protocol = this.server.getLoadCharactersProtocol(); break;
-            case LOGIN_SUCCESS:
-              protocol = this.server.getLoginSuccessProtocol(); break;
-            default: break;
+          if(loggedPlayer == null) {
+            final LoginRequestType loginRequestType = LoginRequestType.fromCode(rawType);
+            switch(loginRequestType) {
+              case LOAD_CHARACTER_LIST: thenDisconnect = Boolean.TRUE;
+                protocol = this.server.getLoadCharactersProtocol(); break;
+              case LOGIN_SUCCESS:
+                protocol = this.server.getLoginSuccessProtocol(); break;
+              default: break;
+            }
+          }
+          else if(Action.LOGOFF.getCode().equals(rawType)) {
+            //TODO: Lógica para remover personagem do mundo ao desconectar.
+            thenDisconnect = Boolean.TRUE;
           }
           else protocol = this.server.getInGameProtocol();
           try {
-            final Packet packet = protocol.execute(buffer, key);
-            if(protocol != null && packet != null)
-              packet.send(socketChannel);
-            if(loggedPlayer == null && !LoginRequestType.LOGIN_SUCCESS.equals(loginRequestType))
-              socketChannel.close();
+            if(protocol != null) {
+              final Packet packet = protocol.execute(buffer, key);
+              if(packet != null) packet.send(socketChannel);
+            }
           }
           catch(LoginException otjex) {
             Packet.createGenericErrorPacket(protocol instanceof ProcessingLoginProtocol ?
@@ -161,6 +166,9 @@ class ConnectionThread extends Thread {
           catch(InGameException ge) {
             //TODO: Tratativa de falhas in-game
             log.error("Deu ruim pra carai: {}", ge.getMessage());
+          }
+          finally {
+            if(thenDisconnect) socketChannel.close();
           }
         }
       }

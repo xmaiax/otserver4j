@@ -17,7 +17,7 @@ public class InGameProtocol implements Protocol {
   @Override
   public Packet execute(ByteBuffer buffer, SelectionKey key) throws InGameException {
     log.info("oi");
-    return null;
+    return new Packet();
   }
 
 }

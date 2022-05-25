@@ -33,6 +33,7 @@ import otserver4j.utils.LightUtils;
 @Component @Slf4j
 public class ProcessingLoginProtocol implements Protocol {
 
+  public static final Long PLAYER_IDENTIFIER_PREFIX = 0x0fffffffL;
   public static final FX SPAWN_EFFECT = FX.SPAWN;
   public static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
@@ -145,27 +146,25 @@ public class ProcessingLoginProtocol implements Protocol {
     log.info("Successful login attemp from account number '{}': {}",
       accountNumber, selectedCharacterName);
     key.attach(player);
-    final Packet packet = new Packet()
-      .writeByte(Packet.PROCESSING_LOGIN_CODE_OK)
-      .writeInt32(0x0fffffffL + player.getIdentifier())
-      .writeInt16(Packet.CLIENT_RENDER_CODE)
-      .writeByte(Packet.ERROR_REPORT_FLAG);
-    this.writePlayerMapInfo(player, packet);
-    this.writeSpawnEffect(player.getPosition(), packet);
-    this.writeInventory(player.getInventory(), packet);
-    this.writeStats(
-      player.getLife(), player.getMana(),
-      player.getCapacity(), player.getExperience(),
-      player.getMagicSkill(), packet);
-    this.writeSkills(
-      player.getFistSkill(), player.getClubSkill(),
-      player.getSwordSkill(), player.getAxeSkill(),
-      player.getDistanceSkill(), player.getShieldSkill(),
-      player.getFishingSkill(), packet);
-    this.writeWorldLight(player.getPosition(), packet);
-    this.writePlayerLight(player, packet);
-    this.writeLoginMessages(player, packet);
-    return this.writeIcons(player, packet);
+    return this.writeIcons(player,
+           this.writeLoginMessages(player,
+           this.writePlayerLight(player,
+           this.writeWorldLight(player.getPosition(),
+           this.writeSkills(
+             player.getFistSkill(), player.getClubSkill(),
+             player.getSwordSkill(), player.getAxeSkill(),
+             player.getDistanceSkill(), player.getShieldSkill(),
+             player.getFishingSkill(),
+           this.writeStats(
+             player.getLife(), player.getMana(),
+             player.getCapacity(), player.getExperience(),
+             player.getMagicSkill(),
+           this.writeInventory(player.getInventory(),
+           this.writeSpawnEffect(player.getPosition(),
+           this.writePlayerMapInfo(player, new Packet().writeByte(Packet.PROCESSING_LOGIN_CODE_OK)
+             .writeInt32(PLAYER_IDENTIFIER_PREFIX + player.getIdentifier())
+             .writeInt16(Packet.CLIENT_RENDER_CODE)
+             .writeByte(Packet.ERROR_REPORT_FLAG))))))))));
   }
 
 }
