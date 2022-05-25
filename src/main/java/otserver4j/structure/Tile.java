@@ -8,7 +8,9 @@ import otserver4j.structure.Item.ItemWithQuantity;
 
 @lombok.Getter
 public enum Tile {
-  GRASS(0x6a);
+  GRASS(0x66),
+  GROUND(0x67),
+  FANCY_GRASS(0x6a);
   private Integer code;
   Tile(Integer code) { this.code = code; }
   public static Tile fromCode(Integer code) {

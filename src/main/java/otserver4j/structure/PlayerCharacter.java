@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import otserver4j.structure.Item.ItemWithQuantity;
+import otserver4j.structure.Status.Skull;
 
 @Data @Accessors(chain = true)
 public class PlayerCharacter {
@@ -97,7 +98,11 @@ public class PlayerCharacter {
   private Outfit outfit;
   private Skill magicSkill, fistSkill, clubSkill, swordSkill,
     axeSkill, distanceSkill, shieldSkill, fishingSkill;
-  private Integer icons;
+  private Skull skull;
   private Calendar lastLogin;
+
+  public Integer getIcons() {
+    return 0x00;
+  }
 
 }

@@ -16,6 +16,7 @@ import otserver4j.structure.PlayerCharacter.Outfit;
 import otserver4j.structure.PlayerCharacter.Profession;
 import otserver4j.structure.PlayerCharacter.Skill;
 import otserver4j.structure.PlayerCharacter.Slot;
+import otserver4j.structure.Status.Skull;
 import otserver4j.structure.Position;
 
 @Service
@@ -37,16 +38,15 @@ public class PlayerCharacterServiceImpl implements PlayerCharacterService {
       .setMana(new Attribute().setValue(80).setMaxValue(100))
       .setCapacity(new Attribute().setValue(30).setMaxValue(180))
       .setPosition(new Position().setX(50).setY(50).setZ((byte) 0x07))
-      .setDirection(Direction.SOUTH)
+      .setDirection(Direction.EAST)
       .setInventory(Collections.singletonMap(Slot.BACKPACK,
         new ItemWithQuantity().setItem(Item.BACKPACK)))
-      .setOutfit(new Outfit()
-        .setHead((byte) 0x50)
-        .setBody((byte) 0x50)
-        .setLegs((byte) 0x50)
-        .setFeet((byte) 0x50)
-        .setExtra(null)
-        .setType(0x80))
+      .setOutfit(new Outfit().setType(0x80)
+        .setHead((byte) 0x04)
+        .setBody((byte) 0x03)
+        .setLegs((byte) 0x02)
+        .setFeet((byte) 0x01)
+        .setExtra((byte) 0x00))
       .setMagicSkill(new Skill().setLevel((byte) 5).setPercent((byte) 33))
       .setFistSkill(new Skill().setLevel((byte) 10).setPercent((byte) 50))
       .setClubSkill(new Skill().setLevel((byte) 12).setPercent((byte) 60))
@@ -55,7 +55,7 @@ public class PlayerCharacterServiceImpl implements PlayerCharacterService {
       .setDistanceSkill(new Skill().setLevel((byte) 18).setPercent((byte) 85))
       .setShieldSkill(new Skill().setLevel((byte) 20).setPercent((byte) 90))
       .setFishingSkill(new Skill().setLevel((byte) 22).setPercent((byte) 95))
-      .setIcons(0)
+      .setSkull(Skull.RED)
       .setLastLogin(lastLogin);
   }
 

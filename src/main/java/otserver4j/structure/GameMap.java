@@ -5,7 +5,11 @@ import java.util.HashMap;
 import org.springframework.stereotype.Component;
 
 import otserver4j.packet.Packet;
+import otserver4j.protocol.impl.ProcessingLoginProtocol;
+import otserver4j.structure.Status.Party;
+import otserver4j.structure.Status.Skull;
 import otserver4j.structure.Tile.TileWithItems;
+import otserver4j.utils.LightUtils;
 
 @Component
 public class GameMap extends HashMap<String, TileWithItems> {
@@ -17,69 +21,58 @@ public class GameMap extends HashMap<String, TileWithItems> {
 
   public static final String MAP_TILE_POSITION_SEPARATOR = "#";
 
+  @SuppressWarnings("unused")
   private String getTilePositionKey(Integer x, Integer y, Integer z) {
     return String.format("%d%s%d%s%d",
       x, MAP_TILE_POSITION_SEPARATOR,
       y, MAP_TILE_POSITION_SEPARATOR, z);
   }
 
-  public GameMap() {
-    for(Integer x = 31950, z = 7; x < 32050; x++)
-      for(Integer y = 31950; y < 32050; y++)
-        this.put(this.getTilePositionKey(x, y, z),
-          new TileWithItems().setTile(Tile.GRASS));
-  }
-
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
-    for(int i = 0; i < 252; i++) {
-      packet.writeByte(i == 14 ? 102 : 106); // SQM do chão
-      packet.writeByte(0);
-      if(i == 118) { // 118 é a posição x50 y50 z7
-        packet.writeByte(97);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(16);
-        packet.writeString(player.getName());
-        packet.writeByte(player.getLife().getValue() * 100 / player.getLife().getMaxValue());
-        packet.writeByte(2);
-        packet.writeByte(128);
-        packet.writeByte(10);
-        packet.writeByte(20);
-        packet.writeByte(30);
-        packet.writeByte(40);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
-        packet.writeByte(0);
+    for(int i = 0, x = 0; x < 18; x++) {
+      for(int y = 0; y < 14; y++, i++) {
+        packet.writeInt16(Tile.FANCY_GRASS.getCode());
+        if(i == 118) { // 118 é a posição x50 (8) y50 (6) z7
+          packet.writeInt16(0x61); // Criatura desconhecida
+          packet.writeInt32(0x00);
+          packet.writeInt32(ProcessingLoginProtocol.PLAYER_IDENTIFIER_PREFIX + player.getIdentifier());
+          packet.writeString(player.getName());
+          packet.writeByte(player.getLife().getValue() * 100 / player.getLife().getMaxValue());
+          packet.writeByte((player.getDirection() != null && player.getDirection().getSpawnable() ?
+            player.getDirection() : Direction.SOUTH).getCode());
+          packet.writeByte(player.getOutfit().getType());
+          packet.writeByte(player.getOutfit().getHead());
+          packet.writeByte(player.getOutfit().getBody());
+          packet.writeByte(player.getOutfit().getLegs());
+          packet.writeByte(player.getOutfit().getFeet());
+          packet.writeByte(player.getOutfit().getExtra());
+          packet.writeByte(0x00);
+          packet.writeByte(0x00);
+          packet.writeByte(0x00);
+          packet.writeByte(player.getSkull().getCode());
+          packet.writeByte(Party.NONE.getCode());
+          packet.writeByte(0x00);
+        }
+        else if(i == 251) { // 251 é o último SQM
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+        }
+        else {
+          packet.writeByte(0);
+        }
+        packet.writeByte(0xff);
       }
-      else if(i == 251) { // 251 é o último SQM
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(0xff);
-        packet.writeByte(228);
-      }
-      else {
-        packet.writeByte(0);
-      }
-      packet.writeByte(0xff);
     }
     return packet;
   }
