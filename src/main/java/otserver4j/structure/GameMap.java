@@ -28,12 +28,14 @@ public class GameMap extends HashMap<String, TileWithItems> {
 
   // y > 2 && y < 10 && x > 4 && x < 12
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
-    for(int i = 0, x = 0; x < 18; x++) {
-      for(int y = 0; y < 14; y++, i++) {
-
-        packet.writeInt16((y + 2 == x ? Tile.GROUND : Tile.FANCY_GRASS).getCode());
-
-        if(i == 118) { // 118 é a posição x50 (8) y50 (6) z7
+    final Position bounds = new Position().setZ(player.getPosition().getZ())
+      .setX(player.getPosition().getX() + 9).setY(player.getPosition().getY() + 7);
+    for(Integer x = player.getPosition().getX() - 8; x <= bounds.getX(); x++)
+      for(Integer y = player.getPosition().getY() - 6; y <= bounds.getY(); y++) {
+        if(x > 45 && x < 55 && y > 45 && y < 55) {
+          packet.writeInt16((y == x ? Tile.GROUND : Tile.FANCY_GRASS).getCode());
+        }
+        if(player.getPosition().getX().equals(x) && player.getPosition().getY().equals(y)) {
           packet.writeInt16(0x61); // Criatura desconhecida
           packet.writeInt32(0x00); // Cache de criatura?
           packet.writeInt32(ProcessingLoginProtocol.PLAYER_IDENTIFIER_PREFIX + player.getIdentifier());
@@ -53,7 +55,7 @@ public class GameMap extends HashMap<String, TileWithItems> {
           packet.writeByte(Party.NONE.getCode());
           packet.writeByte(0x00);
         }
-        else if(i == 251) { // 251 é o último SQM
+        else if(bounds.getX().equals(x) && bounds.getY().equals(y)) {
           packet.writeByte(0xff);
           packet.writeByte(0xff);
           packet.writeByte(0xff);
@@ -68,12 +70,9 @@ public class GameMap extends HashMap<String, TileWithItems> {
           packet.writeByte(0xff);
           packet.writeByte(0xff);
         }
-        else {
-          packet.writeByte(0);
-        }
+        else packet.writeByte(0);
         packet.writeByte(0xff);
       }
-    }
     return packet;
   }
 

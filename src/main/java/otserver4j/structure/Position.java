@@ -5,7 +5,7 @@ package otserver4j.structure;
 public class Position {
   private Integer x;
   private Integer y;
-  private byte z;
+  private Integer z;
   public Position move(Direction direction) {
     switch(direction) {
       case EAST: return this.setX(this.getX() + 1);
