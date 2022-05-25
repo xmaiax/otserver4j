@@ -79,7 +79,7 @@ public class Server {
     try {
       this.selector = Selector.open();
       this.serverSocketChannel = ServerSocketChannel.open();
-      this.serverSocketChannel.configureBlocking(false);
+      this.serverSocketChannel.configureBlocking(Boolean.FALSE);
       this.serverSocketChannel.socket().bind(new InetSocketAddress(this.port));
       this.serverSocketChannel.register(this.selector, serverSocketChannel.validOps());
       new ConnectionThread().setServer(this).start();
@@ -108,6 +108,7 @@ class ConnectionThread extends Thread {
     SocketChannel socketChannel = null;
     while(selectedKeysIterator.hasNext()) {
       final SelectionKey key = selectedKeysIterator.next();
+      selectedKeysIterator.remove();
       if(key.isAcceptable()) {
         socketChannel = this.server.getServerSocketChannel().accept();
         socketChannel.configureBlocking(Boolean.FALSE);
@@ -117,7 +118,9 @@ class ConnectionThread extends Thread {
       else if(key.isReadable() || key.isWritable()) {
         socketChannel = (SocketChannel) key.channel();
         final ByteBuffer buffer = ByteBuffer.allocate(Packet.MAX_SIZE);
-        try { socketChannel.read(buffer); }
+        try {
+          socketChannel.read(buffer);
+        }
         catch(IOException ioex) {
           log.error("Error on read packet, closing the connection.", ioex);
           socketChannel.close();
@@ -161,7 +164,6 @@ class ConnectionThread extends Thread {
           }
         }
       }
-      selectedKeysIterator.remove();
     }
   }
 

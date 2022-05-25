@@ -27,7 +27,7 @@ public class PlayerCharacterServiceImpl implements PlayerCharacterService {
     final Calendar lastLogin = Calendar.getInstance();
     lastLogin.add(Calendar.DAY_OF_YEAR, -10);
     return new PlayerCharacter()
-      .setIdentifier(0x04030201L)
+      .setIdentifier(1L)
       .setName(characterName)
       .setLevel(3)
       .setExperience(4567L)
@@ -36,7 +36,7 @@ public class PlayerCharacterServiceImpl implements PlayerCharacterService {
       .setLife(new Attribute().setValue(150).setMaxValue(200))
       .setMana(new Attribute().setValue(80).setMaxValue(100))
       .setCapacity(new Attribute().setValue(30).setMaxValue(180))
-      .setPosition(new Position().setX(32000).setY(32000).setZ((byte) 0x07))
+      .setPosition(new Position().setX(50).setY(50).setZ((byte) 0x07))
       .setDirection(Direction.SOUTH)
       .setInventory(Collections.singletonMap(Slot.BACKPACK,
         new ItemWithQuantity().setItem(Item.BACKPACK)))

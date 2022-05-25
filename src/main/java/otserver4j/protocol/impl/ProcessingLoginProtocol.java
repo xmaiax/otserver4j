@@ -43,14 +43,14 @@ public class ProcessingLoginProtocol implements Protocol {
 
   @Value("${otserver.version}") private Integer version;
 
-  public static Packet writePosition(Position position, Packet packet) {
+  private Packet writePosition(Position position, Packet packet) {
     return packet.writeInt16(position.getX())
       .writeInt16(position.getY()).writeByte(position.getZ());
   }
 
   private Packet writePlayerMapInfo(PlayerCharacter player, Packet packet) {
-    return this.gameMap.writeMapInfo(player.getIdentifier(), player.getPosition(),
-      packet.writeByte(Packet.CODE_MAP_INFO));
+    return this.gameMap.writeMapInfo(player, this.writePosition(player.getPosition(),
+      packet.writeByte(Packet.CODE_MAP_INFO)));
   }
 
   private Packet writeSpawnEffect(Position position, Packet packet) {
@@ -147,7 +147,7 @@ public class ProcessingLoginProtocol implements Protocol {
     key.attach(player);
     final Packet packet = new Packet()
       .writeByte(Packet.PROCESSING_LOGIN_CODE_OK)
-      .writeInt32(player.getIdentifier())
+      .writeInt32(0x0fffffffL + player.getIdentifier())
       .writeInt16(Packet.CLIENT_RENDER_CODE)
       .writeByte(Packet.ERROR_REPORT_FLAG);
     this.writePlayerMapInfo(player, packet);

@@ -1,12 +1,10 @@
 package otserver4j.structure;
 
 import java.util.HashMap;
-import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
 import otserver4j.packet.Packet;
-import otserver4j.protocol.impl.ProcessingLoginProtocol;
 import otserver4j.structure.Tile.TileWithItems;
 
 @Component
@@ -32,30 +30,57 @@ public class GameMap extends HashMap<String, TileWithItems> {
           new TileWithItems().setTile(Tile.GRASS));
   }
 
-  public Packet writeMapInfo(Long identifier, Position position, Packet packet) {
-    ProcessingLoginProtocol.writePosition(position, packet);
-    Integer skip = 0;
-    for(Integer offsetZ = 7; offsetZ > -1; offsetZ--)
-      for(Integer offsetX = 0; offsetX < SCREEN_WIDTH; offsetX++)
-        for(Integer offsetY = 0; offsetY < SCREEN_HEIGHT; offsetY++) {
-          final String tileKey = this.getTilePositionKey(
-            offsetX + position.getX() + OFFSET_X,
-            offsetY + position.getY() + OFFSET_Y,
-            offsetZ + position.getZ());
-          final Optional<TileWithItems> tile = Optional.ofNullable(this.get(tileKey));
-          if(tile.isPresent()) {
-            if(skip > 0) packet.writeByte(skip - 1).writeByte(0xff);
-            skip = 1;
-            packet.writeInt16(tile.get().getTile().getCode());
-            //TODO: Logica dos itens e criaturas
-          }
-          else if(skip == 0xfe) {
-            packet.writeByte(skip).writeByte(0xff);
-            skip = 0;
-          }
-          else skip++;
-        }
-    return skip > 0 ? packet.writeByte(skip - 1).writeByte(0xff) : packet;
+  public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
+    for(int i = 0; i < 251; i++) {
+      packet.writeByte(106);
+      packet.writeByte(0); // Ground objects
+      if(i == 118) { // Player position
+        packet.writeByte(97);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(16);
+        packet.writeString(player.getName());
+        packet.writeByte(player.getLife().getValue() * 100 / player.getLife().getMaxValue());
+        packet.writeByte(2);
+        packet.writeByte(128);
+        packet.writeByte(10);
+        packet.writeByte(20);
+        packet.writeByte(30);
+        packet.writeByte(40);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+        packet.writeByte(0);
+      }
+      else packet.writeByte(0);
+      packet.writeByte(0xff);
+    }
+    packet.writeByte(106);
+    packet.writeByte(0);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(0xff);
+    packet.writeByte(228);
+    packet.writeByte(0xff);
+    return packet;
   }
 
 }
