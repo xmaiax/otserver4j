@@ -14,16 +14,9 @@ public class GameMap extends HashMap<String, TileWithItems> {
 
   private static final long serialVersionUID = -1L;
 
-  public static final Integer
-    OFFSET_X = -8, OFFSET_Y = -6, SCREEN_WIDTH = 18, SCREEN_HEIGHT = 14;
-
-  public static final String MAP_TILE_POSITION_SEPARATOR = "#";
-
   @SuppressWarnings("unused")
   private String getTilePositionKey(Integer x, Integer y, Integer z) {
-    return String.format("%d%s%d%s%d",
-      x, MAP_TILE_POSITION_SEPARATOR,
-      y, MAP_TILE_POSITION_SEPARATOR, z);
+    return String.format("%d#%d#%d", x, y, z);
   }
 
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
