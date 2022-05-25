@@ -31,10 +31,10 @@ public class GameMap extends HashMap<String, TileWithItems> {
   }
 
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
-    for(int i = 0; i < 251; i++) {
-      packet.writeByte(106);
+    for(int i = 0; i < 252; i++) {
+      packet.writeByte(i == 14 ? 102 : 106); // SQM do chão
       packet.writeByte(0);
-      if(i == 118) {
+      if(i == 118) { // 118 é a posição x50 y50 z7
         packet.writeByte(97);
         packet.writeByte(0);
         packet.writeByte(0);
@@ -61,25 +61,26 @@ public class GameMap extends HashMap<String, TileWithItems> {
         packet.writeByte(0);
         packet.writeByte(0);
       }
-      else packet.writeByte(0);
+      else if(i == 251) { // 251 é o último SQM
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(0xff);
+        packet.writeByte(228);
+      }
+      else {
+        packet.writeByte(0);
+      }
       packet.writeByte(0xff);
     }
-    packet.writeByte(106);
-    packet.writeByte(0);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(0xff);
-    packet.writeByte(228);
-    packet.writeByte(0xff);
     return packet;
   }
 
