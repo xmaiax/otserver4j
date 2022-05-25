@@ -98,6 +98,7 @@ public class PlayerCharacter {
   private Outfit outfit;
   private Skill magicSkill, fistSkill, clubSkill, swordSkill,
     axeSkill, distanceSkill, shieldSkill, fishingSkill;
+  private Integer speed;
   private Skull skull;
   private Calendar lastLogin;
 

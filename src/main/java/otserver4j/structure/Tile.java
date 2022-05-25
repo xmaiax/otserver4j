@@ -8,6 +8,7 @@ import otserver4j.structure.Item.ItemWithQuantity;
 
 @lombok.Getter
 public enum Tile {
+  NULL(0x00),
   GRASS(0x66),
   GROUND(0x67),
   FANCY_GRASS(0x6a);

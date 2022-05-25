@@ -55,6 +55,7 @@ public class PlayerCharacterServiceImpl implements PlayerCharacterService {
       .setDistanceSkill(new Skill().setLevel((byte) 18).setPercent((byte) 85))
       .setShieldSkill(new Skill().setLevel((byte) 20).setPercent((byte) 90))
       .setFishingSkill(new Skill().setLevel((byte) 22).setPercent((byte) 95))
+      .setSpeed(0xff88)
       .setSkull(Skull.RED)
       .setLastLogin(lastLogin);
   }
