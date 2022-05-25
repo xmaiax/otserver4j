@@ -37,7 +37,6 @@ public class GameMap extends HashMap<String, TileWithItems> {
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
     final Position bounds = new Position().setZ(player.getPosition().getZ())
       .setX(player.getPosition().getX() + 9).setY(player.getPosition().getY() + 7);
-
     for(Integer x = player.getPosition().getX() - 8; x <= bounds.getX(); x++)
       for(Integer y = player.getPosition().getY() - 6; y <= bounds.getY(); y++) {
         final TileWithItems tileWithItems = this.get(this.getTilePositionKey(x, y, 7));
