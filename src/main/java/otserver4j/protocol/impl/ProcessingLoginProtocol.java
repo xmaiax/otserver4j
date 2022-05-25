@@ -3,7 +3,6 @@ package otserver4j.protocol.impl;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -30,6 +29,7 @@ import otserver4j.structure.PlayerCharacter.Skill;
 import otserver4j.structure.PlayerCharacter.Slot;
 import otserver4j.structure.Position;
 import otserver4j.structure.Status.Condition;
+import otserver4j.utils.DateFormatUtils;
 import otserver4j.utils.ExperienceUtils;
 import otserver4j.utils.LightUtils;
 
@@ -38,7 +38,6 @@ public class ProcessingLoginProtocol implements Protocol {
 
   public static final Long PLAYER_IDENTIFIER_PREFIX = 0x0fffffffL;
   public static final FX SPAWN_EFFECT = FX.SPAWN;
-  public static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
   @Autowired private AccountService accService;
   @Autowired private PlayerCharacterService pcService;
@@ -117,11 +116,10 @@ public class ProcessingLoginProtocol implements Protocol {
   private Packet writeLoginMessages(PlayerCharacter player, Packet packet) {
     Arrays.stream(new String[] {
       String.format("Welcome, %s.", player.getName()),
-      String.format("Last login: %s", SDF.format(player.getLastLogin().getTime())),
-    }).forEach(msg -> {
-      packet.writeByte(Packet.CODE_SYSTEM_MESSAGE)
-        .writeByte(MessageType.STATUS.getCode()).writeString(msg);
-    });
+      String.format("Last login: %s", DateFormatUtils.getInstance()
+        .formatFullDate(player.getLastLogin())),
+    }).forEach(msg -> packet.writeByte(Packet.CODE_SEND_MESSAGE)
+      .writeByte(MessageType.STATUS.getCode()).writeString(msg));
     return packet;
   }
 

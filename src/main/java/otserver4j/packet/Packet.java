@@ -19,7 +19,7 @@ public class Packet {
     CODE_INVENTORY_SLOT_FILLED = 0x78, CODE_INVENTORY_SLOT_EMPTY = 0x79,
     CODE_STATS = 0xa0, CODE_SKILLS = 0xa1, CODE_WORLD_LIGHT = 0x82,
     CODE_SPAWN_FX = 0x83, CODE_CHARACTER_LIGHT = 0x8d, CODE_ICONS = 0xa2,
-    CODE_SYSTEM_MESSAGE = 0xb4;
+    CODE_SEND_MESSAGE = 0xb4;
 
   public static int readByte(ByteBuffer input) {
     return input.get() & 0xff;
