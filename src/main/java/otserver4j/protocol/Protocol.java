@@ -2,18 +2,19 @@ package otserver4j.protocol;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import java.util.Arrays;
-
-import otserver4j.exception.GenericException;
-import otserver4j.packet.Packet;
+import java.nio.channels.SocketChannel;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import otserver4j.exception.GenericException;
+import otserver4j.packet.Packet;
+import otserver4j.packet.PacketType;
 
 public interface Protocol {
 
-  Packet execute(ByteBuffer buffer, SelectionKey key) throws GenericException;
+  Packet execute(ByteBuffer buffer, SelectionKey key,
+    SocketChannel channel, PacketType type) throws GenericException;
 
   @Getter
   public static enum OperatingSystem {
@@ -27,23 +28,6 @@ public interface Protocol {
         case 0x02: return WINDOWS;
         default: return OTHER;
       }
-    }
-  }
-
-  @Getter
-  public static enum LoginRequestType {
-    LOAD_CHARACTER_LIST(0x01),
-    LOGIN_SUCCESS(0x0a),
-    ALREADY_LOGGED(-1);
-    private Integer code;
-    LoginRequestType(Integer code) {
-      this.code = code;
-    }
-    @Override public String toString() { return this.name(); }
-    public static LoginRequestType fromCode(Integer code) {
-      return Arrays.asList(LoginRequestType.values()).stream()
-        .filter(lrt -> lrt.getCode() == code || lrt == ALREADY_LOGGED)
-          .findFirst().get();
     }
   }
 

@@ -1,7 +1,9 @@
-package otserver4j.structure;
+package otserver4j.packet;
 
 @lombok.Getter
-public enum Action {
+public enum PacketType {
+  LOAD_CHARACTER_LIST(0x01),
+  LOGIN_SUCCESS(0x0a),
   LOGOFF(0x14),
   KEEP_CONECTED(0x1e),
   AUTOWALK_ON(0x64),
@@ -57,9 +59,9 @@ public enum Action {
   REMOVE_FRIEND(0xdd),
   INVALID(-1);
   private Integer code;
-  Action(Integer code) { this.code = code; }
-  public static Action fromCode(Integer code) {
-    return java.util.Arrays.asList(Action.values()).stream()
+  PacketType(Integer code) { this.code = code; }
+  public static PacketType fromCode(Integer code) {
+    return java.util.Arrays.asList(PacketType.values()).stream()
       .filter(d -> d.getCode().equals(code) || d == INVALID)
         .findFirst().get(); }
 }

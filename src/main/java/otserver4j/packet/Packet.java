@@ -19,7 +19,7 @@ public class Packet {
     CODE_INVENTORY_SLOT_FILLED = 0x78, CODE_INVENTORY_SLOT_EMPTY = 0x79,
     CODE_STATS = 0xa0, CODE_SKILLS = 0xa1, CODE_WORLD_LIGHT = 0x82,
     CODE_SPAWN_FX = 0x83, CODE_CHARACTER_LIGHT = 0x8d, CODE_ICONS = 0xa2,
-    CODE_SUCCESSFUL_LOGIN_MESSAGE = 0xb4;
+    CODE_SYSTEM_MESSAGE = 0xb4;
 
   public static int readByte(ByteBuffer input) {
     return input.get() & 0xff;
@@ -28,19 +28,19 @@ public class Packet {
   public static int readInt16(ByteBuffer input) {
     return readByte(input) | (readByte(input) << 8);
   }
-  
+
   public static int readInt32(ByteBuffer input) {
     return readByte(input)        | (readByte(input) <<  8)
         | (readByte(input) << 16) | (readByte(input) << 24);
   }
-  
+
   public static String readString(ByteBuffer input) {
     return java.util.stream.IntStream.iterate(ZERO.intValue(), i -> readByte(input))
       .limit(readInt16(input) + ONE.intValue()).collect(ByteArrayOutputStream::new,
         (baos, i) -> baos.write((byte) i), (baos1, baos2) -> baos1.write(baos2.toByteArray(),
           ZERO.intValue(), baos2.size())).toString().substring(ONE.intValue());
   }
-  
+
   public static void skip(ByteBuffer input, int n) {
     input.position(input.position() + n);
   }
@@ -56,11 +56,11 @@ public class Packet {
     this.buffer[this.size++] = _byte;
     return this;
   }
-  
+
   public Packet writeByte(int _byte) {
     return this.writeByte(Integer.valueOf(_byte & 0xff).byteValue());
   }
-  
+
   public Packet writeByte(char _byte) {
     return this.writeByte((byte) _byte);
   }

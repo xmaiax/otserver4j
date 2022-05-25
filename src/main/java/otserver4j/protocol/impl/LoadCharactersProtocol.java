@@ -3,6 +3,7 @@ package otserver4j.protocol.impl;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.exception.LoginException;
 import otserver4j.packet.Packet;
+import otserver4j.packet.PacketType;
 import otserver4j.protocol.Protocol;
 import otserver4j.service.AccountService;
 import otserver4j.structure.Account;
@@ -48,7 +50,8 @@ public class LoadCharactersProtocol implements Protocol {
   }
 
   @Override
-  public Packet execute(ByteBuffer buffer, SelectionKey key) throws LoginException {
+  public Packet execute(ByteBuffer buffer, SelectionKey key,
+      SocketChannel channel, PacketType type) throws LoginException {
     final OperatingSystem os = OperatingSystem.fromCode(Packet.readInt16(buffer));
     final Integer clientVersion = Packet.readInt16(buffer);
     Packet.skip(buffer, SKIP_CLIENT_UNUSED_INFO);

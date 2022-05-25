@@ -25,12 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 import otserver4j.exception.InGameException;
 import otserver4j.exception.LoginException;
 import otserver4j.packet.Packet;
+import otserver4j.packet.PacketType;
 import otserver4j.protocol.Protocol;
-import otserver4j.protocol.Protocol.LoginRequestType;
 import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.LoadCharactersProtocol;
 import otserver4j.protocol.impl.ProcessingLoginProtocol;
-import otserver4j.structure.Action;
 import otserver4j.structure.PlayerCharacter;
 
 @Component @Getter @Slf4j
@@ -128,18 +127,17 @@ class ConnectionThread extends Thread {
         buffer.position(BigInteger.ZERO.intValue());
         final Integer packetSize = Packet.readInt16(buffer);
         if(packetSize > BigInteger.ZERO.intValue()) {
-          final Integer rawType = Packet.readByte(buffer);
+          PacketType packetType = PacketType.fromCode(Packet.readByte(buffer));
           PlayerCharacter loggedPlayer = null;
           if(key.attachment() != null)
             loggedPlayer = (PlayerCharacter) key.attachment();
-          log.debug("New received packet [Size={}, Type=0x{}]{}", packetSize,
-            String.format("%2s", Integer.toHexString(rawType)).replace(' ', '0'),
-              loggedPlayer == null ? "" : String.format(" from %s.", loggedPlayer.getName()));
+          log.debug("New received packet [Size={}, Type={}]{}", packetSize,
+            packetType.name(), loggedPlayer == null ? "" :
+              String.format(" from %s.", loggedPlayer.getName()));
           Boolean thenDisconnect = Boolean.FALSE;
           Protocol protocol = null;
           if(loggedPlayer == null) {
-            final LoginRequestType loginRequestType = LoginRequestType.fromCode(rawType);
-            switch(loginRequestType) {
+            switch(packetType) {
               case LOAD_CHARACTER_LIST: thenDisconnect = Boolean.TRUE;
                 protocol = this.server.getLoadCharactersProtocol(); break;
               case LOGIN_SUCCESS:
@@ -147,14 +145,14 @@ class ConnectionThread extends Thread {
               default: break;
             }
           }
-          else if(Action.LOGOFF.getCode().equals(rawType)) {
+          else if(PacketType.LOGOFF.equals(packetType)) {
             //TODO: Lógica para remover personagem do mundo ao desconectar.
             thenDisconnect = Boolean.TRUE;
           }
           else protocol = this.server.getInGameProtocol();
           try {
             if(protocol != null) {
-              final Packet packet = protocol.execute(buffer, key);
+              final Packet packet = protocol.execute(buffer, key, socketChannel, packetType);
               if(packet != null) packet.send(socketChannel);
             }
           }

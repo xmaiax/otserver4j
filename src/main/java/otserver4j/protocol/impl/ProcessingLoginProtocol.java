@@ -2,6 +2,7 @@ package otserver4j.protocol.impl;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.exception.LoginException;
 import otserver4j.packet.Packet;
+import otserver4j.packet.PacketType;
 import otserver4j.protocol.Protocol;
 import otserver4j.service.AccountService;
 import otserver4j.service.PlayerCharacterService;
@@ -117,7 +119,7 @@ public class ProcessingLoginProtocol implements Protocol {
       String.format("Welcome, %s.", player.getName()),
       String.format("Last login: %s", SDF.format(player.getLastLogin().getTime())),
     }).forEach(msg -> {
-      packet.writeByte(Packet.CODE_SUCCESSFUL_LOGIN_MESSAGE)
+      packet.writeByte(Packet.CODE_SYSTEM_MESSAGE)
         .writeByte(MessageType.STATUS.getCode()).writeString(msg);
     });
     return packet;
@@ -129,7 +131,8 @@ public class ProcessingLoginProtocol implements Protocol {
   }
 
   @Override
-  public Packet execute(ByteBuffer buffer, SelectionKey key) throws LoginException {
+  public Packet execute(ByteBuffer buffer, SelectionKey key,
+      SocketChannel channel, PacketType type) throws LoginException {
     Packet.skip(buffer, 2);
     if(!this.version.equals(Packet.readInt16(buffer)))
       throw new LoginException("Wrong version number.");
