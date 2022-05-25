@@ -26,7 +26,6 @@ public class GameMap extends HashMap<String, TileWithItems> {
       y, MAP_TILE_POSITION_SEPARATOR, z);
   }
 
-  // y > 2 && y < 10 && x > 4 && x < 12
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
     final Position bounds = new Position().setZ(player.getPosition().getZ())
       .setX(player.getPosition().getX() + 9).setY(player.getPosition().getY() + 7);
