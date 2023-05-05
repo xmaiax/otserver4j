@@ -6,7 +6,7 @@ import java.util.HashMap;
 import org.springframework.stereotype.Component;
 
 import otserver4j.packet.Packet;
-import otserver4j.protocol.impl.ProcessingLoginProtocol;
+import otserver4j.protocol.impl.SpawnProtocol;
 import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.Status.Party;
 import otserver4j.structure.Tile.TileWithItems;
@@ -50,8 +50,8 @@ public class GameMap extends HashMap<String, TileWithItems> {
         }
         if(player.getPosition().getX().equals(x) && player.getPosition().getY().equals(y)) {
           packet.writeInt16(0x61); // Criatura desconhecida
-          packet.writeInt32(0x00); // Cache de criatura?
-          packet.writeInt32(ProcessingLoginProtocol.PLAYER_IDENTIFIER_PREFIX + player.getIdentifier());
+          packet.writeInt32(0x00L); // Cache de criatura?
+          packet.writeInt32(SpawnProtocol.PLAYER_IDENTIFIER_PREFIX + player.getIdentifier());
           packet.writeString(player.getName());
           packet.writeByte(player.getLife().getValue() * 100 / player.getLife().getMaxValue());
           packet.writeByte((player.getDirection() != null && player.getDirection().getSpawnable() ?

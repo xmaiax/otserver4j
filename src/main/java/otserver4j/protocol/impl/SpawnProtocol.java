@@ -1,5 +1,8 @@
 package otserver4j.protocol.impl;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TWO;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -34,14 +37,13 @@ import otserver4j.utils.ExperienceUtils;
 import otserver4j.utils.LightUtils;
 
 @Component @Slf4j
-public class ProcessingLoginProtocol implements Protocol {
+public class SpawnProtocol implements Protocol {
 
-  public static final int PLAYER_IDENTIFIER_PREFIX = 0x0fffffff;
+  public static final Long PLAYER_IDENTIFIER_PREFIX = 0x0fffffffL;
   public static final FX SPAWN_EFFECT = FX.SPAWN;
 
   @Autowired private AccountService accService;
   @Autowired private PlayerCharacterService pcService;
-
   @Autowired private GameMap gameMap;
 
   @Value("${otserver.version}") private Integer version;
@@ -80,19 +82,13 @@ public class ProcessingLoginProtocol implements Protocol {
 
   private Packet writeStats(Attribute life, Attribute mana, Attribute capacity,
       Long experience, Skill magicSkill, Attribute soul, Packet packet) {
-    packet.writeByte(Packet.CODE_STATS);
-    packet.writeInt16(life.getValue());
-    packet.writeInt16(life.getMaxValue());
-    packet.writeInt16(capacity.getValue());
-    packet.writeInt32(experience);
-    packet.writeInt16(ExperienceUtils.getInstance().levelFromExp(experience));
-    packet.writeByte(ExperienceUtils.getInstance().nextLevelPercent(experience));
-    packet.writeInt16(mana.getValue());
-    packet.writeInt16(mana.getMaxValue());
-    packet.writeByte(magicSkill.getLevel());
-    packet.writeByte(magicSkill.getPercent());
-    packet.writeByte(soul.getValue());
-    return packet;
+    return packet.writeByte(Packet.CODE_STATS)
+      .writeInt16(life.getValue()).writeInt16(life.getMaxValue()).writeInt16(capacity.getValue())
+      .writeInt32(experience).writeInt16(ExperienceUtils.getInstance().levelFromExp(experience))
+      .writeByte(ExperienceUtils.getInstance().nextLevelPercent(experience))
+      .writeInt16(mana.getValue()).writeInt16(mana.getMaxValue())
+      .writeByte(magicSkill.getLevel()).writeByte(magicSkill.getPercent())
+      .writeByte(soul.getValue());
   }
 
   private Packet writeSkills(Skill fist, Skill club, Skill sword, Skill axe,
@@ -132,15 +128,15 @@ public class ProcessingLoginProtocol implements Protocol {
   @Override
   public Packet execute(ByteBuffer buffer, SelectionKey key,
       SocketChannel channel, PacketType type) throws LoginException {
-    Packet.skip(buffer, 2);
+    Packet.skip(buffer, TWO.intValue());
     final Integer version = Packet.readInt16(buffer);
     if(!this.version.equals(version))
-      throw new LoginException("Wrong version number.");
-    Packet.skip(buffer, 1);
-    final int accountNumber = Packet.readInt32(buffer);
+      throw new LoginException(LoginException.CommonError.WRONG_VERSION_NUMBER);
+    Packet.skip(buffer, ONE.intValue());
+    final Integer accountNumber = Packet.readInt32(buffer);
     final String selectedCharacterName = Packet.readString(buffer);
     if(selectedCharacterName == null || selectedCharacterName.isBlank())
-      throw new LoginException("Invalid selected character.");
+      throw new LoginException(LoginException.CommonError.INVALID_SELECTED_CHARACTER);
     final String password = Packet.readString(buffer);
     final Account account = this.accService.findAccount(accountNumber, password);
     if(account.getCharacters().stream().noneMatch(c -> c.getName().equals(selectedCharacterName)))

@@ -21,11 +21,9 @@ import otserver4j.structure.Position;
 import otserver4j.structure.Status.Condition;
 import otserver4j.structure.Status.Skull;
 
-@Service
-public class PlayerCharacterServiceImpl implements PlayerCharacterService {
+@Service public class PlayerCharacterServiceImpl implements PlayerCharacterService {
 
-  @Override
-  public PlayerCharacter findPlayerCharacter(int accountNumber,
+  @Override public PlayerCharacter findPlayerCharacter(Integer accountNumber,
       String characterName) throws LoginException {
     final Calendar lastLogin = Calendar.getInstance();
     lastLogin.add(Calendar.DAY_OF_YEAR, -10);

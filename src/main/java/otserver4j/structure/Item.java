@@ -1,8 +1,5 @@
 package otserver4j.structure;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 @lombok.Getter
 public enum Item {
   BACKPACK(0xb26, Boolean.FALSE),
@@ -18,7 +15,7 @@ public enum Item {
     return java.util.Arrays.asList(Item.values()).stream()
       .filter(d -> d.getCode().equals(code) || d == NO_ITEM)
         .findFirst().get(); }
-  @Data @Accessors(chain = true)
+  @lombok.Data @lombok.experimental.Accessors(chain = true)
   public static class ItemWithQuantity {
     private Item item;
     private byte quantity;

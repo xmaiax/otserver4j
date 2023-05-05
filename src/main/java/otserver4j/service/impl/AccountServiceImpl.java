@@ -11,11 +11,8 @@ import otserver4j.service.AccountService;
 import otserver4j.structure.Account;
 import otserver4j.utils.MD5Utils;
 
-@Service
-public class AccountServiceImpl implements AccountService {
-
-  @Override
-  public Account findAccount(int accountNumber, String password) throws LoginException {
+@Service public class AccountServiceImpl implements AccountService {
+  @Override public Account findAccount(Integer accountNumber, String password) throws LoginException {
     if(accountNumber < 1) throw new LoginException(CommonError.INSERT_ACCOUNT_NUMBER);
     if(password == null || password.isEmpty()) throw new LoginException(CommonError.INSERT_PASSWORD);
     if(accountNumber != 123) throw new LoginException(CommonError.ACCOUNT_DOES_NOT_EXIST);
@@ -33,5 +30,4 @@ public class AccountServiceImpl implements AccountService {
         new Account.CharacterOption().setName("Stefane").setProfession("Wizard"),
       }));
   }
-
 }

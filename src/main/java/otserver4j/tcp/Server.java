@@ -28,15 +28,15 @@ import otserver4j.packet.Packet;
 import otserver4j.packet.PacketType;
 import otserver4j.protocol.Protocol;
 import otserver4j.protocol.impl.InGameProtocol;
-import otserver4j.protocol.impl.LoadCharactersProtocol;
-import otserver4j.protocol.impl.ProcessingLoginProtocol;
+import otserver4j.protocol.impl.CharactersListProtocol;
+import otserver4j.protocol.impl.SpawnProtocol;
 import otserver4j.structure.PlayerCharacter;
 
 @Component @Getter @Slf4j
 public class Server {
 
-  private LoadCharactersProtocol loadCharactersProtocol;
-  private ProcessingLoginProtocol loginSuccessProtocol;
+  private CharactersListProtocol charactersListProtocol;
+  private SpawnProtocol spawnProtocol;
   private InGameProtocol inGameProtocol;
 
   private Integer port;
@@ -45,10 +45,9 @@ public class Server {
   private Selector selector;
   private ServerSocketChannel serverSocketChannel;
 
-  @PostConstruct
-  public void initOk() {
+  @PostConstruct public void initOk() {
     log.info("TCP server started! [port={}, protocol={}]", this.port,
-      this.loadCharactersProtocol.formatClientVersion(this.version));
+      this.charactersListProtocol.formatClientVersion(this.version));
   }
 
   private void validateHost(String host) {
@@ -61,15 +60,15 @@ public class Server {
     log.info("'{}' is a valid hostname.", host);
   }
 
-  @Autowired
-  public Server(@Value("${otserver.host}") String host,
+  @Autowired public Server(
+      @Value("${otserver.host}") String host,
       @Value("${otserver.port}") Integer port,
       @Value("${otserver.version}") Integer version,
-      LoadCharactersProtocol loadCharactersProtocol,
-      ProcessingLoginProtocol loginSuccessProtocol,
+      CharactersListProtocol charactersListProtocol,
+      SpawnProtocol spawnProtocol,
       InGameProtocol inGameProtocol) {
-    this.loadCharactersProtocol = loadCharactersProtocol;
-    this.loginSuccessProtocol = loginSuccessProtocol;
+    this.charactersListProtocol = charactersListProtocol;
+    this.spawnProtocol = spawnProtocol;
     this.inGameProtocol = inGameProtocol;
     this.port = port;
     this.version = version;
@@ -90,16 +89,14 @@ public class Server {
     }
   }
 
-  @PreDestroy
-  public void shutdown() {
+  @PreDestroy public void shutdown() {
     this.isRunning = Boolean.FALSE;
     log.info("TCP server stopping...");
   }
 
 }
 
-@Setter @Slf4j
-@Accessors(chain = true)
+@Setter @Slf4j @Accessors(chain = true)
 class ConnectionThread extends Thread {
 
   private Server server;
@@ -139,9 +136,9 @@ class ConnectionThread extends Thread {
           if(loggedPlayer == null) {
             switch(packetType) {
               case LOAD_CHARACTER_LIST: thenDisconnect = Boolean.TRUE;
-                protocol = this.server.getLoadCharactersProtocol(); break;
+                protocol = this.server.getCharactersListProtocol(); break;
               case LOGIN_SUCCESS:
-                protocol = this.server.getLoginSuccessProtocol(); break;
+                protocol = this.server.getSpawnProtocol(); break;
               default: break;
             }
           }
@@ -157,7 +154,7 @@ class ConnectionThread extends Thread {
             }
           }
           catch(LoginException otjex) {
-            Packet.createGenericErrorPacket(protocol instanceof ProcessingLoginProtocol ?
+            Packet.createGenericErrorPacket(protocol instanceof SpawnProtocol ?
               Packet.PROCESSING_LOGIN_CODE_NOK : Packet.LOGIN_CODE_NOK,
                 otjex.getMessage()).send(socketChannel);
           }
@@ -165,9 +162,7 @@ class ConnectionThread extends Thread {
             //TODO: Tratativa de falhas in-game
             log.error("Deu ruim pra carai: {}", ge.getMessage());
           }
-          finally {
-            if(thenDisconnect) socketChannel.close();
-          }
+          finally { if(thenDisconnect) socketChannel.close(); }
         }
       }
     }

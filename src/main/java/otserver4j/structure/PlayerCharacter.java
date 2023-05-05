@@ -1,15 +1,8 @@
 package otserver4j.structure;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import otserver4j.structure.Item.ItemWithQuantity;
-import otserver4j.structure.Status.Condition;
-import otserver4j.structure.Status.Skull;
 
 @Data @Accessors(chain = true)
 public class PlayerCharacter {
@@ -34,15 +27,13 @@ public class PlayerCharacter {
   }
 
   public static enum SkillType {
-    MAGIC, FIST, CLUB, SWORD,
-    AXE, DISTANCE, SHIELD, FISHING;
+    MAGIC, FIST, CLUB, SWORD, AXE, DISTANCE, SHIELD, FISHING;
     @Override public String toString() {
       return this.name();
     }
   }
 
-  @Getter
-  public static enum Profession {
+  @Getter public static enum Profession {
     ROOKIE     (0x00, "Rookie",      100, 5,  25, 5,  250, 5,  100),
     NECROMANCER(0x01, "Necromancer", 100, 10, 50, 20, 300, 10, 150),
     WARRIOR    (0x02, "Warrior",     200, 25, 20, 5,  450, 15, 100),
@@ -74,8 +65,7 @@ public class PlayerCharacter {
     @Override public String toString() { return this._name; }
   }
 
-  @Getter
-  public static enum Slot {
+  @Getter public static enum Slot {
     HEAD(0x01), NECK(0x02), BACKPACK(0x03), CHEST(0x04),
     RIGHT_HAND(0x05), LEFT_HAND(0x06), LEGS(0x07), RING(0x08),
     FEET(0x09), AMMUNITION(0x0a), INVALID(-1);
@@ -96,13 +86,13 @@ public class PlayerCharacter {
   private Attribute life, mana, capacity, soul;
   private Position position;
   private Direction direction;
-  private Map<Slot, ItemWithQuantity> inventory;
+  private java.util.Map<Slot, otserver4j.structure.Item.ItemWithQuantity> inventory;
   private Outfit outfit;
   private Skill magicSkill, fistSkill, clubSkill, swordSkill,
     axeSkill, distanceSkill, shieldSkill, fishingSkill;
   private Integer speed;
-  private List<Condition> conditions;
-  private Skull skull;
-  private Calendar lastLogin;
+  private java.util.List<otserver4j.structure.Status.Condition> conditions;
+  private otserver4j.structure.Status.Skull skull;
+  private java.util.Calendar lastLogin;
 
 }

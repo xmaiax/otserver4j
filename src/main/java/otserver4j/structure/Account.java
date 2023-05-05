@@ -1,12 +1,10 @@
 package otserver4j.structure;
 
 import lombok.Data;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@Data @Accessors(chain = true)
-public class Account {
-  @Data @ToString
+@Data @Accessors(chain = true) public class Account {
+  @Data @lombok.ToString
   @Accessors(chain = true)
   public static class CharacterOption {
     private String name;

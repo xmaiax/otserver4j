@@ -1,5 +1,7 @@
 package otserver4j.protocol.impl;
 
+import static java.math.BigInteger.ZERO;
+
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -13,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.exception.LoginException;
 import otserver4j.packet.Packet;
@@ -22,9 +27,35 @@ import otserver4j.service.AccountService;
 import otserver4j.structure.Account;
 
 @Component @Slf4j
-public class LoadCharactersProtocol implements Protocol {
+public class CharactersListProtocol implements Protocol {
 
   public static Integer SKIP_CLIENT_UNUSED_INFO = 0x0c;
+
+  @AllArgsConstructor @Getter private enum OperatingSystem {
+    UNIX_LIKE("Unix-like"), WINDOWS("Windows"), OTHER("Other");
+    private String type;
+    @Override public String toString() { return this.type; }
+    public static OperatingSystem fromCode(Integer code) {
+      switch(code) {
+        case 0x01: return UNIX_LIKE;
+        case 0x02: return WINDOWS;
+        default: return OTHER;
+      }
+    }
+  }
+
+  @Getter @Setter private class MOTD {
+    public static final String DEFAULT_MOTD_MESSAGE = "Welcome!";
+    private String message;
+    private Byte code;
+    public MOTD(String message) {
+      this.message = message == null || message.isBlank() ? DEFAULT_MOTD_MESSAGE : message;
+      this.code = 0x01;
+    }
+    @Override public String toString() {
+      return String.format("%d\n%s", this.code, this.message);
+    }
+  }
 
   @Autowired private AccountService accService;
 
@@ -55,31 +86,32 @@ public class LoadCharactersProtocol implements Protocol {
     final OperatingSystem os = OperatingSystem.fromCode(Packet.readInt16(buffer));
     final Integer clientVersion = Packet.readInt16(buffer);
     Packet.skip(buffer, SKIP_CLIENT_UNUSED_INFO);
-    final int accountNumber = Packet.readInt32(buffer);
+    final Integer accountNumber = Packet.readInt32(buffer);
     final String password = Packet.readString(buffer);
     if(!this.version.equals(clientVersion))
       throw new LoginException(String.format("Expected client %s, got client %s.",
         this.formatClientVersion(this.version), formatClientVersion(clientVersion)));
     final Account account = this.accService.findAccount(accountNumber, password);
     log.info("Login attemp from account number '{}' [OS: {}]", accountNumber, os);
-    final Packet characterListPacket = new Packet();
-    characterListPacket.writeByte(Packet.LOGIN_CODE_OK);
-    characterListPacket.writeString(new Protocol.MOTD()
-      .setMessage(this.motd).toString());
-    characterListPacket.writeByte(Packet.CHARACTERS_LIST_START);
+    final Packet characterListPacket = new Packet().writeByte(Packet.LOGIN_CODE_OK)
+      .writeString(new MOTD(this.motd).toString())
+      .writeByte(Packet.CHARACTERS_LIST_START);
     if(account.getCharacters() != null) {
       characterListPacket.writeByte(account.getCharacters().size());
       account.getCharacters().forEach(ch -> {
         characterListPacket.writeString(ch.getName());
         characterListPacket.writeString(ch.getProfession());
         this.writeHostPort2Packet(characterListPacket);
-      }); }
-    Integer premiumDuration = 0;
-    if(account.getPremiumExpiration() != null && account.getPremiumExpiration()
-        .after(Calendar.getInstance()))
-      premiumDuration = (int) TimeUnit.DAYS.convert(account.getPremiumExpiration()
-        .getTimeInMillis() - Calendar.getInstance().getTimeInMillis(), TimeUnit.MILLISECONDS);
-    return characterListPacket.writeInt16(premiumDuration);
+      });
+    }
+    else {
+      //FIXME Lançar exception sobre lista de personagens inválida.
+    }
+    return characterListPacket.writeInt16(
+        account.getPremiumExpiration() != null && account.getPremiumExpiration()
+      .after(Calendar.getInstance()) ? (int) TimeUnit.DAYS.convert(account.getPremiumExpiration()
+        .getTimeInMillis() - Calendar.getInstance().getTimeInMillis(),
+          TimeUnit.MILLISECONDS) : ZERO.intValue());
   }
 
 }

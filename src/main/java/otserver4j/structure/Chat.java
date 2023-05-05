@@ -21,17 +21,17 @@ public interface Chat {
 
   @Getter
   public static enum Channel {
-    CLAN("Clan", 0x00, false, false),
-    REPORT("Report", 0x03, false, true),
-    CHAT("Chat", 0x04, true, false),
-    TRADE("Trade", 0x05, true, false),
-    RL_CHAT("RL Chat", 0x06, true, false),
-    HELP("Help", 0x07, true, false),
-    DEVS("Maintainer", 0x08, false, true),
-    TUTOR("Tutor", 0x09, false, true),
-    GM("GM", 0x10, false, true),
-    PRIVATE("Private", 0xff, false, false),
-    INVALID(null, -1, false, false);
+    CLAN("Clan", 0x00, Boolean.FALSE, Boolean.FALSE),
+    REPORT("Report", 0x03, Boolean.FALSE, Boolean.TRUE),
+    CHAT("Chat", 0x04, Boolean.TRUE, Boolean.FALSE),
+    TRADE("Trade", 0x05, Boolean.TRUE, Boolean.FALSE),
+    RL_CHAT("RL Chat", 0x06, Boolean.TRUE, Boolean.FALSE),
+    HELP("Help", 0x07, Boolean.TRUE, Boolean.FALSE),
+    DEVS("Maintainer", 0x08, Boolean.FALSE, Boolean.TRUE),
+    TUTOR("Tutor", 0x09, Boolean.FALSE, Boolean.TRUE),
+    GM("GM", 0x10, Boolean.FALSE, Boolean.TRUE),
+    PRIVATE("Private", 0xff, Boolean.FALSE, Boolean.FALSE),
+    INVALID(null, -1, Boolean.FALSE, Boolean.FALSE);
     private String identifier; private Integer code;
     private Boolean isPublic, isSpecial;
     Channel(String identifier, Integer code, Boolean isPublic, Boolean isSpecial) {
