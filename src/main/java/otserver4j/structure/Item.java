@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 
 @lombok.Getter
 public enum Item {
-  BACKPACK(0x7c4, Boolean.FALSE),
+  BACKPACK(0xb26, Boolean.FALSE),
   MAGIC_PLATE_ARMOR(0x9a8, Boolean.FALSE),
   CROSSBOW(0x997, Boolean.FALSE),
   BOLTS(0x9ef, Boolean.FALSE),

@@ -39,6 +39,7 @@ public class PlayerCharacterServiceImpl implements PlayerCharacterService {
       .setLife(new Attribute().setValue(150).setMaxValue(200))
       .setMana(new Attribute().setValue(80).setMaxValue(100))
       .setCapacity(new Attribute().setValue(30).setMaxValue(180))
+      .setSoul(new Attribute().setValue(100).setMaxValue(100))
       .setPosition(new Position().setX(50).setY(50).setZ(7))
       .setDirection(Direction.EAST)
       .setInventory(Collections.singletonMap(Slot.BACKPACK,

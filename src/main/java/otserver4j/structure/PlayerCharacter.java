@@ -77,7 +77,7 @@ public class PlayerCharacter {
   @Getter
   public static enum Slot {
     HEAD(0x01), NECK(0x02), BACKPACK(0x03), CHEST(0x04),
-    SHIELD(0x05), WEAPON(0x06), LEGS(0x07), RING(0x08),
+    RIGHT_HAND(0x05), LEFT_HAND(0x06), LEGS(0x07), RING(0x08),
     FEET(0x09), AMMUNITION(0x0a), INVALID(-1);
     private Integer code;
     Slot(Integer code) { this.code = code; }
@@ -93,7 +93,7 @@ public class PlayerCharacter {
   private Long experience;
   private Byte percentNextLevel;
   private Profession profession;
-  private Attribute life, mana, capacity;
+  private Attribute life, mana, capacity, soul;
   private Position position;
   private Direction direction;
   private Map<Slot, ItemWithQuantity> inventory;

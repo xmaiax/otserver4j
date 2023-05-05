@@ -127,7 +127,7 @@ class ConnectionThread extends Thread {
         buffer.position(BigInteger.ZERO.intValue());
         final Integer packetSize = Packet.readInt16(buffer);
         if(packetSize > BigInteger.ZERO.intValue()) {
-          PacketType packetType = PacketType.fromCode(Packet.readByte(buffer));
+          final PacketType packetType = PacketType.fromCode(Packet.readByte(buffer));
           PlayerCharacter loggedPlayer = null;
           if(key.attachment() != null)
             loggedPlayer = (PlayerCharacter) key.attachment();

@@ -36,7 +36,7 @@ import otserver4j.utils.LightUtils;
 @Component @Slf4j
 public class ProcessingLoginProtocol implements Protocol {
 
-  public static final Long PLAYER_IDENTIFIER_PREFIX = 0x0fffffffL;
+  public static final int PLAYER_IDENTIFIER_PREFIX = 0x0fffffff;
   public static final FX SPAWN_EFFECT = FX.SPAWN;
 
   @Autowired private AccountService accService;
@@ -79,18 +79,19 @@ public class ProcessingLoginProtocol implements Protocol {
   }
 
   private Packet writeStats(Attribute life, Attribute mana, Attribute capacity,
-      Long experience, Skill magicSkill, Packet packet) {
+      Long experience, Skill magicSkill, Attribute soul, Packet packet) {
     packet.writeByte(Packet.CODE_STATS);
     packet.writeInt16(life.getValue());
     packet.writeInt16(life.getMaxValue());
     packet.writeInt16(capacity.getValue());
     packet.writeInt32(experience);
-    packet.writeByte(ExperienceUtils.getInstance().levelFromExp(experience));
+    packet.writeInt16(ExperienceUtils.getInstance().levelFromExp(experience));
     packet.writeByte(ExperienceUtils.getInstance().nextLevelPercent(experience));
     packet.writeInt16(mana.getValue());
     packet.writeInt16(mana.getMaxValue());
     packet.writeByte(magicSkill.getLevel());
     packet.writeByte(magicSkill.getPercent());
+    packet.writeByte(soul.getValue());
     return packet;
   }
 
@@ -132,7 +133,8 @@ public class ProcessingLoginProtocol implements Protocol {
   public Packet execute(ByteBuffer buffer, SelectionKey key,
       SocketChannel channel, PacketType type) throws LoginException {
     Packet.skip(buffer, 2);
-    if(!this.version.equals(Packet.readInt16(buffer)))
+    final Integer version = Packet.readInt16(buffer);
+    if(!this.version.equals(version))
       throw new LoginException("Wrong version number.");
     Packet.skip(buffer, 1);
     final int accountNumber = Packet.readInt32(buffer);
@@ -153,6 +155,7 @@ public class ProcessingLoginProtocol implements Protocol {
            this.writeLoginMessages(player,
            this.writePlayerLight(player,
            this.writeWorldLight(player.getPosition(),
+           this.writeSpawnEffect(player.getPosition(),
            this.writeSkills(
              player.getFistSkill(), player.getClubSkill(),
              player.getSwordSkill(), player.getAxeSkill(),
@@ -161,10 +164,10 @@ public class ProcessingLoginProtocol implements Protocol {
            this.writeStats(
              player.getLife(), player.getMana(),
              player.getCapacity(), player.getExperience(),
-             player.getMagicSkill(),
+             player.getMagicSkill(), player.getSoul(),
            this.writeInventory(player.getInventory(),
-           this.writeSpawnEffect(player.getPosition(),
-           this.writePlayerMapInfo(player, new Packet().writeByte(Packet.PROCESSING_LOGIN_CODE_OK)
+           this.writePlayerMapInfo(player, new Packet()
+             .writeByte(Packet.PROCESSING_LOGIN_CODE_OK)
              .writeInt32(PLAYER_IDENTIFIER_PREFIX + player.getIdentifier())
              .writeInt16(Packet.CLIENT_RENDER_CODE)
              .writeByte(Packet.ERROR_REPORT_FLAG))))))))));
