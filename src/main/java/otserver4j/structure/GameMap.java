@@ -1,5 +1,6 @@
 package otserver4j.structure;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -21,10 +22,27 @@ public class GameMap extends HashMap<String, TileWithItems> {
     for(Integer x = 46; x < 55; x++)
       for(Integer y = 46; y < 55; y++) {
         final TileWithItems tile = new TileWithItems()
-          .setTile(y == x ? Tile.GROUND : Tile.FANCY_GRASS);
+          .setTile(y == x ? Tile.GROUND : Tile.GRASS);
         if(x == 53 && y == 47) {
-          tile.setItems(Collections.singletonList(
-            new ItemWithQuantity().setItem(Item.MAGIC_PLATE_ARMOR)));
+          tile.setItems(
+            Arrays.asList(new ItemWithQuantity[] {
+              new ItemWithQuantity().setItem(Item.CARLIN_SWORD),
+              new ItemWithQuantity().setItem(Item.WARLORD_SWORD),
+            })
+          );
+        }
+        if(x == 52 && y == 46) {
+          tile.setItems(java.util.Collections.singletonList(
+            new ItemWithQuantity().setItem(Item.MAGIC_PLATE_ARMOR)
+          ));
+        }
+        if(x == 53 && y == 46) {
+          tile.setItems(
+            Arrays.asList(new ItemWithQuantity[] {
+              new ItemWithQuantity().setItem(Item.ARROW).setQuantity(15),
+              new ItemWithQuantity().setItem(Item.CROSSBOW),
+            })
+          );
         }
         this.put(this.getTilePositionKey(x, y, z), tile);
       }
@@ -32,6 +50,12 @@ public class GameMap extends HashMap<String, TileWithItems> {
 
   private String getTilePositionKey(Integer x, Integer y, Integer z) {
     return String.format("%d#%d#%d", x, y, z);
+  }
+  
+  public TileWithItems getTileWithItemsFromPosition(Position position) {
+    final String positionKey = this.getTilePositionKey(position.getX(), position.getY(), position.getZ());
+    return this.containsKey(positionKey) ? this.get(positionKey) : new TileWithItems()
+      .setTile(Tile.NOTHING).setItems(Collections.emptyList());
   }
 
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
@@ -43,7 +67,10 @@ public class GameMap extends HashMap<String, TileWithItems> {
         if(tileWithItems != null) {
           packet.writeInt16(tileWithItems.getTile().getCode());
           if(tileWithItems.getItems() != null && !tileWithItems.getItems().isEmpty())
-            tileWithItems.getItems().forEach(item -> packet.writeInt16(item.getItem().getCode()));
+            tileWithItems.getItems().forEach(item -> {
+              packet.writeInt16(item.getItem().getCode());
+              if(item.getItem().isStackable()) packet.writeByte(item.getQuantity());
+            });
         }
         else {
           //...

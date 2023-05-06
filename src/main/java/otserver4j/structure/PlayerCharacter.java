@@ -73,7 +73,7 @@ public class PlayerCharacter {
     Slot(Integer code) { this.code = code; }
     public static Slot fromCode(Integer code) {
       return java.util.Arrays.asList(Slot.values()).stream()
-        .filter(d -> d.getCode().equals(code) || d == INVALID).findFirst().get();
+        .filter(sl -> sl.getCode().equals(code) || INVALID.equals(sl)).findFirst().get();
     }
   }
 

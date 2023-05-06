@@ -22,7 +22,7 @@ public interface Status {
     private Integer code;
     public static Skull fromCode(Integer code) {
       return java.util.Arrays.asList(Skull.values()).stream()
-        .filter(d -> d.getCode().equals(code) || d == NONE).findFirst().get();
+        .filter(sk -> sk.getCode().equals(code) || NONE.equals(sk)).findFirst().get();
     }
   }
 
@@ -32,7 +32,7 @@ public interface Status {
     private Integer code;
     public static Party fromCode(Integer code) {
       return java.util.Arrays.asList(Party.values()).stream()
-        .filter(d -> d.getCode().equals(code) || d == NONE).findFirst().get();
+        .filter(pt -> pt.getCode().equals(code) || NONE.equals(pt)).findFirst().get();
     }
   }
 

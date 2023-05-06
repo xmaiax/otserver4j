@@ -15,7 +15,7 @@ public interface Chat {
     MessageType(Integer code) { this.code = code; }
     public static MessageType fromCode(Integer code) {
       return java.util.Arrays.asList(MessageType.values()).stream()
-        .filter(d -> d.getCode().equals(code) || d == INVALID).findFirst().get();
+        .filter(mt -> mt.getCode().equals(code) || INVALID.equals(mt)).findFirst().get();
     }
   }
 
@@ -40,7 +40,7 @@ public interface Chat {
     }
     public static Channel fromCode(Integer code) {
       return java.util.Arrays.asList(Channel.values()).stream()
-        .filter(d -> d.getCode().equals(code) || d == INVALID).findFirst().get();
+        .filter(ch -> ch.getCode().equals(code) || INVALID.equals(ch)).findFirst().get();
     }
   }
 
@@ -57,7 +57,7 @@ public interface Chat {
     ChatType(Integer code) { this.code = code; }
     public static ChatType fromCode(Integer code) {
       return java.util.Arrays.asList(ChatType.values()).stream()
-        .filter(d -> d.getCode().equals(code) || d == INVALID).findFirst().get();
+        .filter(ct -> ct.getCode().equals(code) || INVALID.equals(ct)).findFirst().get();
     }
   }
 

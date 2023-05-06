@@ -62,6 +62,5 @@ public enum PacketType {
   PacketType(Integer code) { this.code = code; }
   public static PacketType fromCode(Integer code) {
     return java.util.Arrays.asList(PacketType.values()).stream()
-      .filter(d -> d.getCode().equals(code) || d == INVALID)
-        .findFirst().get(); }
+      .filter(pt -> pt.getCode().equals(code) || INVALID.equals(pt)).findFirst().get(); }
 }

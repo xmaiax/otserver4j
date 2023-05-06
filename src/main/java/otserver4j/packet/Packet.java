@@ -21,7 +21,9 @@ public class Packet {
     CODE_SPAWN_FX = 0x83, CODE_CHARACTER_LIGHT = 0x8d, CODE_ICONS = 0xa2,
     CODE_SEND_MESSAGE = 0xb4;
 
-  public static Integer readByte(ByteBuffer input) { return input.get() & 0xff; }
+  public static Integer readByte(ByteBuffer input) {
+    return input.get() & 0xff;
+  }
   public static Integer readInt16(ByteBuffer input) {
     return readByte(input) | (readByte(input) << 8); }
   public static Integer readInt32(ByteBuffer input) {

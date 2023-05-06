@@ -14,6 +14,6 @@ public enum Direction {
   }
   public static Direction fromCode(Integer code) {
     return java.util.Arrays.asList(Direction.values()).stream()
-      .filter(d -> d.getCode().equals(code)).findFirst().get();
+      .filter(dr -> dr.getCode().equals(code)).findFirst().get();
   }
 }

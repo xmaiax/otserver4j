@@ -73,7 +73,7 @@ public class SpawnProtocol implements Protocol {
       if(haveItem) {
         final ItemWithQuantity itemWithQt = inventory.get(slot);
         packet.writeInt16(itemWithQt.getItem().getCode());
-        if(itemWithQt.getItem().getStackable())
+        if(itemWithQt.getItem().isStackable())
           packet.writeByte(itemWithQt.getQuantity());
       }
     });
