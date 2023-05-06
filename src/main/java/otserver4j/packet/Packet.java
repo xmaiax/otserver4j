@@ -62,10 +62,6 @@ public class Packet {
       .writeByte(((int)(_long & 0xff000000)) >> 24);
   }
 
-  public Packet writeInt32(Integer _int) {
-    return this.writeInt32(Math.toIntExact(_int));
-  }
-
   public Packet writeString(String _str) {
     this.writeInt16(_str.length());
     _str.chars().forEachOrdered(c -> this.writeByte(c));
