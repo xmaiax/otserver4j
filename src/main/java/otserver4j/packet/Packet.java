@@ -4,13 +4,9 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import lombok.Getter;
-
-@Getter
-public class Packet {
+@lombok.Getter public class Packet {
 
   public static final Integer MAX_SIZE = 0xffff,
     CHARACTERS_LIST_START = 0x64, LOGIN_CODE_OK = 0x14, LOGIN_CODE_NOK = 0x0a,
@@ -19,7 +15,7 @@ public class Packet {
     CODE_INVENTORY_SLOT_FILLED = 0x78, CODE_INVENTORY_SLOT_EMPTY = 0x79,
     CODE_STATS = 0xa0, CODE_SKILLS = 0xa1, CODE_WORLD_LIGHT = 0x82,
     CODE_SPAWN_FX = 0x83, CODE_CHARACTER_LIGHT = 0x8d, CODE_ICONS = 0xa2,
-    CODE_SEND_MESSAGE = 0xb4;
+    CODE_SEND_MESSAGE = 0xb4, SNAPBACK_CODE = 0xb5;
 
   public static Integer readByte(ByteBuffer input) {
     return input.get() & 0xff;
@@ -42,7 +38,7 @@ public class Packet {
   public static Packet createGenericErrorPacket(Integer code, String message) {
     return new Packet().writeByte(code).writeString(message); }
 
-  private Integer size = 0;
+  private Integer size = ZERO.intValue();
   private byte[] buffer = new byte[MAX_SIZE - 2];
 
   public Packet writeByte(byte _byte) {
@@ -71,17 +67,20 @@ public class Packet {
   }
 
   public byte[] bufferWithSize() {
-    final byte[] output = new byte[this.size + 0x2];
+    final byte[] output = new byte[this.size + 0x02];
     System.arraycopy(new byte[] { ((byte)(this.size & 0x00ff)),
       ((byte)((this.size & 0xff00) >> 8)), }, ZERO.intValue(), output, ZERO.intValue(), 0x02);
     System.arraycopy(this.buffer, ZERO.intValue(), output, 0x02, this.size);
     return output;
   }
 
-  public void send(java.nio.channels.SocketChannel sc) throws IOException {
+  public static final Packet newSnapbackPacket(otserver4j.structure.PlayerCharacter player) {
+    return new Packet().writeByte(SNAPBACK_CODE).writeByte(player.getDirection().getCode());
+  }
+
+  public void send(java.nio.channels.SocketChannel sc) throws java.io.IOException {
     final ByteBuffer bufferTemp = ByteBuffer.allocate(Packet.MAX_SIZE);
-    bufferTemp.put(this.bufferWithSize());
-    bufferTemp.flip();
+    bufferTemp.put(this.bufferWithSize()); bufferTemp.flip();
     while(bufferTemp.hasRemaining()) sc.write(bufferTemp);
   }
 

@@ -15,15 +15,14 @@ public class PlayerCharacter {
 
   @Data @Accessors(chain = true)
   public static class Skill {
-    private byte level = 0;
-    private byte percent = 0;
+    private Integer level = 0;
+    private Integer percent = 0;
   }
 
   @Data @Accessors(chain = true)
   public static class Outfit {
     private Integer type;
-    private Byte head, body,
-      legs, feet ,extra;
+    private Integer head, body, legs, feet ,extra;
   }
 
   public static enum SkillType {
@@ -81,7 +80,7 @@ public class PlayerCharacter {
   private String name;
   private Integer level;
   private Long experience;
-  private Byte percentNextLevel;
+  private Integer percentNextLevel;
   private Profession profession;
   private Attribute life, mana, capacity, soul;
   private Position position;

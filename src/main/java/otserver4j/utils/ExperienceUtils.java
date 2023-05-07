@@ -7,11 +7,11 @@ public class ExperienceUtils {
   public static ExperienceUtils getInstance() { return INSTANCE; }
 
   public Integer levelFromExp(Long experience) {
-    return 4;
+    return 32;
   }
 
   public Integer nextLevelPercent(Long experience) {
-    return 50;
+    return 67;
   }
 
 }

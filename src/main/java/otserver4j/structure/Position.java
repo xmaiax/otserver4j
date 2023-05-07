@@ -3,9 +3,7 @@ package otserver4j.structure;
 import static java.math.BigInteger.ONE;
 
 @lombok.Data @lombok.experimental.Accessors(chain = true) public class Position {
-  private Integer x;
-  private Integer y;
-  private Integer z;
+  private Integer x; private Integer y; private Integer z;
   public Position move(Direction direction) {
     switch(direction) {
       case EAST: return this.setX(this.getX() + ONE.intValue());

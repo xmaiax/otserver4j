@@ -1,17 +1,14 @@
 package otserver4j.service.impl;
 
-import java.util.Arrays;
 import java.util.Calendar;
-
-import org.springframework.stereotype.Service;
 
 import otserver4j.exception.LoginException;
 import otserver4j.exception.LoginException.CommonError;
-import otserver4j.service.AccountService;
 import otserver4j.structure.Account;
 import otserver4j.utils.MD5Utils;
 
-@Service public class AccountServiceImpl implements AccountService {
+@org.springframework.stereotype.Service public class AccountServiceImpl
+    implements otserver4j.service.AccountService {
   @Override public Account findAccount(Integer accountNumber, String password) throws LoginException {
     if(accountNumber < 1) throw new LoginException(CommonError.INSERT_ACCOUNT_NUMBER);
     if(password == null || password.isEmpty()) throw new LoginException(CommonError.INSERT_PASSWORD);
@@ -25,7 +22,7 @@ import otserver4j.utils.MD5Utils;
       .setAccountNumber(accountNumber)
       .setPasswordMD5(MD5Utils.getInstance().str2md5(password))
       .setPremiumExpiration(premiumExpiration)
-      .setCharacters(Arrays.asList(new Account.CharacterOption[] {
+      .setCharacters(java.util.Arrays.asList(new Account.CharacterOption[] {
         new Account.CharacterOption().setName("Maia").setProfession("Necromancer"),
         new Account.CharacterOption().setName("Stefane").setProfession("Wizard"),
       }));

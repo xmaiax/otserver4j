@@ -58,8 +58,7 @@ public enum PacketType {
   ADD_FRIEND(0xdc),
   REMOVE_FRIEND(0xdd),
   INVALID(-1);
-  private Integer code;
-  PacketType(Integer code) { this.code = code; }
+  private Integer code; PacketType(Integer code) { this.code = code; }
   public static PacketType fromCode(Integer code) {
     return java.util.Arrays.asList(PacketType.values()).stream()
       .filter(pt -> pt.getCode().equals(code) || INVALID.equals(pt)).findFirst().get(); }

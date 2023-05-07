@@ -2,9 +2,6 @@ package otserver4j.structure;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-
-import org.springframework.stereotype.Component;
 
 import otserver4j.packet.Packet;
 import otserver4j.protocol.impl.SpawnProtocol;
@@ -12,8 +9,8 @@ import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.Status.Party;
 import otserver4j.structure.Tile.TileWithItems;
 
-@Component
-public class GameMap extends HashMap<String, TileWithItems> {
+@org.springframework.stereotype.Component
+public class GameMap extends java.util.HashMap<String, TileWithItems> {
 
   private static final long serialVersionUID = -1L;
 
@@ -32,7 +29,7 @@ public class GameMap extends HashMap<String, TileWithItems> {
           );
         }
         if(x == 52 && y == 46) {
-          tile.setItems(java.util.Collections.singletonList(
+          tile.setItems(Collections.singletonList(
             new ItemWithQuantity().setItem(Item.MAGIC_PLATE_ARMOR)
           ));
         }

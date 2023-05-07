@@ -1,38 +1,26 @@
 package otserver4j.tcp;
 
+import static java.math.BigInteger.ZERO;
+
 import java.io.IOException;
-import java.math.BigInteger;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import otserver4j.exception.InGameException;
-import otserver4j.exception.LoginException;
 import otserver4j.packet.Packet;
 import otserver4j.packet.PacketType;
-import otserver4j.protocol.Protocol;
-import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.CharactersListProtocol;
+import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.SpawnProtocol;
 import otserver4j.structure.PlayerCharacter;
 
-@Component @Getter @Slf4j
+@Slf4j @lombok.Getter
+@org.springframework.stereotype.Component
 public class Server {
 
   private CharactersListProtocol charactersListProtocol;
@@ -45,7 +33,7 @@ public class Server {
   private Selector selector;
   private ServerSocketChannel serverSocketChannel;
 
-  @PostConstruct public void initOk() {
+  @javax.annotation.PostConstruct public void initOk() {
     log.info("TCP server started! [port={}, protocol={}]", this.port,
       this.charactersListProtocol.formatClientVersion(this.version));
   }
@@ -53,14 +41,14 @@ public class Server {
   private void validateHost(String host) {
     log.info("Validating hostname: {}", host);
     try { java.net.InetAddress.getByName(host).getHostAddress(); }
-    catch(UnknownHostException uhe) {
+    catch(java.net.UnknownHostException uhe) {
       log.error("'{}' is not a valid hostname.", host);
       throw new IllegalArgumentException(String.format("'%s' is not a valid hostname.", host));
     }
     log.info("'{}' is a valid hostname.", host);
   }
 
-  @Autowired public Server(
+  @org.springframework.beans.factory.annotation.Autowired public Server(
       @Value("${otserver.host}") String host,
       @Value("${otserver.port}") Integer port,
       @Value("${otserver.version}") Integer version,
@@ -79,7 +67,7 @@ public class Server {
       this.selector = Selector.open();
       this.serverSocketChannel = ServerSocketChannel.open();
       this.serverSocketChannel.configureBlocking(Boolean.FALSE);
-      this.serverSocketChannel.socket().bind(new InetSocketAddress(this.port));
+      this.serverSocketChannel.socket().bind(new java.net.InetSocketAddress(this.port));
       this.serverSocketChannel.register(this.selector, serverSocketChannel.validOps());
       new ConnectionThread().setServer(this).start();
     }
@@ -89,19 +77,20 @@ public class Server {
     }
   }
 
-  @PreDestroy public void shutdown() {
+  @javax.annotation.PreDestroy public void shutdown() {
     this.isRunning = Boolean.FALSE;
     log.info("TCP server stopping...");
   }
 
 }
 
-@Setter @Slf4j @Accessors(chain = true)
+@Slf4j @lombok.Setter @lombok.experimental.Accessors(chain = true)
 class ConnectionThread extends Thread {
 
   private Server server;
 
-  private void handleReceivedPacket(Iterator<SelectionKey> selectedKeysIterator) throws IOException {
+  private void handleReceivedPacket(
+      java.util.Iterator<SelectionKey> selectedKeysIterator) throws IOException {
     SocketChannel socketChannel = null;
     while(selectedKeysIterator.hasNext()) {
       final SelectionKey key = selectedKeysIterator.next();
@@ -121,9 +110,9 @@ class ConnectionThread extends Thread {
           socketChannel.close();
           return;
         }
-        buffer.position(BigInteger.ZERO.intValue());
+        buffer.position(ZERO.intValue());
         final Integer packetSize = Packet.readInt16(buffer);
-        if(packetSize > BigInteger.ZERO.intValue()) {
+        if(packetSize > ZERO.intValue()) {
           final PacketType packetType = PacketType.fromCode(Packet.readByte(buffer));
           PlayerCharacter loggedPlayer = null;
           if(key.attachment() != null)
@@ -132,7 +121,7 @@ class ConnectionThread extends Thread {
             packetType.name(), loggedPlayer == null ? "" :
               String.format(" from %s.", loggedPlayer.getName()));
           Boolean thenDisconnect = Boolean.FALSE;
-          Protocol protocol = null;
+          otserver4j.protocol.Protocol protocol = null;
           if(loggedPlayer == null) {
             switch(packetType) {
               case LOAD_CHARACTER_LIST: thenDisconnect = Boolean.TRUE;
@@ -149,18 +138,18 @@ class ConnectionThread extends Thread {
           else protocol = this.server.getInGameProtocol();
           try {
             if(protocol != null) {
-              final Packet packet = protocol.execute(buffer, key, socketChannel, packetType);
-              if(packet != null) packet.send(socketChannel);
+              final Packet packet = protocol.execute(buffer, key, socketChannel, loggedPlayer, packetType);
+              (packet == null ? Packet.newSnapbackPacket(loggedPlayer) : packet).send(socketChannel);
             }
           }
-          catch(LoginException otjex) {
+          catch(otserver4j.exception.LoginException otjex) {
             Packet.createGenericErrorPacket(protocol instanceof SpawnProtocol ?
               Packet.PROCESSING_LOGIN_CODE_NOK : Packet.LOGIN_CODE_NOK,
                 otjex.getMessage()).send(socketChannel);
           }
-          catch(InGameException ge) {
+          catch(otserver4j.exception.InGameException ige) {
             //TODO: Tratativa de falhas in-game
-            log.error("Deu ruim pra carai: {}", ge.getMessage());
+            log.error("Deu ruim pra carai: {}", ige.getMessage());
           }
           finally { if(thenDisconnect) socketChannel.close(); }
         }
