@@ -1,5 +1,6 @@
 package otserver4j.utils;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ public class MD5Utils {
     try { this.messageDigest = MessageDigest.getInstance("MD5"); }
     catch(java.security.NoSuchAlgorithmException nsae) {
       log.error("Unable to load MD5 algorithm: ", nsae);
-      System.exit(-1);
+      System.exit(-BigInteger.ONE.intValue());
     }
   }
   public static MD5Utils getInstance() { return INSTANCE; }

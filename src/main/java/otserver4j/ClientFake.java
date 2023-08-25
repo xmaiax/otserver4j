@@ -34,7 +34,7 @@ public class ClientFake {
         final ByteBuffer buffer = ByteBuffer.wrap(output.getBytes());
         final StringBuilder message = new StringBuilder();
         while(buffer.hasRemaining()) {
-          message.append(String.format("%d, ", (int) buffer.get()));
+          message.append(String.format("%d\t", buffer.get() /*Byte.toUnsignedInt(buffer.get())*/));
         }
         System.out.println(message.toString().trim());
       }

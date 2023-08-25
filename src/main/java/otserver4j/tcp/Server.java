@@ -3,6 +3,7 @@ package otserver4j.tcp;
 import static java.math.BigInteger.ZERO;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -12,6 +13,7 @@ import java.nio.channels.SocketChannel;
 import org.springframework.beans.factory.annotation.Value;
 
 import lombok.extern.slf4j.Slf4j;
+import otserver4j.action.EventQueue;
 import otserver4j.packet.Packet;
 import otserver4j.packet.PacketType;
 import otserver4j.protocol.impl.CharactersListProtocol;
@@ -54,7 +56,8 @@ public class Server {
       @Value("${otserver.version}") Integer version,
       CharactersListProtocol charactersListProtocol,
       SpawnProtocol spawnProtocol,
-      InGameProtocol inGameProtocol) {
+      InGameProtocol inGameProtocol,
+      EventQueue eventQueue) {
     this.charactersListProtocol = charactersListProtocol;
     this.spawnProtocol = spawnProtocol;
     this.inGameProtocol = inGameProtocol;
@@ -69,11 +72,11 @@ public class Server {
       this.serverSocketChannel.configureBlocking(Boolean.FALSE);
       this.serverSocketChannel.socket().bind(new java.net.InetSocketAddress(this.port));
       this.serverSocketChannel.register(this.selector, serverSocketChannel.validOps());
-      new ConnectionThread().setServer(this).start();
+      new ConnectionThread(this, eventQueue).start();
     }
     catch (IOException ioex) {
       log.error("Unable to start TCP server: {}", ioex.getMessage(), ioex);
-      System.exit(-1);
+      System.exit(-BigInteger.ONE.intValue());
     }
   }
 
@@ -84,10 +87,17 @@ public class Server {
 
 }
 
-@Slf4j @lombok.Setter @lombok.experimental.Accessors(chain = true)
+@Slf4j @lombok.experimental.Accessors(chain = true)
 class ConnectionThread extends Thread {
-
+  
   private Server server;
+  private EventQueue eventQueue;
+  
+  public ConnectionThread(Server server, EventQueue eventQueue) {
+    super("TCPServerThread");
+    this.server = server;
+    this.eventQueue = eventQueue;
+  }
 
   private void handleReceivedPacket(
       java.util.Iterator<SelectionKey> selectedKeysIterator) throws IOException {
@@ -151,7 +161,12 @@ class ConnectionThread extends Thread {
             //TODO: Tratativa de falhas in-game
             log.error("Deu ruim pra carai: {}", ige.getMessage());
           }
-          finally { if(thenDisconnect) socketChannel.close(); }
+          finally {
+            if(thenDisconnect) {
+              this.eventQueue.removeConnection(loggedPlayer);
+              socketChannel.close();
+            }
+          }
         }
       }
     }

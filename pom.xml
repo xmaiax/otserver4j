@@ -17,9 +17,6 @@
     <developer>
       <name>Maia</name>
       <email>felipe_m92@live.com</email>
-      <roles>
-        <role>Creator</role>
-      </roles>
     </developer>
   </developers>
 
@@ -28,12 +25,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <main.class>${project.groupId}.App</main.class>
     <output.directory>RELEASE/</output.directory>
-    <spring-boot.version>2.6.3</spring-boot.version>
-    <webjar-locator.version>0.42</webjar-locator.version>
+    <spring-boot.version>2.7.15</spring-boot.version>
+    <apache-qpid.version>9.0.0</apache-qpid.version>
+    <webjar-locator.version>0.47</webjar-locator.version>
     <angularjs.version>1.8.2</angularjs.version>
-    <bootstrap.version>5.1.3</bootstrap.version>
-    <jquery.version>3.6.0</jquery.version>
-    <swagger.version>2.10.5</swagger.version>
+    <bootstrap.version>5.3.1</bootstrap.version>
+    <jquery.version>3.7.0</jquery.version>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
     <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
@@ -70,10 +67,8 @@
   </profiles>
 
   <build>
-
     <finalName>../${output.directory}${project.artifactId}-${project.version}</finalName>
     <sourceDirectory>src/main/java</sourceDirectory>
-
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -177,6 +172,29 @@
       <artifactId>lombok</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.qpid</groupId>
+      <artifactId>qpid-broker-core</artifactId>
+      <version>${apache-qpid.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.qpid</groupId>
+      <artifactId>qpid-broker-plugins-amqp-0-8-protocol</artifactId>
+      <version>${apache-qpid.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.qpid</groupId>
+      <artifactId>qpid-broker-plugins-memory-store</artifactId>
+      <version>${apache-qpid.version}</version>
+    </dependency>
+
     <!--
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -211,18 +229,6 @@
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
       <version>${jquery.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger2</artifactId>
-      <version>${swagger.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger-ui</artifactId>
-      <version>${swagger.version}</version>
     </dependency>
 
   </dependencies>
