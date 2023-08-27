@@ -16,13 +16,11 @@ public class LookAction implements otserver4j.action.Action {
   @org.springframework.beans.factory.annotation.Autowired
   private otserver4j.structure.GameMap gameMap;
 
-  @Override public Packet execute(
-      otserver4j.packet.PacketType type,
-      java.nio.ByteBuffer buffer,
-      java.nio.channels.SocketChannel channel,
+  @Override public Packet execute(otserver4j.packet.PacketType type,
+      java.nio.ByteBuffer buffer, java.nio.channels.SocketChannel channel,
       otserver4j.structure.PlayerCharacter player) {
     final Position position = new Position().setX(Packet.readInt16(buffer))
-        .setY(Packet.readInt16(buffer)).setZ(Packet.readByte(buffer));
+      .setY(Packet.readInt16(buffer)).setZ(Packet.readByte(buffer));
     final Item item = Item.fromCode(Packet.readInt16(buffer));
     final Boolean isOnCharacter = Packet.readByte(buffer).equals(ZERO.intValue());
     final Tile.TileWithItems tileWithItems = isOnCharacter ?

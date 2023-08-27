@@ -1,5 +1,5 @@
 {
-  "name": "EmbeddedBroker",
+  "name": "@project.name@EmbeddedBroker",
   "modelVersion": "7.0",
   "authenticationproviders": [
     {
@@ -19,7 +19,7 @@
     {
       "name": "AMQP",
       "port": "5672",
-      "bindingAddress": "127.0.0.1",
+      "bindingAddress": "localhost",
       "protocols": [ "AMQP_0_9_1" ],
       "authenticationProvider": "@project.artifactId@-amqp-user",
       "virtualhostaliases": [
@@ -35,7 +35,7 @@
       "name": "@project.artifactId@",
       "type": "Memory",
       "defaultVirtualHostNode": "true",
-      "virtualHostInitialConfiguration": "{\"type\": \"Memory\"}"
+      "virtualHostInitialConfiguration": "{\"type\":\"Memory\"}"
     }
   ]
 }

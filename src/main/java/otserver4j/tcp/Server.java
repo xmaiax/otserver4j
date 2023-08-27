@@ -35,11 +35,6 @@ public class Server {
   private Selector selector;
   private ServerSocketChannel serverSocketChannel;
 
-  @javax.annotation.PostConstruct public void initOk() {
-    log.info("TCP server started! [port={}, protocol={}]", this.port,
-      this.charactersListProtocol.formatClientVersion(this.version));
-  }
-
   private void validateHost(String host) {
     log.info("Validating hostname: {}", host);
     try { java.net.InetAddress.getByName(host).getHostAddress(); }
@@ -51,7 +46,7 @@ public class Server {
   }
 
   @org.springframework.beans.factory.annotation.Autowired public Server(
-      @Value("${otserver.host}") String host,
+      @Value("${otserver.host:localhost}") String host,
       @Value("${otserver.port}") Integer port,
       @Value("${otserver.version}") Integer version,
       CharactersListProtocol charactersListProtocol,
@@ -71,13 +66,20 @@ public class Server {
       this.serverSocketChannel = ServerSocketChannel.open();
       this.serverSocketChannel.configureBlocking(Boolean.FALSE);
       this.serverSocketChannel.socket().bind(new java.net.InetSocketAddress(this.port));
-      this.serverSocketChannel.register(this.selector, serverSocketChannel.validOps());
+      this.serverSocketChannel.register(this.selector, this.serverSocketChannel.validOps());
+      
       new ConnectionThread(this, eventQueue).start();
+      
     }
     catch (IOException ioex) {
       log.error("Unable to start TCP server: {}", ioex.getMessage(), ioex);
       System.exit(-BigInteger.ONE.intValue());
     }
+  }
+
+  @javax.annotation.PostConstruct public void initOk() {
+    log.info("TCP server started! [port={}, protocol={}]", this.port,
+      this.charactersListProtocol.formatClientVersion(this.version));
   }
 
   @javax.annotation.PreDestroy public void shutdown() {
@@ -116,7 +118,7 @@ class ConnectionThread extends Thread {
         final ByteBuffer buffer = ByteBuffer.allocate(Packet.MAX_SIZE);
         try { socketChannel.read(buffer); }
         catch(IOException ioex) {
-          log.error("Error on read packet, closing the connection.", ioex);
+          log.error("Error on read packet, closing the connection.");
           socketChannel.close();
           return;
         }
@@ -125,8 +127,7 @@ class ConnectionThread extends Thread {
         if(packetSize > ZERO.intValue()) {
           final PacketType packetType = PacketType.fromCode(Packet.readByte(buffer));
           PlayerCharacter loggedPlayer = null;
-          if(key.attachment() != null)
-            loggedPlayer = (PlayerCharacter) key.attachment();
+          if(key.attachment() != null) loggedPlayer = (PlayerCharacter) key.attachment();
           log.debug("New received packet [Size={}, Type={}]{}", packetSize,
             packetType.name(), loggedPlayer == null ? "" :
               String.format(" from %s.", loggedPlayer.getName()));
@@ -177,8 +178,7 @@ class ConnectionThread extends Thread {
     while(this.server.getIsRunning()) {
       try {
         this.server.getSelector().select();
-        this.handleReceivedPacket(
-          this.server.getSelector().selectedKeys().iterator());
+        this.handleReceivedPacket(this.server.getSelector().selectedKeys().iterator());
       }
       catch(IOException ioex) {
         log.error("Error on handling connection: {}", ioex.getMessage(), ioex);

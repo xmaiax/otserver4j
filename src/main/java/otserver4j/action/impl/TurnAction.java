@@ -13,8 +13,8 @@ public class TurnAction implements otserver4j.action.Action {
     switch(type) {
       case TURN_NORTH: direction = NORTH; break;
       case TURN_SOUTH: direction = SOUTH; break;
-      case TURN_EAST: direction = EAST; break;
-      case TURN_WEST: direction = WEST; break;
+      case TURN_EAST:  direction = EAST;  break;
+      case TURN_WEST:  direction = WEST;  break;
       default: direction = player.getDirection() != null ? player.getDirection() : SOUTH;
     }
     player.setDirection(direction);
