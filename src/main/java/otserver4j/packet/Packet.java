@@ -1,7 +1,7 @@
 package otserver4j.packet;
 
-import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static java.math.BigInteger.ONE;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;

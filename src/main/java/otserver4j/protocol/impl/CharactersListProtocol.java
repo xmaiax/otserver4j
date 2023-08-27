@@ -39,7 +39,7 @@ public class CharactersListProtocol implements otserver4j.protocol.Protocol {
   @org.springframework.beans.factory.annotation.Autowired
   private otserver4j.service.AccountService accService;
 
-  @Value("${otserver.host}") private String host;
+  @Value("${otserver.host:localhost}") private String host;
   @Value("${otserver.port}") private Integer port;
   @Value("${otserver.version}") private Integer version;
   @Value("${otserver.motd}") private String motd;
@@ -74,8 +74,7 @@ public class CharactersListProtocol implements otserver4j.protocol.Protocol {
     final otserver4j.structure.Account account = this.accService.findAccount(accountNumber, password);
     log.info("Login attemp from account number '{}' [OS: {}]", accountNumber, os);
     final Packet characterListPacket = new Packet().writeByte(Packet.LOGIN_CODE_OK)
-      .writeString(new MOTD(this.motd).toString())
-      .writeByte(Packet.CHARACTERS_LIST_START);
+      .writeString(new MOTD(this.motd).toString()).writeByte(Packet.CHARACTERS_LIST_START);
     if(account.getCharacters() != null) {
       characterListPacket.writeByte(account.getCharacters().size());
       account.getCharacters().forEach(ch -> {
