@@ -14,7 +14,7 @@ import otserver4j.Application;
 import otserver4j.consumer.converter.PacketMessageConverter.PacketWrapper;
 import otserver4j.consumer.converter.RawPacket;
 import otserver4j.consumer.converter.wrapper.LoadCharacterListPacketWrapper;
-import otserver4j.tcp.TcpConnectionManager;
+import otserver4j.tcp.SessionManager;
 
 @Component
 public class PacketConsumer {
@@ -36,11 +36,11 @@ public class PacketConsumer {
     }
   }
 
-  @Autowired private TcpConnectionManager tcpConnectionManager;
+  @Autowired private SessionManager sessionManager;
 
   @RabbitListener(queues = { Application.PACKET_OUTPUT_QUEUE, })
-  public void outputListener(PacketWrapper packetObject)  throws IOException {
-    final SocketChannel socketChannel = this.tcpConnectionManager.getSocketChannelFromPacketWrapper(packetObject);
+  public void outputListener(PacketWrapper packetObject) throws IOException {
+    final SocketChannel socketChannel = this.sessionManager.getSocketChannelFromPacketWrapper(packetObject);
     final RawPacket rawPacket = packetObject.convertToRawPacket();
     rawPacket.sendAndClose(socketChannel);
   }

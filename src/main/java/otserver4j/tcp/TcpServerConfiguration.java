@@ -28,20 +28,20 @@ import otserver4j.consumer.converter.RawPacket;
 public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
 
   private final AmqpTemplate amqpTemplate;
-  private final TcpConnectionManager tcpConnectionManager;
+  private final SessionManager sessionManager;
 
   public TcpServerConfiguration(@Value("${otserver.port}") Integer port,
-      TcpConnectionManager tcpConnectionManager, AmqpTemplate amqpTemplate) {
+      SessionManager sessionManager, AmqpTemplate amqpTemplate) {
     super(port);
     this.amqpTemplate = amqpTemplate;
-    this.tcpConnectionManager = tcpConnectionManager;
+    this.sessionManager = sessionManager;
     log.info("Starting TCP Server...");
     final ByteArrayRawSerializer byteArrayRawSerializer = new ByteArrayRawSerializer();
     super.setSerializer(byteArrayRawSerializer);
     super.setDeserializer(byteArrayRawSerializer);
     super.registerListener(new TcpReceivingChannelAdapter());
-    super.registerSender(tcpConnectionManager);
-    super.setTcpNioConnectionSupport(tcpConnectionManager);
+    super.registerSender(sessionManager);
+    super.setTcpNioConnectionSupport(sessionManager);
   }
 
   @PostConstruct
@@ -93,8 +93,8 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
           final PacketType packetType = PacketType.fromCode(RawPacket.readByte(buffer));
           this.amqpTemplate.convertAndSend(Application.PACKET_INPUT_QUEUE,
             new otserver4j.consumer.converter.PacketMessageConverter.RawPacketAmqpMessage()
-              .setPacketSize(packetSize).setPacketType(packetType).setBuffer(buffer).setConnectionIdentifier(
-                this.tcpConnectionManager.getConnectionIdentifier(key.attachment().toString())));
+              .setPacketSize(packetSize).setPacketType(packetType).setBuffer(buffer)
+              .setSession(this.sessionManager.getSession(key.attachment().toString())));
         }
       }
     }

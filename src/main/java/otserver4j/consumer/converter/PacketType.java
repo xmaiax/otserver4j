@@ -1,10 +1,8 @@
 package otserver4j.consumer.converter;
 
-import otserver4j.consumer.converter.wrapper.LoadCharacterListPacketWrapper;
-
 @lombok.Getter
 public enum PacketType {
-  LOAD_CHARACTER_LIST(0x01, LoadCharacterListPacketWrapper.class),
+  LOAD_CHARACTER_LIST(0x01, otserver4j.consumer.converter.wrapper.LoadCharacterListPacketWrapper.class),
   LOGIN_SUCCESS(0x0a, null),
   LOGOFF(0x14, null),
   KEEP_CONECTED(0x1e, null),

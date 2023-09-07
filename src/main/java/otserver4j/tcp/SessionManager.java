@@ -19,27 +19,27 @@ import otserver4j.consumer.converter.PacketMessageConverter.PacketWrapper;
 
 //TODO Melhorar as exception aqui
 @Slf4j @Component
-public class TcpConnectionManager extends DefaultTcpNioConnectionSupport implements TcpSender {
+public class SessionManager extends DefaultTcpNioConnectionSupport implements TcpSender {
 
   private final String portsRegexCapturingGroup;
-  private final Map<String, SocketChannel> connections;
+  private final Map<String, SocketChannel> activeSessions;
+
+  public SessionManager(@Value(":\\d+:${otserver.port}:") String portsRegexCapturingGroup) {
+    this.portsRegexCapturingGroup = portsRegexCapturingGroup;
+    this.activeSessions = new HashMap<>();
+  }
 
   public SocketChannel getSocketChannelFromPacketWrapper(PacketWrapper packetWrapper) {
-    if(packetWrapper == null || packetWrapper.getConnectionIdentifier() == null ||
-       packetWrapper.getConnectionIdentifier().isBlank()) throw new IllegalArgumentException("???");
-    final SocketChannel socketChannel = this.connections.get(packetWrapper.getConnectionIdentifier());
+    if(packetWrapper == null || packetWrapper.getSession() == null ||
+       packetWrapper.getSession().isBlank()) throw new IllegalArgumentException("???");
+    final SocketChannel socketChannel = this.activeSessions.get(packetWrapper.getSession());
     if(socketChannel == null) throw new IllegalArgumentException("???");
     return socketChannel;
   }
 
-  public TcpConnectionManager(@Value(":\\d+:${otserver.port}:") String portsRegexCapturingGroup) {
-    this.connections = new HashMap<>();
-    this.portsRegexCapturingGroup = portsRegexCapturingGroup;
-  }
-  
-  public String getConnectionIdentifier(String connectionId) {
+  public String getSession(String connectionId) {
     if(connectionId == null || connectionId.isBlank()) throw new IllegalArgumentException("???");
-    final String[] split = connectionId.split(portsRegexCapturingGroup);
+    final String[] split = connectionId.split(this.portsRegexCapturingGroup);
     if(split.length > ONE.intValue()) return split[ONE.intValue()];
     throw new IllegalArgumentException("???");
   }
@@ -60,24 +60,24 @@ public class TcpConnectionManager extends DefaultTcpNioConnectionSupport impleme
        tcpConnection.getConnectionId().isBlank()) {
       throw new IllegalArgumentException("???");
     }
-    final String connectionIdentifier = this.getConnectionIdentifier(tcpConnection.getConnectionId());
-    this.connections.put(connectionIdentifier, ((TcpNioConnectionWithSocketChannel) tcpConnection).getSocketChannel());
-    log.info("New connection: {}", connectionIdentifier);
+    final String session = this.getSession(tcpConnection.getConnectionId());
+    this.activeSessions.put(session, ((TcpNioConnectionWithSocketChannel) tcpConnection).getSocketChannel());
+    log.info("New session: {}", session);
   }
 
   public void removeConnection(String connectionIdentifier) {
-    this.connections.remove(connectionIdentifier);
-    log.info("Connection removed: {}", connectionIdentifier);
+    this.activeSessions.remove(connectionIdentifier);
+    log.info("Session removed: {}", connectionIdentifier);
   }
 
   @Override
   public void removeDeadConnection(TcpConnection tcpConnection) {
     if(tcpConnection == null || tcpConnection.getConnectionId() == null ||
         tcpConnection.getConnectionId().isBlank()) {
-       throw new IllegalArgumentException("???");
-     }
-     final String connectionIdentifier = this.getConnectionIdentifier(tcpConnection.getConnectionId());
-    this.removeConnection(connectionIdentifier);
+      throw new IllegalArgumentException("???");
+    }
+    final String session = this.getSession(tcpConnection.getConnectionId());
+    this.removeConnection(session);
   }
 
   @Override

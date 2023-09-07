@@ -2,6 +2,7 @@ package otserver4j.consumer.converter;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Optional;
@@ -28,13 +29,12 @@ public class PacketMessageConverter implements MessageConverter {
     private Integer packetSize;
     private PacketType packetType;
     private ByteBuffer buffer;
-    private String connectionIdentifier;
+    private String session;
   }
 
   public static abstract class PacketWrapper {
-    @Getter @Setter private String connectionIdentifier;
-    protected abstract Object modifyFromBuffer(
-      ByteBuffer byteBuffer, Integer size, String connectionIdentifier);
+    @Accessors(chain = true) @Getter @Setter private String session;
+    protected abstract Object modifyFromBuffer(ByteBuffer byteBuffer, Integer size);
     protected abstract PacketType getPacketType();
     public abstract RawPacket convertToRawPacket();
   }
@@ -46,14 +46,13 @@ public class PacketMessageConverter implements MessageConverter {
     try {
       final Optional<Constructor<?>> emptyConstructor = Arrays.asList(
         rawPacketAmqpMessage.getPacketType().getObjectClass().getConstructors()).stream()
-          .filter(constr -> constr.getParameterCount() < java.math.BigInteger.ONE.intValue())
-          .findFirst();
+          .filter(constr -> constr.getParameterCount() < BigInteger.ONE.intValue()).findFirst();
       if(emptyConstructor.isEmpty()) throw new IllegalStateException(
         String.format("No empty constructor found in packet wrapper '%s'...",
           rawPacketAmqpMessage.getPacketType().getObjectClass().getCanonicalName()));
-      return ((PacketWrapper) emptyConstructor.get().newInstance())
-        .modifyFromBuffer(rawPacketAmqpMessage.getBuffer(), rawPacketAmqpMessage.getPacketSize(),
-          rawPacketAmqpMessage.getConnectionIdentifier());
+      final PacketWrapper packetWrapper = (PacketWrapper)((PacketWrapper) emptyConstructor.get().newInstance())
+        .modifyFromBuffer(rawPacketAmqpMessage.getBuffer(), rawPacketAmqpMessage.getPacketSize());
+      return packetWrapper.setSession(rawPacketAmqpMessage.getSession());
     }
     catch(Exception e) {
       throw new IllegalStateException(e);

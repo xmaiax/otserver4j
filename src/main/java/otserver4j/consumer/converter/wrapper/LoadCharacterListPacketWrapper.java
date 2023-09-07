@@ -47,8 +47,7 @@ public class LoadCharacterListPacketWrapper extends PacketWrapper {
   private String password;
 
   @Override
-  protected Object modifyFromBuffer(ByteBuffer byteBuffer, Integer size, String connectionIdentifier) {
-    this.setConnectionIdentifier(connectionIdentifier);
+  protected Object modifyFromBuffer(ByteBuffer byteBuffer, Integer size) {
     this.setOperatingSystem(OperatingSystem.fromCode(RawPacket.readInt16(byteBuffer)))
         .setClientVersion(RawPacket.readInt16(byteBuffer));
     RawPacket.skip(byteBuffer, SKIP_CLIENT_UNUSED_INFO);
