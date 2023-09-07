@@ -1,12 +1,13 @@
 package otserver4j.action.impl;
 
-import otserver4j.packet.Packet;
 import static otserver4j.structure.Direction.*;
+
+import otserver4j.consumer.converter.RawPacket;
 
 @org.springframework.stereotype.Component
 public class TurnAction implements otserver4j.action.Action {
 
-  @Override public Packet execute(otserver4j.packet.PacketType type,
+  @Override public RawPacket execute(otserver4j.consumer.converter.PacketType type,
       java.nio.ByteBuffer buffer, java.nio.channels.SocketChannel channel,
       otserver4j.structure.PlayerCharacter player) {
     otserver4j.structure.Direction direction = null;
@@ -19,7 +20,7 @@ public class TurnAction implements otserver4j.action.Action {
     }
     player.setDirection(direction);
     // TODO Atualizar mundo?
-    return Packet.newSnapbackPacket(player);
+    return RawPacket.newSnapbackPacket(player);
   }
 
 }

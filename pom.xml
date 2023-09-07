@@ -1,18 +1,17 @@
-<project
-  xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-            http://maven.apache.org/maven-v4_0_0.xsd">
+                      http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>otserver4j</groupId>
   <artifactId>otserver4j</artifactId>
   <packaging>jar</packaging>
-  <version>mk-i</version>
+  <version>mk-ii</version>
   <name>OTServer4J</name>
   <description>Open Tibia Server for Java</description>
 
-  <url>https://github.com/xmaiax/otjserver.git</url>
+  <url>https://github.com/xmaiax/otserver4j.git</url>
   <developers>
     <developer>
       <name>Maia</name>
@@ -23,7 +22,7 @@
   <properties>
     <jdk.version>11</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <main.class>${project.groupId}.App</main.class>
+    <main.class>${project.groupId}.Application</main.class>
     <output.directory>RELEASE/</output.directory>
     <spring-boot.version>2.7.15</spring-boot.version>
     <apache-qpid.version>9.0.0</apache-qpid.version>
@@ -162,10 +161,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-undertow</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -173,8 +168,24 @@
     </dependency>
 
     <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-ip</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-undertow</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-websockets-jsr</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

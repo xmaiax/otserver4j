@@ -1,13 +1,13 @@
 package otserver4j.action.impl;
 
-import otserver4j.packet.PacketType;
+import otserver4j.consumer.converter.PacketType;
 
 @org.springframework.stereotype.Component
 public class MoveAction implements otserver4j.action.Action {
 
   @org.springframework.beans.factory.annotation.Autowired private TurnAction turnAction;
   
-  @Override public otserver4j.packet.Packet execute(PacketType type, java.nio.ByteBuffer buffer,
+  @Override public otserver4j.consumer.converter.RawPacket execute(PacketType type, java.nio.ByteBuffer buffer,
       java.nio.channels.SocketChannel channel, otserver4j.structure.PlayerCharacter player) {
     switch(type) {
       case MOVE_NORTH: return this.turnAction.execute(PacketType.TURN_NORTH, buffer, channel, player);

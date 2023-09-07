@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import otserver4j.packet.Packet;
+import otserver4j.consumer.converter.RawPacket;
 import otserver4j.structure.PlayerCharacter;
 import otserver4j.structure.Position;
 
@@ -22,7 +22,7 @@ public class EventQueue {
 
   @Data @Accessors(chain = true)
   private static class Event {
-    private Packet packet;
+    private RawPacket packet;
     private Set<PlayerCharacter> players;
   }
   
@@ -40,7 +40,7 @@ public class EventQueue {
       this.loggedPlayers.remove(playerCharacter);
   }
 
-  public void addNewEvent(Packet packet, Position position) {
+  public void addNewEvent(RawPacket packet, Position position) {
     final Event event = new Event().setPacket(packet).setPlayers(
       this.loggedPlayers.entrySet().stream().map(x -> x.getKey()).collect(Collectors.toSet())
     );

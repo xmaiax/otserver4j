@@ -1,15 +1,15 @@
-package otserver4j.packet;
+package otserver4j.consumer.converter;
 
-import static java.math.BigInteger.ZERO;
 import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
-@lombok.Getter public class Packet {
+@lombok.Getter public class RawPacket {
 
-  public static final Integer MAX_SIZE = 0xffff,
-    CHARACTERS_LIST_START = 0x64, LOGIN_CODE_OK = 0x14, LOGIN_CODE_NOK = 0x0a,
+  public static final Integer MAX_SIZE = 0xffff, LOGIN_CODE_NOK = 0x0a,
     PROCESSING_LOGIN_CODE_OK = 0x0a, PROCESSING_LOGIN_CODE_NOK = 0x14,
     CLIENT_RENDER_CODE = 0x32, ERROR_REPORT_FLAG = 0x00, CODE_MAP_INFO = 0x64,
     CODE_INVENTORY_SLOT_FILLED = 0x78, CODE_INVENTORY_SLOT_EMPTY = 0x79,
@@ -29,30 +29,30 @@ import java.nio.ByteBuffer;
 
   public static String readString(ByteBuffer input) {
     return java.util.stream.IntStream.iterate(ZERO.intValue(), i -> readByte(input))
-      .limit(readInt16(input) + ONE.intValue()).collect(ByteArrayOutputStream::new,
+      .limit(readInt16(input) + ONE.intValue()).collect(java.io.ByteArrayOutputStream::new,
         (baos, i) -> baos.write((byte) i), (baos1, baos2) -> baos1.write(baos2.toByteArray(),
           ZERO.intValue(), baos2.size())).toString().substring(ONE.intValue());
   }
 
   public static void skip(ByteBuffer input, Integer n) { input.position(input.position() + n); }
-  public static Packet createGenericErrorPacket(Integer code, String message) {
-    return new Packet().writeByte(code).writeString(message); }
+  public static RawPacket createGenericErrorPacket(Integer code, String message) {
+    return new RawPacket().writeByte(code).writeString(message); }
 
   private Integer size = ZERO.intValue();
   private byte[] buffer = new byte[MAX_SIZE - 2];
 
-  public Packet writeByte(byte _byte) {
+  public RawPacket writeByte(byte _byte) {
     this.buffer[this.size++] = _byte;
     return this;
   }
 
-  public Packet writeByte(Integer _byte) { return this.writeByte(
+  public RawPacket writeByte(Integer _byte) { return this.writeByte(
     Integer.valueOf(_byte & 0xff).byteValue()); }
-  public Packet writeByte(char _byte) { return this.writeByte((byte) _byte); }
-  public Packet writeInt16(Integer _int) { return this.writeByte(_int & 0x00ff)
+  public RawPacket writeByte(char _byte) { return this.writeByte((byte) _byte); }
+  public RawPacket writeInt16(Integer _int) { return this.writeByte(_int & 0x00ff)
     .writeByte((_int & 0xff00) >> 8); }
 
-  public Packet writeInt32(Long _long) {
+  public RawPacket writeInt32(Long _long) {
     return this
       .writeByte( (int)(_long & 0x000000ff))
       .writeByte(((int)(_long & 0x0000ff00)) >>  8)
@@ -60,7 +60,7 @@ import java.nio.ByteBuffer;
       .writeByte(((int)(_long & 0xff000000)) >> 24);
   }
 
-  public Packet writeString(String _str) {
+  public RawPacket writeString(String _str) {
     this.writeInt16(_str.length());
     _str.chars().forEachOrdered(c -> this.writeByte(c));
     return this;
@@ -74,14 +74,19 @@ import java.nio.ByteBuffer;
     return output;
   }
 
-  public static final Packet newSnapbackPacket(otserver4j.structure.PlayerCharacter player) {
-    return new Packet().writeByte(SNAPBACK_CODE).writeByte(player.getDirection().getCode());
+  public static final RawPacket newSnapbackPacket(otserver4j.structure.PlayerCharacter player) {
+    return new RawPacket().writeByte(SNAPBACK_CODE).writeByte(player.getDirection().getCode());
   }
 
-  public void send(java.nio.channels.SocketChannel sc) throws java.io.IOException {
-    final ByteBuffer bufferTemp = ByteBuffer.allocate(Packet.MAX_SIZE);
+  public void send(SocketChannel socketChannel) throws IOException {
+    final ByteBuffer bufferTemp = ByteBuffer.allocate(RawPacket.MAX_SIZE);
     bufferTemp.put(this.bufferWithSize()); bufferTemp.flip();
-    while(bufferTemp.hasRemaining()) sc.write(bufferTemp);
+    while(bufferTemp.hasRemaining()) socketChannel.write(bufferTemp);
+  }
+
+  public void sendAndClose(SocketChannel socketChannel) throws IOException {
+    this.send(socketChannel);
+    socketChannel.close();
   }
 
 }

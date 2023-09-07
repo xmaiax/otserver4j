@@ -3,7 +3,7 @@ package otserver4j.structure;
 import java.util.Arrays;
 import java.util.Collections;
 
-import otserver4j.packet.Packet;
+import otserver4j.consumer.converter.RawPacket;
 import otserver4j.protocol.impl.SpawnProtocol;
 import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.Status.Party;
@@ -55,7 +55,7 @@ public class GameMap extends java.util.HashMap<String, TileWithItems> {
       .setTile(Tile.NOTHING).setItems(Collections.emptyList());
   }
 
-  public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
+  public RawPacket writeMapInfo(PlayerCharacter player, RawPacket packet) {
     final Position bounds = new Position().setZ(player.getPosition().getZ())
       .setX(player.getPosition().getX() + 9).setY(player.getPosition().getY() + 7);
     for(Integer x = player.getPosition().getX() - 8; x <= bounds.getX(); x++)

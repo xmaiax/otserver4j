@@ -5,8 +5,8 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-import otserver4j.packet.Packet;
-import otserver4j.packet.PacketType;
+import otserver4j.consumer.converter.PacketType;
+import otserver4j.consumer.converter.RawPacket;
 
 public class ClientFake {
 
@@ -17,7 +17,7 @@ public class ClientFake {
   
   public static void main(String[] args) throws IOException, InterruptedException {
     final SocketChannel clientSocket = SocketChannel.open(new InetSocketAddress("localhost", 7171));
-    final Packet loginPacket = new Packet();
+    final RawPacket loginPacket = new RawPacket();
     loginPacket.writeByte(PacketType.LOGIN_SUCCESS.getCode());
     loginPacket.writeInt16(2);
     loginPacket.writeInt16(PROTOCOL_VERSION);
@@ -27,7 +27,7 @@ public class ClientFake {
     loginPacket.writeString(PASSWORD);
     loginPacket.send(clientSocket);
     while(clientSocket.isConnected()) {
-      final ByteBuffer serverResponse = ByteBuffer.allocate(Packet.MAX_SIZE);
+      final ByteBuffer serverResponse = ByteBuffer.allocate(RawPacket.MAX_SIZE);
       clientSocket.read(serverResponse);
       final String output = new String(serverResponse.array()).trim();
       if(!output.isBlank()) {

@@ -6,9 +6,9 @@ import java.nio.channels.SocketChannel;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import otserver4j.config.AMQPConfiguration;
-import otserver4j.packet.Packet;
-import otserver4j.packet.PacketType;
+import otserver4j.Application;
+import otserver4j.consumer.converter.PacketType;
+import otserver4j.consumer.converter.RawPacket;
 import otserver4j.structure.Chat;
 import otserver4j.structure.PlayerCharacter;
 import otserver4j.structure.Position;
@@ -23,21 +23,19 @@ public class TalkAction implements otserver4j.action.Action {
 
   public static final Integer TALK_SERVER_CODE = 0xaa;
   
-  public Packet speak(String name, Chat.ChatType chatType, Position position, String message) {
-    return new Packet().writeByte(TALK_SERVER_CODE).writeString(name).writeByte(chatType.getCode())
+  public RawPacket speak(String name, Chat.ChatType chatType, Position position, String message) {
+    return new RawPacket().writeByte(TALK_SERVER_CODE).writeString(name).writeByte(chatType.getCode())
       .writeInt16(position.getX()).writeInt16(position.getY()).writeByte(position.getZ())
       .writeString(Chat.ChatType.YELL.equals(chatType) ? message.toUpperCase() : message);
   }
 
-  @Override public Packet execute(PacketType type, ByteBuffer buffer,
+  @Override public RawPacket execute(PacketType type, ByteBuffer buffer,
       SocketChannel channel, PlayerCharacter player) {
-    final Chat.ChatType chatType = Chat.ChatType.fromCode(Packet.readByte(buffer));
-    final String message = Packet.readString(buffer);
+    final Chat.ChatType chatType = Chat.ChatType.fromCode(RawPacket.readByte(buffer));
+    final String message = RawPacket.readString(buffer);
     this.eventQueue.addNewEvent(this.speak(player.getName(), chatType,
       player.getPosition(), message), player.getPosition());
-    
-    this.amqpTemplate.convertAndSend(AMQPConfiguration.IN_GAME_ACTIONS_QUEUE, message);
-    
+    this.amqpTemplate.convertAndSend(Application.PACKET_OUTPUT_QUEUE, message);
     return /*new Packet().writeByte(Packet.CODE_SEND_MESSAGE)
       .writeByte(Chat.MessageType.YELLOW.getCode())
       .writeString(String.format("[%s] %s %s: %s",
