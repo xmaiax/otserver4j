@@ -15,7 +15,7 @@ import org.springframework.integration.ip.tcp.connection.TcpSender;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import otserver4j.consumer.converter.PacketMessageConverter.PacketWrapper;
+import otserver4j.converter.PacketMessageConverter.PacketWrapper;
 
 //TODO Melhorar as exception aqui
 @Slf4j @Component

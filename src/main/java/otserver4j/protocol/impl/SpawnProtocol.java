@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.RawPacket;
 import otserver4j.exception.LoginException;
 import otserver4j.structure.FX;
 import otserver4j.structure.Item.ItemWithQuantity;
@@ -110,7 +110,7 @@ public class SpawnProtocol implements otserver4j.protocol.Protocol {
 
   @Override
   public RawPacket execute(java.nio.ByteBuffer buffer, java.nio.channels.SocketChannel channel,
-      PlayerCharacter _null, otserver4j.consumer.converter.PacketType type) throws LoginException {
+      PlayerCharacter _null, otserver4j.converter.PacketType type) throws LoginException {
     RawPacket.skip(buffer, java.math.BigInteger.TWO.intValue());
     final Integer version = RawPacket.readInt16(buffer);
     if(!this.version.equals(version))

@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.action.EventQueue;
-import otserver4j.consumer.converter.PacketType;
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.PacketType;
+import otserver4j.converter.RawPacket;
 import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.SpawnProtocol;
 import otserver4j.structure.PlayerCharacter;

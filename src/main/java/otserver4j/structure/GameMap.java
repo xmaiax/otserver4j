@@ -3,7 +3,7 @@ package otserver4j.structure;
 import java.util.Arrays;
 import java.util.Collections;
 
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.RawPacket;
 import otserver4j.protocol.impl.SpawnProtocol;
 import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.Status.Party;

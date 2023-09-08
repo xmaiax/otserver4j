@@ -5,8 +5,8 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-import otserver4j.consumer.converter.PacketType;
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.PacketType;
+import otserver4j.converter.RawPacket;
 
 public class ClientFake {
 

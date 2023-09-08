@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
 
 import lombok.extern.slf4j.Slf4j;
-import otserver4j.consumer.converter.PacketMessageConverter;
+import otserver4j.converter.PacketMessageConverter;
 
 @Slf4j @SpringBootApplication
 public class Application {

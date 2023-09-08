@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.Application;
-import otserver4j.consumer.converter.PacketType;
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.PacketType;
+import otserver4j.converter.RawPacket;
 
 @Slf4j @Component
 public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
@@ -92,7 +92,7 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
         if(packetSize > ZERO.intValue()) {
           final PacketType packetType = PacketType.fromCode(RawPacket.readByte(buffer));
           this.amqpTemplate.convertAndSend(Application.PACKET_INPUT_QUEUE,
-            new otserver4j.consumer.converter.PacketMessageConverter.RawPacketAmqpMessage()
+            new otserver4j.converter.PacketMessageConverter.RawPacketAmqpMessage()
               .setPacketSize(packetSize).setPacketType(packetType).setBuffer(buffer)
               .setSession(this.sessionManager.getSession(key.attachment().toString())));
         }

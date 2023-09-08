@@ -1,4 +1,4 @@
-package otserver4j.consumer.converter;
+package otserver4j.converter;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;

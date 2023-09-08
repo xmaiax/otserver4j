@@ -2,12 +2,12 @@ package otserver4j.action.impl;
 
 import static otserver4j.structure.Direction.*;
 
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.RawPacket;
 
 @org.springframework.stereotype.Component
 public class TurnAction implements otserver4j.action.Action {
 
-  @Override public RawPacket execute(otserver4j.consumer.converter.PacketType type,
+  @Override public RawPacket execute(otserver4j.converter.PacketType type,
       java.nio.ByteBuffer buffer, java.nio.channels.SocketChannel channel,
       otserver4j.structure.PlayerCharacter player) {
     otserver4j.structure.Direction direction = null;

@@ -15,9 +15,9 @@ public class InGameProtocol implements otserver4j.protocol.Protocol {
   @Autowired private MoveAction moveAction;
   @Autowired private LookAction lookAction;
   
-  @Override public otserver4j.consumer.converter.RawPacket execute(java.nio.ByteBuffer buffer,
+  @Override public otserver4j.converter.RawPacket execute(java.nio.ByteBuffer buffer,
       java.nio.channels.SocketChannel socketChannel,
-      otserver4j.structure.PlayerCharacter player, otserver4j.consumer.converter.PacketType type)
+      otserver4j.structure.PlayerCharacter player, otserver4j.converter.PacketType type)
         throws otserver4j.exception.InGameException {
     switch(type) {
       case TALK:

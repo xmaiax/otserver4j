@@ -4,7 +4,7 @@ import static java.math.BigInteger.ZERO;
 
 import java.util.Collections;
 
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.RawPacket;
 import otserver4j.structure.Item;
 import otserver4j.structure.Position;
 import otserver4j.structure.Tile;
@@ -16,7 +16,7 @@ public class LookAction implements otserver4j.action.Action {
   @org.springframework.beans.factory.annotation.Autowired
   private otserver4j.structure.GameMap gameMap;
 
-  @Override public RawPacket execute(otserver4j.consumer.converter.PacketType type,
+  @Override public RawPacket execute(otserver4j.converter.PacketType type,
       java.nio.ByteBuffer buffer, java.nio.channels.SocketChannel channel,
       otserver4j.structure.PlayerCharacter player) {
     final Position position = new Position().setX(RawPacket.readInt16(buffer))

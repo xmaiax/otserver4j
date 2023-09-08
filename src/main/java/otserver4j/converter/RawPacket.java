@@ -1,4 +1,4 @@
-package otserver4j.consumer.converter;
+package otserver4j.converter;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;

@@ -7,8 +7,8 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import otserver4j.Application;
-import otserver4j.consumer.converter.PacketType;
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.PacketType;
+import otserver4j.converter.RawPacket;
 import otserver4j.structure.Chat;
 import otserver4j.structure.PlayerCharacter;
 import otserver4j.structure.Position;

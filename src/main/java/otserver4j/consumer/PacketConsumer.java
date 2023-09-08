@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import otserver4j.Application;
-import otserver4j.consumer.converter.PacketMessageConverter.PacketWrapper;
-import otserver4j.consumer.converter.RawPacket;
-import otserver4j.consumer.converter.wrapper.LoadCharacterListPacketWrapper;
+import otserver4j.converter.RawPacket;
+import otserver4j.converter.PacketMessageConverter.PacketWrapper;
+import otserver4j.converter.wrapper.LoadCharacterListPacketWrapper;
 import otserver4j.tcp.SessionManager;
 
 @Component

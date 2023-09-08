@@ -1,4 +1,4 @@
-package otserver4j.consumer.converter.wrapper;
+package otserver4j.converter.wrapper;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -15,9 +15,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import otserver4j.consumer.converter.PacketMessageConverter.PacketWrapper;
-import otserver4j.consumer.converter.PacketType;
-import otserver4j.consumer.converter.RawPacket;
+import otserver4j.converter.PacketType;
+import otserver4j.converter.RawPacket;
+import otserver4j.converter.PacketMessageConverter.PacketWrapper;
 import otserver4j.exception.LoginException;
 
 @Accessors(chain = true) @Getter @Setter @ToString
