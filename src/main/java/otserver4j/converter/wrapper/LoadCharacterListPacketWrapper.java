@@ -24,7 +24,7 @@ import otserver4j.exception.LoginException;
 public class LoadCharacterListPacketWrapper extends PacketWrapper {
 
   public static final Integer
-    SKIP_CLIENT_UNUSED_INFO = 0x0c,
+    SKIP_LOGIN_UNUSED_INFO = 0x0c,
     LOGIN_CODE_OK = 0x14,
     CHARACTERS_LIST_START = 0x64;
 
@@ -50,7 +50,7 @@ public class LoadCharacterListPacketWrapper extends PacketWrapper {
   protected Object modifyFromBuffer(ByteBuffer byteBuffer, Integer size) {
     this.setOperatingSystem(OperatingSystem.fromCode(RawPacket.readInt16(byteBuffer)))
         .setClientVersion(RawPacket.readInt16(byteBuffer));
-    RawPacket.skip(byteBuffer, SKIP_CLIENT_UNUSED_INFO);
+    RawPacket.skip(byteBuffer, SKIP_LOGIN_UNUSED_INFO);
     return this.setAccountNumber(RawPacket.readInt32(byteBuffer))
                .setPassword(RawPacket.readString(byteBuffer));
   }
@@ -77,7 +77,7 @@ public class LoadCharacterListPacketWrapper extends PacketWrapper {
   @Accessors(chain = true) @Data @ToString
   public static class CharacterOption {
     private String name;
-    private String profession;
+    private String vocation;
   }
 
   private void writeHostPort(RawPacket packet) throws LoginException {
@@ -101,7 +101,7 @@ public class LoadCharacterListPacketWrapper extends PacketWrapper {
       .writeByte(this.characterOptions.size());
     this.characterOptions.forEach(characterOption -> {
       rawPacket.writeString(characterOption.getName());
-      rawPacket.writeString(characterOption.getProfession());
+      rawPacket.writeString(characterOption.getVocation());
       this.writeHostPort(rawPacket);
     });
     return rawPacket.writeInt16(this.premiumExpiration.after(Calendar.getInstance()) ?
