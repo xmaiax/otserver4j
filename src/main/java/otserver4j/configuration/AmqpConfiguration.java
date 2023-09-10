@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,7 @@ import lombok.Getter;
 
 @lombok.extern.slf4j.Slf4j
 @org.springframework.context.annotation.Configuration
-public class AmqpConnectionConfiguration {
+public class AmqpConfiguration {
 
   @AllArgsConstructor @Getter public static class QpidUser {
     private String name;
@@ -111,6 +112,19 @@ public class AmqpConnectionConfiguration {
     final RabbitTemplate rabbitTemplate = new RabbitTemplate(amqpConnectionFactory);
     rabbitTemplate.setMessageConverter(packetMessageConverter);
     return rabbitTemplate;
+  }
+
+  public static final String PACKET_INPUT_QUEUE = "packetInputQueue";
+  public static final String PACKET_OUTPUT_QUEUE = "packetOutputQueue";
+
+  @Bean
+  public Queue packetInputQueue() {
+    return new Queue(PACKET_INPUT_QUEUE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE);
+  }
+
+  @Bean
+  public Queue packetOutputQueue() {
+    return new Queue(PACKET_OUTPUT_QUEUE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE);
   }
 
 }

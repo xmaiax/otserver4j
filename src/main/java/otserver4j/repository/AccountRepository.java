@@ -1,6 +1,6 @@
 package otserver4j.repository;
 
-import otserver4j.structure.Account;
+import otserver4j.entity.Account;
 
 @org.springframework.stereotype.Repository
 public interface AccountRepository

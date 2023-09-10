@@ -1,4 +1,4 @@
-package otserver4j.tcp;
+package otserver4j.consumer;
 
 import static java.math.BigInteger.ONE;
 

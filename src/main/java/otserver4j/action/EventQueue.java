@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import otserver4j.converter.RawPacket;
-import otserver4j.structure.PlayerCharacter;
+import otserver4j.entity.PlayerCharacter;
 import otserver4j.structure.Position;
 
 //@lombok.extern.slf4j.Slf4j

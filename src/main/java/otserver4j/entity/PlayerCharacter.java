@@ -1,8 +1,15 @@
-package otserver4j.structure;
+package otserver4j.entity;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import otserver4j.structure.Direction;
+import otserver4j.structure.Item;
+import otserver4j.structure.Position;
+import otserver4j.structure.Status;
+import otserver4j.structure.Item.ItemWithQuantity;
+import otserver4j.structure.Status.Condition;
+import otserver4j.structure.Status.Skull;
 
 @Data @Accessors(chain = true)
 public class PlayerCharacter {

@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.converter.wrapper.LoadCharacterListPacketWrapper;
 import otserver4j.converter.wrapper.LoadCharacterListPacketWrapper.CharacterOption;
+import otserver4j.entity.Account;
 import otserver4j.exception.AccountException;
 import otserver4j.repository.AccountRepository;
 import otserver4j.service.LoginService;
-import otserver4j.structure.Account;
 import otserver4j.utils.MD5Utils;
 
 @Slf4j @Service

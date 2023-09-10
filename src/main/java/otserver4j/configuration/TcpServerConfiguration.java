@@ -1,4 +1,4 @@
-package otserver4j.tcp;
+package otserver4j.configuration;
 
 import static java.math.BigInteger.ZERO;
 
@@ -20,7 +20,7 @@ import org.springframework.integration.ip.tcp.serializer.ByteArrayRawSerializer;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import otserver4j.configuration.AmqpQueueConfiguration;
+import otserver4j.consumer.SessionManager;
 import otserver4j.converter.PacketType;
 import otserver4j.converter.RawPacket;
 
@@ -94,7 +94,7 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
           if(PacketType.INVALID.equals(packetType)) {
             log.warn("Invalid packet!"); return;
           }
-          this.amqpTemplate.convertAndSend(AmqpQueueConfiguration.PACKET_INPUT_QUEUE,
+          this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_INPUT_QUEUE,
             new otserver4j.converter.PacketMessageConverter.RawPacketAmqpMessage()
               .setPacketSize(packetSize).setPacketType(packetType).setBuffer(buffer)
               .setSession(this.sessionManager.getSession(key.attachment().toString())));

@@ -1,10 +1,14 @@
-package otserver4j.structure;
+package otserver4j.entity;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import otserver4j.converter.RawPacket;
 import otserver4j.protocol.impl.SpawnProtocol;
+import otserver4j.structure.Direction;
+import otserver4j.structure.Item;
+import otserver4j.structure.Position;
+import otserver4j.structure.Tile;
 import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.Status.Party;
 import otserver4j.structure.Tile.TileWithItems;

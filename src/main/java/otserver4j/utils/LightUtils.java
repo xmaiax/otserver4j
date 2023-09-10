@@ -1,8 +1,8 @@
 package otserver4j.utils;
 
-import otserver4j.structure.GameMap;
+import otserver4j.entity.GameMap;
+import otserver4j.entity.PlayerCharacter;
 import otserver4j.structure.Light;
-import otserver4j.structure.PlayerCharacter;
 import otserver4j.structure.Position;
 
 //TODO: Implementar cálculo de iluminação

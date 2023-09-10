@@ -5,11 +5,11 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import otserver4j.converter.RawPacket;
+import otserver4j.entity.PlayerCharacter;
 import otserver4j.exception.AccountException;
 import otserver4j.structure.FX;
 import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.Light;
-import otserver4j.structure.PlayerCharacter;
 import otserver4j.structure.Position;
 import otserver4j.utils.ExperienceUtils;
 import otserver4j.utils.LightUtils;
@@ -22,7 +22,7 @@ public class SpawnProtocol implements otserver4j.protocol.Protocol {
 
   //@Autowired private otserver4j.service.AccountService accService;
   @Autowired private otserver4j.service.PlayerCharacterService pcService;
-  @Autowired private otserver4j.structure.GameMap gameMap;
+  @Autowired private otserver4j.entity.GameMap gameMap;
 
   @org.springframework.beans.factory.annotation.Value("${otserver.version}")
   private Integer version;

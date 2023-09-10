@@ -75,7 +75,7 @@ import java.nio.channels.SocketChannel;
     return output;
   }
 
-  public static final RawPacket newSnapbackPacket(otserver4j.structure.PlayerCharacter player) {
+  public static final RawPacket newSnapbackPacket(otserver4j.entity.PlayerCharacter player) {
     return new RawPacket().writeByte(SNAPBACK_CODE).writeByte(player.getDirection().getCode());
   }
 

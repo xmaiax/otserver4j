@@ -9,7 +9,7 @@ public class TurnAction implements otserver4j.action.Action {
 
   @Override public RawPacket execute(otserver4j.converter.PacketType type,
       java.nio.ByteBuffer buffer, java.nio.channels.SocketChannel channel,
-      otserver4j.structure.PlayerCharacter player) {
+      otserver4j.entity.PlayerCharacter player) {
     otserver4j.structure.Direction direction = null;
     switch(type) {
       case TURN_NORTH: direction = NORTH; break;

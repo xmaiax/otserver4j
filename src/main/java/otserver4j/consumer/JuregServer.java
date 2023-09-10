@@ -1,4 +1,4 @@
-package otserver4j.tcp;
+package otserver4j.consumer;
 
 import static java.math.BigInteger.ZERO;
 
@@ -16,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import otserver4j.action.EventQueue;
 import otserver4j.converter.PacketType;
 import otserver4j.converter.RawPacket;
+import otserver4j.entity.PlayerCharacter;
 import otserver4j.protocol.impl.InGameProtocol;
 import otserver4j.protocol.impl.SpawnProtocol;
-import otserver4j.structure.PlayerCharacter;
 
 @Slf4j @lombok.Getter
 @org.springframework.stereotype.Component

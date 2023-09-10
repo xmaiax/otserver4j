@@ -1,4 +1,4 @@
-package otserver4j.structure;
+package otserver4j.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

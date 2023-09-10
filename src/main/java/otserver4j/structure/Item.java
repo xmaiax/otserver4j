@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import otserver4j.structure.PlayerCharacter.Slot;
+import otserver4j.entity.PlayerCharacter.Slot;
 
 @lombok.AllArgsConstructor @lombok.Getter
 public enum Item {
