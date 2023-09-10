@@ -15,7 +15,6 @@ import org.springframework.integration.ip.tcp.connection.TcpSender;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import otserver4j.converter.PacketMessageConverter.PacketWrapper;
 
 @Slf4j @Component
 public class SessionManager extends DefaultTcpNioConnectionSupport implements TcpSender {
@@ -28,10 +27,12 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
     this.activeSessions = new HashMap<>();
   }
 
-  public SocketChannel getSocketChannelFromPacketWrapper(PacketWrapper packetWrapper) {
-    if(packetWrapper == null || packetWrapper.getSession() == null ||
-       packetWrapper.getSession().isBlank()) throw new IllegalArgumentException("???");
-    final SocketChannel socketChannel = this.activeSessions.get(packetWrapper.getSession());
+  public SocketChannel getSocketChannelFromSession(String session) {
+    if(session == null || session.isBlank()) {
+      log.error("xxxxxxxxxxxxxxxxxxxxxx");
+      throw new IllegalArgumentException("???");
+    }
+    final SocketChannel socketChannel = this.activeSessions.get(session);
     if(socketChannel == null) {
       log.error("xxxxxxxxxxxxxxxxxxxxxx");
       throw new IllegalArgumentException("???");

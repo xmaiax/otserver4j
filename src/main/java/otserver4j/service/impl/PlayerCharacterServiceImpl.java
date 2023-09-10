@@ -2,7 +2,7 @@ package otserver4j.service.impl;
 
 import java.util.Calendar;
 
-import otserver4j.exception.LoginException;
+import otserver4j.exception.AccountException;
 import otserver4j.structure.Item;
 import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.PlayerCharacter;
@@ -19,7 +19,7 @@ import otserver4j.structure.Status.Skull;
     implements otserver4j.service.PlayerCharacterService {
 
   @Override public PlayerCharacter findPlayerCharacter(Integer accountNumber,
-      String characterName) throws LoginException {
+      String characterName) throws AccountException {
     final Calendar lastLogin = Calendar.getInstance();
     lastLogin.add(Calendar.DAY_OF_YEAR, -10);
     return new PlayerCharacter()

@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.amqp.core.Message;
@@ -33,10 +34,12 @@ public class PacketMessageConverter implements MessageConverter {
   }
 
   public static abstract class PacketWrapper {
-    @Accessors(chain = true) @Getter @Setter private String session;
-    protected abstract Object modifyFromBuffer(ByteBuffer byteBuffer, Integer size);
     protected abstract PacketType getPacketType();
+    protected abstract Object modifyFromBuffer(ByteBuffer byteBuffer, Integer size);
+    @Accessors(chain = true) @Getter @Setter private String fromSession;
+    @Accessors(chain = true) @Getter @Setter private List<String> toSessions;
     public abstract RawPacket convertToRawPacket();
+    public Boolean thenDisconnect() { return Boolean.FALSE; }
   }
 
   private final ObjectMapper objectMapper;
@@ -56,7 +59,7 @@ public class PacketMessageConverter implements MessageConverter {
       }
       final PacketWrapper packetWrapper = (PacketWrapper)((PacketWrapper) emptyConstructor.get().newInstance())
         .modifyFromBuffer(rawPacketAmqpMessage.getBuffer(), rawPacketAmqpMessage.getPacketSize());
-      return packetWrapper.setSession(rawPacketAmqpMessage.getSession());
+      return packetWrapper.setFromSession(rawPacketAmqpMessage.getSession());
     }
     catch(Exception exc) {
       log.error("xxxxxxxxxxxxxxxxxxxxxx");

@@ -15,18 +15,20 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import otserver4j.converter.PacketMessageConverter.PacketWrapper;
 import otserver4j.converter.PacketType;
 import otserver4j.converter.RawPacket;
-import otserver4j.converter.PacketMessageConverter.PacketWrapper;
-import otserver4j.exception.LoginException;
+import otserver4j.exception.AccountException;
 
 @Accessors(chain = true) @Getter @Setter @ToString
 public class LoadCharacterListPacketWrapper extends PacketWrapper {
 
   public static final Integer
     SKIP_LOGIN_UNUSED_INFO = 0x0c,
-    LOGIN_CODE_OK = 0x14,
+    LOGIN_CODE_OK = 0x14, LOGIN_CODE_NOK = 0x0a,
     CHARACTERS_LIST_START = 0x64;
+
+  @Override protected PacketType getPacketType() { return PacketType.LOAD_CHARACTER_LIST; }
 
   @AllArgsConstructor @Getter
   private enum OperatingSystem {
@@ -68,6 +70,9 @@ public class LoadCharacterListPacketWrapper extends PacketWrapper {
     }
   }
 
+  private Boolean failed;
+  private String errorMessage;
+
   private String motd;
   private List<CharacterOption> characterOptions;
   private String host;
@@ -80,22 +85,26 @@ public class LoadCharacterListPacketWrapper extends PacketWrapper {
     private String vocation;
   }
 
-  private void writeHostPort(RawPacket packet) throws LoginException {
+  private void writeHostPort(RawPacket packet) throws AccountException {
     try {
       Arrays.stream(InetAddress.getByName(this.host).getHostAddress()
         .split("[.]")).forEach(ipPart -> packet.writeByte(Integer.valueOf(ipPart)));
       packet.writeInt16(this.port);
     }
     catch(UnknownHostException uhe) {
-      throw new LoginException(String.format("Unable to reach host '%s'.", this.host));
+      throw new AccountException(String.format("Unable to reach host '%s'.", this.host));
     }
   }
 
-  @Override protected PacketType getPacketType() { return PacketType.LOAD_CHARACTER_LIST; }
-
   @Override
   public RawPacket convertToRawPacket() {
-    final RawPacket rawPacket = new RawPacket().writeByte(LOGIN_CODE_OK)
+    if(this.failed == null || this.failed) {
+      return new RawPacket()
+        .writeByte(LOGIN_CODE_NOK)
+        .writeString(this.errorMessage);
+    }
+    final RawPacket rawPacket = new RawPacket()
+      .writeByte(LOGIN_CODE_OK)
       .writeString(new MOTD(this.motd).toString())
       .writeByte(CHARACTERS_LIST_START)
       .writeByte(this.characterOptions.size());
@@ -108,6 +117,11 @@ public class LoadCharacterListPacketWrapper extends PacketWrapper {
       (int) TimeUnit.DAYS.convert(this.premiumExpiration.getTimeInMillis() -
         Calendar.getInstance().getTimeInMillis(), TimeUnit.MILLISECONDS) :
           BigInteger.ZERO.intValue());
+  }
+
+  @Override
+  public Boolean thenDisconnect() {
+    return Boolean.TRUE;
   }
 
 }
