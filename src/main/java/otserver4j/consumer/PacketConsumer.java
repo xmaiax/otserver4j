@@ -47,11 +47,11 @@ public class PacketConsumer {
   }
 
   @RabbitListener(queues = { AmqpConfiguration.PACKET_INPUT_QUEUE, })
-  public void inputListener(PacketWrapper packetObject) {
-    if(packetObject instanceof LoadCharacterListPacketWrapper) {
-      this.loginService.modifyCharacterListPacket((LoadCharacterListPacketWrapper) packetObject);
+  public void inputListener(PacketWrapper packetWrapper) {
+    if(packetWrapper instanceof LoadCharacterListPacketWrapper) {
+      this.loginService.modifyCharacterListPacket((LoadCharacterListPacketWrapper) packetWrapper);
     }
-    this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_OUTPUT_QUEUE, packetObject);
+    this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_OUTPUT_QUEUE, packetWrapper);
   }
 
 }
