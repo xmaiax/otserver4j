@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.converter.PacketMessageConverter.PacketWrapper;
 
-//TODO Melhorar as exception aqui
 @Slf4j @Component
 public class SessionManager extends DefaultTcpNioConnectionSupport implements TcpSender {
 
@@ -33,7 +32,10 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
     if(packetWrapper == null || packetWrapper.getSession() == null ||
        packetWrapper.getSession().isBlank()) throw new IllegalArgumentException("???");
     final SocketChannel socketChannel = this.activeSessions.get(packetWrapper.getSession());
-    if(socketChannel == null) throw new IllegalArgumentException("???");
+    if(socketChannel == null) {
+      log.error("xxxxxxxxxxxxxxxxxxxxxx");
+      throw new IllegalArgumentException("???");
+    }
     return socketChannel;
   }
 
@@ -41,6 +43,7 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
     if(connectionId == null || connectionId.isBlank()) throw new IllegalArgumentException("???");
     final String[] split = connectionId.split(this.portsRegexCapturingGroup);
     if(split.length > ONE.intValue()) return split[ONE.intValue()];
+    log.error("xxxxxxxxxxxxxxxxxxxxxx");
     throw new IllegalArgumentException("???");
   }
 
@@ -58,25 +61,27 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
   public void addNewConnection(TcpConnection tcpConnection) {
     if(tcpConnection == null || tcpConnection.getConnectionId() == null ||
        tcpConnection.getConnectionId().isBlank()) {
+      log.error("xxxxxxxxxxxxxxxxxxxxxx");
       throw new IllegalArgumentException("???");
     }
     final String session = this.getSession(tcpConnection.getConnectionId());
+    //...
     this.activeSessions.put(session, ((TcpNioConnectionWithSocketChannel) tcpConnection).getSocketChannel());
-    log.info("New session: {}", session);
   }
 
   public void removeConnection(String connectionIdentifier) {
     this.activeSessions.remove(connectionIdentifier);
-    log.info("Session removed: {}", connectionIdentifier);
   }
 
   @Override
   public void removeDeadConnection(TcpConnection tcpConnection) {
     if(tcpConnection == null || tcpConnection.getConnectionId() == null ||
         tcpConnection.getConnectionId().isBlank()) {
+      log.error("xxxxxxxxxxxxxxxxxxxxxx");
       throw new IllegalArgumentException("???");
     }
     final String session = this.getSession(tcpConnection.getConnectionId());
+    //...
     this.removeConnection(session);
   }
 

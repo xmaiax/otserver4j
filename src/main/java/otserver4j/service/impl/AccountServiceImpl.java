@@ -1,6 +1,7 @@
 package otserver4j.service.impl;
 
 import java.util.Calendar;
+import java.util.Collections;
 
 import org.springframework.stereotype.Service;
 
@@ -25,12 +26,9 @@ public class AccountServiceImpl implements AccountService {
     premiumExpiration.add(Calendar.DAY_OF_MONTH, 15);
     return new Account()
       .setAccountNumber(accountNumber)
-      .setPasswordMD5(MD5Utils.getInstance().str2md5(password))
+      .setPasswordHash(MD5Utils.getInstance().str2md5(password))
       .setPremiumExpiration(premiumExpiration)
-      .setCharacters(java.util.Arrays.asList(new Account.CharacterOption[] {
-        new Account.CharacterOption().setName("Maia").setProfession("Necromancer"),
-        new Account.CharacterOption().setName("Stefane").setProfession("Wizard"),
-      }));
+      .setCharacters(Collections.emptyList());
   }
 
 }
