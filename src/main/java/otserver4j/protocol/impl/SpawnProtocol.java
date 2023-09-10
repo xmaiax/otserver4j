@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import otserver4j.converter.RawPacket;
-import otserver4j.exception.LoginException;
+import otserver4j.exception.AccountException;
 import otserver4j.structure.FX;
 import otserver4j.structure.Item.ItemWithQuantity;
 import otserver4j.structure.Light;
@@ -20,7 +20,7 @@ public class SpawnProtocol implements otserver4j.protocol.Protocol {
   public static final Long PLAYER_IDENTIFIER_PREFIX = 0x0fffffffL;
   public static final FX SPAWN_EFFECT = FX.SPAWN;
 
-  @Autowired private otserver4j.service.AccountService accService;
+  //@Autowired private otserver4j.service.AccountService accService;
   @Autowired private otserver4j.service.PlayerCharacterService pcService;
   @Autowired private otserver4j.structure.GameMap gameMap;
 
@@ -110,20 +110,21 @@ public class SpawnProtocol implements otserver4j.protocol.Protocol {
 
   @Override
   public RawPacket execute(java.nio.ByteBuffer buffer, java.nio.channels.SocketChannel channel,
-      PlayerCharacter _null, otserver4j.converter.PacketType type) throws LoginException {
-    RawPacket.skip(buffer, java.math.BigInteger.TWO.intValue());
+      PlayerCharacter _null, otserver4j.converter.PacketType type) throws AccountException {
+        return null;
+    /*RawPacket.skip(buffer, java.math.BigInteger.TWO.intValue());
     final Integer version = RawPacket.readInt16(buffer);
     if(!this.version.equals(version))
-      throw new LoginException(LoginException.CommonError.WRONG_VERSION_NUMBER);
+      throw new AccountException(AccountException.CommonError.WRONG_VERSION_NUMBER);
     RawPacket.skip(buffer, java.math.BigInteger.ONE.intValue());
     final Integer accountNumber = RawPacket.readInt32(buffer);
     final String selectedCharacterName = RawPacket.readString(buffer);
     if(selectedCharacterName == null || selectedCharacterName.isBlank())
-      throw new LoginException(LoginException.CommonError.INVALID_SELECTED_CHARACTER);
+      throw new AccountException(AccountException.CommonError.INVALID_SELECTED_CHARACTER);
     final String password = RawPacket.readString(buffer);
     final otserver4j.structure.Account account = this.accService.findAccount(accountNumber, password);
     if(account.getCharacters().stream().noneMatch(c -> c.getName().equals(selectedCharacterName)))
-      throw new LoginException(String.format("No character found with name "
+      throw new AccountException(String.format("No character found with name "
         + "'%s' in the given account.", selectedCharacterName));
     final PlayerCharacter player = this.pcService.findPlayerCharacter(
       accountNumber, selectedCharacterName);
@@ -149,7 +150,7 @@ public class SpawnProtocol implements otserver4j.protocol.Protocol {
              .writeByte(RawPacket.PROCESSING_LOGIN_CODE_OK)
              .writeInt32(PLAYER_IDENTIFIER_PREFIX + player.getIdentifier())
              .writeInt16(RawPacket.CLIENT_RENDER_CODE)
-             .writeByte(RawPacket.ERROR_REPORT_FLAG))))))))));
+             .writeByte(RawPacket.ERROR_REPORT_FLAG))))))))));*/
   }
 
 }

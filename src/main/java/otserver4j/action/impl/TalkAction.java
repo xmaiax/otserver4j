@@ -6,7 +6,7 @@ import java.nio.channels.SocketChannel;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import otserver4j.Application;
+import otserver4j.configuration.AmqpQueueConfiguration;
 import otserver4j.converter.PacketType;
 import otserver4j.converter.RawPacket;
 import otserver4j.structure.Chat;
@@ -35,7 +35,7 @@ public class TalkAction implements otserver4j.action.Action {
     final String message = RawPacket.readString(buffer);
     this.eventQueue.addNewEvent(this.speak(player.getName(), chatType,
       player.getPosition(), message), player.getPosition());
-    this.amqpTemplate.convertAndSend(Application.PACKET_OUTPUT_QUEUE, message);
+    this.amqpTemplate.convertAndSend(AmqpQueueConfiguration.PACKET_OUTPUT_QUEUE, message);
     return /*new Packet().writeByte(Packet.CODE_SEND_MESSAGE)
       .writeByte(Chat.MessageType.YELLOW.getCode())
       .writeString(String.format("[%s] %s %s: %s",

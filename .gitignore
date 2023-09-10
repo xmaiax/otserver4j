@@ -4,3 +4,5 @@ RELEASE/
 target/
 .classpath
 .project
+/database/
+/derby.log

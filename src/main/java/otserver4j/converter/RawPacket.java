@@ -9,7 +9,7 @@ import java.nio.channels.SocketChannel;
 
 @lombok.Getter public class RawPacket {
 
-  public static final Integer MAX_SIZE = 0xffff, LOGIN_CODE_NOK = 0x0a,
+  public static final Integer MAX_SIZE = 0xffff,
     PROCESSING_LOGIN_CODE_OK = 0x0a, PROCESSING_LOGIN_CODE_NOK = 0x14,
     CLIENT_RENDER_CODE = 0x32, ERROR_REPORT_FLAG = 0x00, CODE_MAP_INFO = 0x64,
     CODE_INVENTORY_SLOT_FILLED = 0x78, CODE_INVENTORY_SLOT_EMPTY = 0x79,
@@ -35,6 +35,7 @@ import java.nio.channels.SocketChannel;
   }
 
   public static void skip(ByteBuffer input, Integer n) { input.position(input.position() + n); }
+
   public static RawPacket createGenericErrorPacket(Integer code, String message) {
     return new RawPacket().writeByte(code).writeString(message); }
 
@@ -82,11 +83,6 @@ import java.nio.channels.SocketChannel;
     final ByteBuffer bufferTemp = ByteBuffer.allocate(RawPacket.MAX_SIZE);
     bufferTemp.put(this.bufferWithSize()); bufferTemp.flip();
     while(bufferTemp.hasRemaining()) socketChannel.write(bufferTemp);
-  }
-
-  public void sendAndClose(SocketChannel socketChannel) throws IOException {
-    this.send(socketChannel);
-    socketChannel.close();
   }
 
 }

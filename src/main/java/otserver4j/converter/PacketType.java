@@ -2,6 +2,7 @@ package otserver4j.converter;
 
 @lombok.Getter
 public enum PacketType {
+
   LOAD_CHARACTER_LIST(0x01, otserver4j.converter.wrapper.LoadCharacterListPacketWrapper.class),
   LOGIN_SUCCESS(0x0a, null),
   LOGOFF(0x14, null),
@@ -68,6 +69,7 @@ public enum PacketType {
   }
 
   public static PacketType fromCode(Integer code) {
+    if(code == null) return INVALID;
     return java.util.Arrays.asList(PacketType.values()).stream()
       .filter(pt -> pt.getCode().equals(code) || INVALID.equals(pt)).findFirst().get(); }
 

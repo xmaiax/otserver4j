@@ -142,9 +142,9 @@ class ConnectionThread extends Thread {
               (packet == null ? RawPacket.newSnapbackPacket(loggedPlayer) : packet).send(socketChannel);
             }
           }
-          catch(otserver4j.exception.LoginException otjex) {
+          catch(otserver4j.exception.AccountException otjex) {
             RawPacket.createGenericErrorPacket(protocol instanceof SpawnProtocol ?
-              RawPacket.PROCESSING_LOGIN_CODE_NOK : RawPacket.LOGIN_CODE_NOK,
+              RawPacket.PROCESSING_LOGIN_CODE_NOK : 0x0a,
                 otjex.getMessage()).send(socketChannel);
           }
           catch(otserver4j.exception.InGameException ige) {

@@ -1,17 +1,14 @@
 package otserver4j.structure;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-@Data @Accessors(chain = true) public class Account {
-  @Data @lombok.ToString
-  @Accessors(chain = true)
-  public static class CharacterOption {
-    private String name;
-    private String profession;
-  }
-  private Integer accountNumber;
-  private String passwordMD5;
+@Entity @Data @Accessors(chain = true)
+public class Account {
+  @Id private Integer accountNumber;
+  private String passwordHash;
   private java.util.Calendar premiumExpiration;
-  private java.util.List<CharacterOption> characters;
 }

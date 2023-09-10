@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.amqp.core.Message;
@@ -20,12 +21,12 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
-@Component
+@Slf4j @Component
 public class PacketMessageConverter implements MessageConverter {
 
-  @Data @Accessors(chain = true)
-  public static class RawPacketAmqpMessage {
+  @Data @Accessors(chain = true) public static class RawPacketAmqpMessage {
     private Integer packetSize;
     private PacketType packetType;
     private ByteBuffer buffer;
@@ -33,29 +34,36 @@ public class PacketMessageConverter implements MessageConverter {
   }
 
   public static abstract class PacketWrapper {
-    @Accessors(chain = true) @Getter @Setter private String session;
-    protected abstract Object modifyFromBuffer(ByteBuffer byteBuffer, Integer size);
     protected abstract PacketType getPacketType();
+    protected abstract Object modifyFromBuffer(ByteBuffer byteBuffer, Integer size);
+    @Accessors(chain = true) @Getter @Setter private String fromSession;
+    @Accessors(chain = true) @Getter @Setter private List<String> toSessions;
     public abstract RawPacket convertToRawPacket();
+    public Boolean thenDisconnect() { return Boolean.FALSE; }
   }
 
   private final ObjectMapper objectMapper;
-  public PacketMessageConverter(ObjectMapper objectMapper) { this.objectMapper = objectMapper; }
+  public PacketMessageConverter(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 
   private Object getWrapperFromRawPacketAmqpMessage(RawPacketAmqpMessage rawPacketAmqpMessage) {
     try {
       final Optional<Constructor<?>> emptyConstructor = Arrays.asList(
         rawPacketAmqpMessage.getPacketType().getObjectClass().getConstructors()).stream()
           .filter(constr -> constr.getParameterCount() < BigInteger.ONE.intValue()).findFirst();
-      if(emptyConstructor.isEmpty()) throw new IllegalStateException(
-        String.format("No empty constructor found in packet wrapper '%s'...",
+      if(emptyConstructor.isEmpty()) {
+        log.error("xxxxxxxxxxxxxxxxxxxxxx");
+        throw new IllegalStateException(String.format("No empty constructor found in packet wrapper '%s'...",
           rawPacketAmqpMessage.getPacketType().getObjectClass().getCanonicalName()));
+      }
       final PacketWrapper packetWrapper = (PacketWrapper)((PacketWrapper) emptyConstructor.get().newInstance())
         .modifyFromBuffer(rawPacketAmqpMessage.getBuffer(), rawPacketAmqpMessage.getPacketSize());
-      return packetWrapper.setSession(rawPacketAmqpMessage.getSession());
+      return packetWrapper.setFromSession(rawPacketAmqpMessage.getSession());
     }
-    catch(Exception e) {
-      throw new IllegalStateException(e);
+    catch(Exception exc) {
+      log.error("xxxxxxxxxxxxxxxxxxxxxx");
+      throw new IllegalStateException(exc);
     }
   }
 
@@ -70,6 +78,7 @@ public class PacketMessageConverter implements MessageConverter {
           this.getWrapperFromRawPacketAmqpMessage(rawPacketAmqpMessage)), messageProperties);
       }
       catch(JsonProcessingException jpex) {
+        log.error("xxxxxxxxxxxxxxxxxxxxxx");
         throw new MessageConversionException(jpex.getMessage(), jpex);
       }
     }
@@ -78,19 +87,24 @@ public class PacketMessageConverter implements MessageConverter {
       messageProperties.setType(packetWrapper.getPacketType().name());
       try { return new Message(this.objectMapper.writeValueAsBytes(packetWrapper), messageProperties); }
       catch(JsonProcessingException jpex) {
+        log.error("xxxxxxxxxxxxxxxxxxxxxx");
         throw new MessageConversionException(jpex.getMessage(), jpex);
       }
     }
-    else throw new MessageConversionException(
-      String.format("Unknown instance type: %s", object.getClass()));
+    else {
+      log.error("xxxxxxxxxxxxxxxxxxxxxx");
+      throw new MessageConversionException(
+        String.format("Unknown instance type: %s", object.getClass()));
+    }
   }
 
   @Override
   public Object fromMessage(Message message) throws MessageConversionException {
     final PacketType packetType = PacketType.valueOf(message.getMessageProperties().getType());
     try { return this.objectMapper.readValue(message.getBody(), packetType.getObjectClass()); }
-    catch (IOException e) {
-      throw new IllegalStateException(e);
+    catch(IOException ioex) {
+      log.error("xxxxxxxxxxxxxxxxxxxxxx");
+      throw new IllegalStateException(ioex);
     }
   }
 
