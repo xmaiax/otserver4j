@@ -13,6 +13,7 @@ import java.util.Iterator;
 import javax.annotation.PostConstruct;
 
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.ip.tcp.TcpReceivingChannelAdapter;
 import org.springframework.integration.ip.tcp.connection.TcpNioServerConnectionFactory;
@@ -20,9 +21,8 @@ import org.springframework.integration.ip.tcp.serializer.ByteArrayRawSerializer;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import otserver4j.consumer.SessionManager;
-import otserver4j.converter.PacketType;
-import otserver4j.converter.RawPacket;
+import otserver4j.structure.PacketType;
+import otserver4j.structure.RawPacket;
 
 @Slf4j @Component
 public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
@@ -82,8 +82,8 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
         catch (IOException ioex) {
           log.error("Packet read error: {}", ioex.getMessage(), ioex);
           try { socketChannel.close(); }
-          catch(IOException e) {
-            log.error("Socket channel failed to close: {}", ioex.getMessage(), ioex);
+          catch(IOException ioex2) {
+            log.error("Socket channel failed to close: {}", ioex2.getMessage(), ioex2);
           }
           return;
         }
@@ -95,12 +95,16 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
             log.warn("Invalid packet!"); return;
           }
           this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_INPUT_QUEUE,
-            new otserver4j.converter.PacketMessageConverter.RawPacketAmqpMessage()
+            new otserver4j.packet.PacketMessageConverter.RawPacketAmqpMessage()
               .setPacketSize(packetSize).setPacketType(packetType).setBuffer(buffer)
               .setSession(this.sessionManager.getSession(key.attachment().toString())));
         }
       }
     }
   }
+
+  @RabbitListener(queues = { AmqpConfiguration.PACKET_INPUT_QUEUE, })
+  public void inputListener(otserver4j.packet.AbstractPacketFactory.PacketRequest packetRequest) {
+    this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_OUTPUT_QUEUE, packetRequest); }
 
 }

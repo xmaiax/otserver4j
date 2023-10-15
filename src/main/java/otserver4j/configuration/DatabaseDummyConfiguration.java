@@ -10,12 +10,12 @@ import otserver4j.repository.AccountRepository;
 import otserver4j.service.LoginService;
 
 @Configuration
-public class DatabaseConfiguration {
+public class DatabaseDummyConfiguration {
 
-  private LoginService loginService;
-  private AccountRepository accountRepository;
+  private final LoginService loginService;
+  private final AccountRepository accountRepository;
 
-  public DatabaseConfiguration(
+  public DatabaseDummyConfiguration(
       LoginService loginService,
       AccountRepository accountRepository) {
     this.loginService = loginService;

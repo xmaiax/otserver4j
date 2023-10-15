@@ -1,7 +1,7 @@
 package otserver4j.repository;
 
-import otserver4j.entity.Account;
+import otserver4j.entity.AccountEntity;
 
 @org.springframework.stereotype.Repository
 public interface AccountRepository
-  extends org.springframework.data.repository.CrudRepository<Account, Integer> { }
+  extends org.springframework.data.repository.CrudRepository<AccountEntity, Integer> { }

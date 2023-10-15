@@ -1,4 +1,4 @@
-package otserver4j.consumer;
+package otserver4j.configuration;
 
 import static java.math.BigInteger.ONE;
 
@@ -27,15 +27,18 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
     this.activeSessions = new HashMap<>();
   }
 
+  private static final IllegalArgumentException
+    INVALID_SESSION_EXCEPTION = new IllegalArgumentException("Invalid session.");
+
   public SocketChannel getSocketChannelFromSession(String session) {
     if(session == null || session.isBlank()) {
-      log.error("xxxxxxxxxxxxxxxxxxxxxx");
-      throw new IllegalArgumentException("???");
+      log.error("Invalid session.");
+      throw INVALID_SESSION_EXCEPTION;
     }
     final SocketChannel socketChannel = this.activeSessions.get(session);
     if(socketChannel == null) {
-      log.error("xxxxxxxxxxxxxxxxxxxxxx");
-      throw new IllegalArgumentException("???");
+      final String message = String.format("No socket channel found for session '%s'.", session);
+      log.error(message); throw new IllegalArgumentException(message);
     }
     return socketChannel;
   }
@@ -44,8 +47,8 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
     if(connectionId == null || connectionId.isBlank()) throw new IllegalArgumentException("???");
     final String[] split = connectionId.split(this.portsRegexCapturingGroup);
     if(split.length > ONE.intValue()) return split[ONE.intValue()];
-    log.error("xxxxxxxxxxxxxxxxxxxxxx");
-    throw new IllegalArgumentException("???");
+    final String message = String.format("Invalid connectionId format: %s", connectionId);
+    log.error(message); throw new IllegalArgumentException(message);
   }
 
   private static class TcpNioConnectionWithSocketChannel extends TcpNioConnection {
@@ -62,8 +65,8 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
   public void addNewConnection(TcpConnection tcpConnection) {
     if(tcpConnection == null || tcpConnection.getConnectionId() == null ||
        tcpConnection.getConnectionId().isBlank()) {
-      log.error("xxxxxxxxxxxxxxxxxxxxxx");
-      throw new IllegalArgumentException("???");
+      log.error("Invalid TCP connection.");
+      throw new IllegalArgumentException("Invalid TCP connection.");
     }
     final String session = this.getSession(tcpConnection.getConnectionId());
     //...
@@ -78,8 +81,8 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
   public void removeDeadConnection(TcpConnection tcpConnection) {
     if(tcpConnection == null || tcpConnection.getConnectionId() == null ||
         tcpConnection.getConnectionId().isBlank()) {
-      log.error("xxxxxxxxxxxxxxxxxxxxxx");
-      throw new IllegalArgumentException("???");
+      log.error("Invalid TCP connection.");
+      throw new IllegalArgumentException("Invalid TCP connection.");
     }
     final String session = this.getSession(tcpConnection.getConnectionId());
     //...

@@ -1,4 +1,4 @@
-package otserver4j.converter;
+package otserver4j.structure;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
@@ -73,10 +73,6 @@ import java.nio.channels.SocketChannel;
       ((byte)((this.size & 0xff00) >> 8)), }, ZERO.intValue(), output, ZERO.intValue(), 0x02);
     System.arraycopy(this.buffer, ZERO.intValue(), output, 0x02, this.size);
     return output;
-  }
-
-  public static final RawPacket newSnapbackPacket(otserver4j.entity.PlayerCharacter player) {
-    return new RawPacket().writeByte(SNAPBACK_CODE).writeByte(player.getDirection().getCode());
   }
 
   public void send(SocketChannel socketChannel) throws IOException {
