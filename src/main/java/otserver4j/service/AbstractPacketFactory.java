@@ -1,4 +1,4 @@
-package otserver4j.packet;
+package otserver4j.service;
 
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
@@ -11,8 +11,8 @@ import otserver4j.structure.RawPacket;
 @lombok.extern.slf4j.Slf4j
 @SuppressWarnings({ "unchecked", })
 public abstract class AbstractPacketFactory<
-    Request extends otserver4j.packet.AbstractPacketFactory.PacketRequest,
-    Response extends otserver4j.packet.AbstractPacketFactory.PacketResponse> {
+    Request extends otserver4j.service.AbstractPacketFactory.PacketRequest,
+    Response extends otserver4j.service.AbstractPacketFactory.PacketResponse> {
 
   public abstract PacketType getPacketType();
   public abstract boolean thenDisconnect();
@@ -32,7 +32,7 @@ public abstract class AbstractPacketFactory<
     @Getter private PacketType packetType;
   }
   public abstract Response generatePacketResponse(Request request);
-  protected final Response convertObjectRequestToCustomPacketResponse(PacketRequest packetRequest) {
+  public final Response convertObjectRequestToCustomPacketResponse(PacketRequest packetRequest) {
     final PacketResponse response = (PacketResponse) this.generatePacketResponse((Request) packetRequest);
     response.session = packetRequest.getSession();
     response.packetType = packetRequest.getPacketType();

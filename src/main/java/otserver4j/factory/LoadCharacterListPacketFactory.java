@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.entity.AccountEntity;
 import otserver4j.exception.AccountException;
-import otserver4j.packet.AbstractPacketFactory;
+import otserver4j.service.AbstractPacketFactory;
 import otserver4j.service.LoginService;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
@@ -64,7 +64,7 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
 
   @Accessors(chain = true) @Getter @Setter
   public static class LoadCharacterListPacketRequest
-      extends otserver4j.packet.AbstractPacketFactory.PacketRequest {
+      extends otserver4j.service.AbstractPacketFactory.PacketRequest {
     private OperatingSystem operatingSystem;
     private Integer clientVersion;
     private Integer accountNumber;
@@ -92,7 +92,7 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
 
   @Accessors(chain = true) @Getter @Setter
   public static class LoadCharacterListPacketResponse
-      extends otserver4j.packet.AbstractPacketFactory.PacketResponse {
+      extends otserver4j.service.AbstractPacketFactory.PacketResponse {
     private String errorMessage;
     private String messageOfTheDay;
     private java.util.List<CharacterOption> characterOptions;

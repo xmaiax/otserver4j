@@ -108,7 +108,7 @@ public class AmqpConfiguration {
   @Bean
   public org.springframework.amqp.core.AmqpTemplate amqpTemplate(
       org.springframework.amqp.rabbit.connection.ConnectionFactory amqpConnectionFactory,
-      otserver4j.packet.PacketMessageConverter packetMessageConverter) {
+      otserver4j.service.impl.PacketMessageConverter packetMessageConverter) {
     final RabbitTemplate rabbitTemplate = new RabbitTemplate(amqpConnectionFactory);
     rabbitTemplate.setMessageConverter(packetMessageConverter);
     return rabbitTemplate;

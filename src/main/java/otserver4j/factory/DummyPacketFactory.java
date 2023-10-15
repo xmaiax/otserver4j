@@ -3,7 +3,7 @@ package otserver4j.factory;
 import java.util.Collections;
 import java.util.Set;
 
-import otserver4j.packet.AbstractPacketFactory;
+import otserver4j.service.AbstractPacketFactory;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
@@ -16,10 +16,10 @@ public class DummyPacketFactory extends AbstractPacketFactory<
   @Override public boolean thenDisconnect() { return false; }
 
   public static class DummyPacketRequest
-    extends otserver4j.packet.AbstractPacketFactory.PacketRequest { }
+    extends otserver4j.service.AbstractPacketFactory.PacketRequest { }
 
   public static class DummyPacketResponse
-    extends otserver4j.packet.AbstractPacketFactory.PacketResponse { }
+    extends otserver4j.service.AbstractPacketFactory.PacketResponse { }
 
   @Override
   public DummyPacketRequest newPacketRequest(java.nio.ByteBuffer byteBuffer, Integer packetSize) {

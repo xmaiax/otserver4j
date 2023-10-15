@@ -1,4 +1,4 @@
-package otserver4j.packet;
+package otserver4j.service.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,9 +20,10 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.configuration.AmqpConfiguration;
 import otserver4j.exception.GenericException;
-import otserver4j.packet.AbstractPacketFactory.PacketRequest;
-import otserver4j.packet.AbstractPacketFactory.PacketResponse;
 import otserver4j.repository.SessionManager;
+import otserver4j.service.AbstractPacketFactory;
+import otserver4j.service.AbstractPacketFactory.PacketRequest;
+import otserver4j.service.AbstractPacketFactory.PacketResponse;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 

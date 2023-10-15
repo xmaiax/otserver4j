@@ -96,7 +96,7 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
             log.warn("Invalid packet!"); return;
           }
           this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_INPUT_QUEUE,
-            new otserver4j.packet.PacketMessageConverter.RawPacketAmqpMessage()
+            new otserver4j.service.impl.PacketMessageConverter.RawPacketAmqpMessage()
               .setPacketSize(packetSize).setPacketType(packetType).setBuffer(buffer)
               .setSession(this.sessionManager.getSession(key.attachment().toString())));
         }
@@ -105,7 +105,7 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
   }
 
   @RabbitListener(queues = { AmqpConfiguration.PACKET_INPUT_QUEUE, })
-  public void inputListener(otserver4j.packet.AbstractPacketFactory.PacketRequest packetRequest) {
+  public void inputListener(otserver4j.service.AbstractPacketFactory.PacketRequest packetRequest) {
     this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_OUTPUT_QUEUE, packetRequest); }
 
 }
