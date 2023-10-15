@@ -158,7 +158,8 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
         }
       });
     }
-    return rawPacket.writeInt16(response.getPremiumDaysLeft() == null ?
+    return rawPacket.writeInt16(response.getPremiumDaysLeft() == null ||
+        response.getPremiumDaysLeft() < BigInteger.ZERO.intValue() ?
       BigInteger.ZERO.intValue() : response.getPremiumDaysLeft());
   }
 
