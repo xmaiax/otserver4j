@@ -64,29 +64,4 @@ public class LoginServiceImpl implements LoginService {
     return accountOpt.get().setPasswordHash(null);
   }
 
-  /*
-  @Override
-  public void modifyCharacterListPacket(LoadCharacterListPacketWrapper loadCharacterListPacketWrapper) {
-    try {
-      if(!this.version.equals(loadCharacterListPacketWrapper.getClientVersion()))
-        throw AccountException.WRONG_VERSION_NUMBER_EXCEPTION;
-      final Account account = this.findAccountToLogin(
-        loadCharacterListPacketWrapper.getAccountNumber(),
-        loadCharacterListPacketWrapper.getPassword());
-      loadCharacterListPacketWrapper.setFailed(Boolean.FALSE).setMotd(this.messageOfTheDay)
-        .setPremiumExpiration(account.getPremiumExpiration()).setHost(this.host).setPort(this.port);
-      //----
-      loadCharacterListPacketWrapper.setCharacterOptions(
-        Collections.singletonList(new CharacterOption().setName("Maia").setVocation("Necromancer"))
-      );
-      //----
-      log.info("Successful login from account '{}'!", account.getAccountNumber());
-    }
-    catch(AccountException accountException) {
-      loadCharacterListPacketWrapper.setFailed(Boolean.TRUE);
-      loadCharacterListPacketWrapper.setErrorMessage(accountException.getMessage());
-    }
-  }
-  */
-
 }
