@@ -55,8 +55,7 @@ public abstract class AbstractPacketFactory<
     this.responseClass = (Class<Response>) genericSuperclass.getActualTypeArguments(
       )[BigInteger.ONE.intValue()];
     log.info("PacketFactory for type '{}' initialized (Request: {}, Response: {}).",
-      this.getPacketType().name(), this.requestClass.getSimpleName(),
-        this.responseClass.getSimpleName());
+      this.getPacketType(), this.requestClass.getName(), this.responseClass.getName());
   }
 
 }

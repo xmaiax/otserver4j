@@ -69,7 +69,7 @@ public enum PacketType {
 
   @Override
   public String toString() {
-    return String.format("%s (%d)", this.name(), this.getCode());
+    return String.format("%s (0x%02X)", this.name(), this.getCode());
   }
 
 }

@@ -57,8 +57,7 @@ public class PacketMessageConverter implements MessageConverter {
   public static class NoPacketFactoryFoundException extends GenericException {
     private static final long serialVersionUID = -1L;
     public NoPacketFactoryFoundException(PacketType packetType) {
-      super(String.format("No packet factory of type '%s' found.",
-        packetType == null ? null : packetType.name()));
+      super(String.format("No packet factory of type '%s' found.", packetType));
     }
   }
 

@@ -70,11 +70,8 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
     }
     final String session = this.getSession(tcpConnection.getConnectionId());
     //...
-    this.activeSessions.put(session, ((TcpNioConnectionWithSocketChannel) tcpConnection).getSocketChannel());
-  }
-
-  public void removeConnection(String connectionIdentifier) {
-    this.activeSessions.remove(connectionIdentifier);
+    this.activeSessions.put(session,
+      ((TcpNioConnectionWithSocketChannel) tcpConnection).getSocketChannel());
   }
 
   @Override
@@ -86,7 +83,7 @@ public class SessionManager extends DefaultTcpNioConnectionSupport implements Tc
     }
     final String session = this.getSession(tcpConnection.getConnectionId());
     //...
-    this.removeConnection(session);
+    this.activeSessions.remove(session);
   }
 
   @Override
