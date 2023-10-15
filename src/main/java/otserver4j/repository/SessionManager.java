@@ -1,4 +1,4 @@
-package otserver4j.configuration;
+package otserver4j.repository;
 
 import static java.math.BigInteger.ONE;
 

@@ -19,10 +19,10 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.configuration.AmqpConfiguration;
-import otserver4j.configuration.SessionManager;
 import otserver4j.exception.GenericException;
 import otserver4j.packet.AbstractPacketFactory.PacketRequest;
 import otserver4j.packet.AbstractPacketFactory.PacketResponse;
+import otserver4j.repository.SessionManager;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 

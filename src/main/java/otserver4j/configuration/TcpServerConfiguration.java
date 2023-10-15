@@ -21,6 +21,7 @@ import org.springframework.integration.ip.tcp.serializer.ByteArrayRawSerializer;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import otserver4j.repository.SessionManager;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
