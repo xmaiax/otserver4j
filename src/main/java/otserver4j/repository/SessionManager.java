@@ -16,8 +16,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j @Component
-public class SessionManager extends DefaultTcpNioConnectionSupport implements TcpSender {
+@Slf4j @Component public class SessionManager extends DefaultTcpNioConnectionSupport implements TcpSender {
 
   private final String portsRegexCapturingGroup;
   private final Map<String, SocketChannel> activeSessions;

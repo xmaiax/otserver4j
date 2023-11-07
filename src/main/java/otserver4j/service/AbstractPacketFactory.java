@@ -2,14 +2,15 @@ package otserver4j.service;
 
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Set;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
-@lombok.extern.slf4j.Slf4j
-@SuppressWarnings({ "unchecked", })
+@Slf4j @SuppressWarnings({ "unchecked", })
 public abstract class AbstractPacketFactory<
     Request extends otserver4j.service.AbstractPacketFactory.PacketRequest,
     Response extends otserver4j.service.AbstractPacketFactory.PacketResponse> {
@@ -21,7 +22,7 @@ public abstract class AbstractPacketFactory<
     @Getter private String session;
     @Getter private PacketType packetType;
   }
-  public abstract Request newPacketRequest(java.nio.ByteBuffer byteBuffer, Integer packetSize);
+  public abstract Request newPacketRequest(ByteBuffer byteBuffer, Integer packetSize);
   public final void addSessionAndType(PacketRequest request, String session, PacketType packetType) {
     request.session = session;
     request.packetType = packetType;

@@ -3,12 +3,13 @@ package otserver4j.factory;
 import java.util.Collections;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import otserver4j.service.AbstractPacketFactory;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
-@org.springframework.stereotype.Component
-public class DummyPacketFactory extends AbstractPacketFactory<
+@Component public class DummyPacketFactory extends AbstractPacketFactory<
     otserver4j.factory.DummyPacketFactory.DummyPacketRequest,
     otserver4j.factory.DummyPacketFactory.DummyPacketResponse> {
 

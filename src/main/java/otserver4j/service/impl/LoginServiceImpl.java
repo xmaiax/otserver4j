@@ -6,20 +6,17 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import otserver4j.entity.AccountEntity;
 import otserver4j.exception.AccountException;
 import otserver4j.repository.AccountRepository;
 import otserver4j.service.LoginService;
 import otserver4j.utils.MD5Utils;
 
-@Service
+@RequiredArgsConstructor @Service
 public class LoginServiceImpl implements LoginService {
 
-  private AccountRepository accountRepository;
-
-  public LoginServiceImpl(AccountRepository accountRepository) {
-    this.accountRepository = accountRepository;
-  }
+  private final AccountRepository accountRepository;
 
   private void validateAccountNumber(Integer accountNumber) throws AccountException {
     if(accountNumber == null || accountNumber < BigInteger.ONE.intValue() ||
@@ -31,8 +28,7 @@ public class LoginServiceImpl implements LoginService {
       throw AccountException.INSERT_PASSWORD_EXCEPTION;
   }
 
-  @Override
-  public AccountEntity createNewAccount(Integer accountNumber, String password) {
+  @Override public AccountEntity createNewAccount(Integer accountNumber, String password) {
     this.validateAccountNumber(accountNumber);
     this.validatePassword(password);
     if(this.accountRepository.existsById(accountNumber))
@@ -41,13 +37,12 @@ public class LoginServiceImpl implements LoginService {
       .setPasswordHash(MD5Utils.getInstance().str2md5(password))).setPasswordHash(null);
   }
 
-  @Override
-  public AccountEntity addPremiumTimeInDays(Integer accountNumber, Integer days) {
+  @Override public void addPremiumTimeInDays(Integer accountNumber, Integer days) {
     this.validateAccountNumber(accountNumber);
     final Optional<AccountEntity> accountOpt = this.accountRepository.findById(accountNumber);
     if(accountOpt.isEmpty())
       throw AccountException.ACCOUNT_DOES_NOT_EXIST_EXCEPTION;
-    return this.accountRepository.save(accountOpt.get().setPremiumExpiration((
+    this.accountRepository.save(accountOpt.get().setPremiumExpiration((
       accountOpt.get().getPremiumExpiration() == null || accountOpt.get().getPremiumExpiration()
         .isBefore(LocalDate.now()) ? LocalDate.now() : accountOpt.get().getPremiumExpiration())
           .plusDays(days))).setPasswordHash(null);
@@ -59,7 +54,7 @@ public class LoginServiceImpl implements LoginService {
     this.validatePassword(password);
     final Optional<AccountEntity> accountOpt = this.accountRepository.findById(accountNumber);
     if(accountOpt.isEmpty()) throw AccountException.ACCOUNT_DOES_NOT_EXIST_EXCEPTION;
-    if(!MD5Utils.getInstance().str2md5(password).equals(accountOpt.get().getPasswordHash()))
+    if(!accountOpt.get().getPasswordHash().equals(MD5Utils.getInstance().str2md5(password)))
       throw AccountException.INCORRECT_PASSWORD_EXCEPTION;
     return accountOpt.get().setPasswordHash(null);
   }

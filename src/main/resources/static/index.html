@@ -14,7 +14,7 @@
   </head>
 
   <body class="container">
-    <div ng-app="otserver4jApp" ng-controller="otserver4jController" class="application">
+    <div ng-app="@project.name@App" ng-controller="@project.name@Controller" class="application">
       <h1>{{ helloMessage }}</h1>
     </div>
   </body>
@@ -24,7 +24,7 @@
   <script src="webjars/angularjs/angular.min.js"></script>
   <script type="text/javascript">
 
-    angular.module('otserver4jApp', []).controller('otserver4jController', ($scope) => {
+    angular.module('@project.name@App', []).controller('@project.name@Controller', ($scope) => {
       $scope.helloMessage = "It's working!!"
     })
 

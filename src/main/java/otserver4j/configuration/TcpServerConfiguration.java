@@ -22,11 +22,11 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.repository.SessionManager;
+import otserver4j.service.impl.PacketMessageConverter;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
-@Slf4j @Component
-public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
+@Slf4j @Component public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
 
   private final AmqpTemplate amqpTemplate;
   private final SessionManager sessionManager;
@@ -45,8 +45,7 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
     super.setTcpNioConnectionSupport(sessionManager);
   }
 
-  @PostConstruct
-  public void initialize() {
+  @PostConstruct public void initialize() {
     super.start();
     log.info("TCP Server started on port {}", super.getPort());
   }
@@ -96,8 +95,8 @@ public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
             log.warn("Invalid packet!"); return;
           }
           this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_INPUT_QUEUE,
-            new otserver4j.service.impl.PacketMessageConverter.RawPacketAmqpMessage()
-              .setPacketSize(packetSize).setPacketType(packetType).setBuffer(buffer)
+            new PacketMessageConverter.RawPacketAmqpMessage().setBuffer(buffer)
+              .setPacketSize(packetSize).setPacketType(packetType)
               .setSession(this.sessionManager.getSession(key.attachment().toString())));
         }
       }

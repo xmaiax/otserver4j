@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.configuration.AmqpConfiguration;
@@ -27,7 +28,7 @@ import otserver4j.service.AbstractPacketFactory.PacketResponse;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
-@Slf4j @Component
+@RequiredArgsConstructor @Slf4j @Component
 public class PacketMessageConverter implements MessageConverter {
 
   @Data @Accessors(chain = true)
@@ -41,14 +42,6 @@ public class PacketMessageConverter implements MessageConverter {
   private final ObjectMapper objectMapper;
   private final Map<String, AbstractPacketFactory<?, ?>> packetFactories;
   private final SessionManager sessionManager;
-  
-  public PacketMessageConverter(ObjectMapper objectMapper, 
-      Map<String, AbstractPacketFactory<?, ?>> packetFactories,
-      SessionManager sessionManager) {
-    this.objectMapper = objectMapper;
-    this.packetFactories = packetFactories;
-    this.sessionManager = sessionManager;
-  }
 
   public static class InvalidPacketTypeException extends GenericException {
     private static final long serialVersionUID = -1L;
@@ -71,8 +64,7 @@ public class PacketMessageConverter implements MessageConverter {
     return packetFactory.get();
   }
 
-  @Override
-  public Message toMessage(Object object, MessageProperties messageProperties)
+  @Override public Message toMessage(Object object, MessageProperties messageProperties)
       throws MessageConversionException {
     if(object instanceof RawPacketAmqpMessage) {
       final RawPacketAmqpMessage rawPacketAmqpMessage = (RawPacketAmqpMessage) object;
@@ -124,8 +116,7 @@ public class PacketMessageConverter implements MessageConverter {
     }
   }
 
-  @Override
-  public Object fromMessage(Message message) throws MessageConversionException {
+  @Override public Object fromMessage(Message message) throws MessageConversionException {
     try {
       final AbstractPacketFactory<?, ?> packetFactory = this.getPacketFactoryFromPacketType(
         PacketType.valueOf(message.getMessageProperties().getType()));
@@ -142,21 +133,21 @@ public class PacketMessageConverter implements MessageConverter {
   public void outputListener(PacketResponse packetResponse) {
     if(packetResponse == null || packetResponse.getPacketType() == null ||
        packetResponse.getSession() == null || packetResponse.getSession().isBlank())
-      throw new IllegalStateException("Invalid packet response.");
+      throw new RuntimeException("Invalid packet response.");
     final AbstractPacketFactory<?, ?> packetFactory = this
       .getPacketFactoryFromPacketType(packetResponse.getPacketType());
     final RawPacket rawPacket = packetFactory
       .convertPacketResponseToCustomPacketResponse(packetResponse);
     if(rawPacket == null)
-      throw new IllegalStateException("Invalid raw packet response.");
+      throw new RuntimeException("Invalid raw packet response.");
     packetFactory.sessionsToSendFrom(packetResponse.getSession()).stream().forEach(session -> {
       try {
         final SocketChannel socketChannel = this.sessionManager.getSocketChannelFromSession(session);
         rawPacket.send(socketChannel); if(packetFactory.thenDisconnect()) socketChannel.close();
       }
-      catch(IllegalArgumentException | IOException exc) {
+      catch(RuntimeException | IOException exception) {
         log.error("Failed to send raw packet ({}) to session '{}': {}",
-          packetFactory.getPacketType(), session, exc.getMessage(), exc);
+          packetFactory.getPacketType(), session, exception.getMessage(), exception);
       }
     });
   }

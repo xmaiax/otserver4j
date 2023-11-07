@@ -1,10 +1,13 @@
 package otserver4j.factory;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,9 +21,7 @@ import otserver4j.service.LoginService;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
-@Slf4j
-@org.springframework.stereotype.Component
-public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
+@Slf4j @Component public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
     otserver4j.factory.LoadCharacterListPacketFactory.LoadCharacterListPacketRequest,
     otserver4j.factory.LoadCharacterListPacketFactory.LoadCharacterListPacketResponse> {
 
@@ -35,16 +36,16 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
 
   private final LoginService loginService;
 
-  public LoadCharacterListPacketFactory(
+  public LoadCharacterListPacketFactory(LoginService loginService,
       @Value("${otserver.version}") Integer version,
       @Value("${otserver.motd}") String messageOfTheDay,
       @Value("${otserver.host}") String host,
-      @Value("${otserver.port}") Integer port,
-      LoginService loginService) {
+      @Value("${otserver.port}") Integer port) {
+    this.loginService = loginService;
     this.version = version;
     this.messageOfTheDay = messageOfTheDay;
-    this.host = host; this.port = port;
-    this.loginService = loginService;
+    this.host = host;
+    this.port = port;
   }
 
   @Override public PacketType getPacketType() { return PacketType.LOAD_CHARACTER_LIST; }
@@ -71,8 +72,7 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
     private String password;
   }
 
-  @Override
-  public LoadCharacterListPacketRequest newPacketRequest(java.nio.ByteBuffer byteBuffer, Integer packetSize) {
+  @Override public LoadCharacterListPacketRequest newPacketRequest(ByteBuffer byteBuffer, Integer packetSize) {
     final OperatingSystem operatingSystem = OperatingSystem.fromCode(RawPacket.readInt16(byteBuffer));
     final Integer clientVersion = RawPacket.readInt16(byteBuffer);
     RawPacket.skip(byteBuffer, SKIP_LOGIN_UNUSED_INFO);
@@ -82,20 +82,18 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
       .setPassword(RawPacket.readString(byteBuffer));
   }
 
-  @Accessors(chain = true) @Getter @Setter
-  public static class CharacterOption {
+  @Accessors(chain = true) @Getter @Setter public static class CharacterOption {
     private String name;
     private String details;
     private String host;
     private Integer port;
   }
 
-  @Accessors(chain = true) @Getter @Setter
-  public static class LoadCharacterListPacketResponse
+  @Accessors(chain = true) @Getter @Setter public static class LoadCharacterListPacketResponse
       extends otserver4j.service.AbstractPacketFactory.PacketResponse {
     private String errorMessage;
     private String messageOfTheDay;
-    private java.util.List<CharacterOption> characterOptions;
+    private List<CharacterOption> characterOptions;
     private Integer premiumDaysLeft;
   }
 
@@ -108,8 +106,8 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
         request.getAccountNumber(), request.getPassword());
       return new LoadCharacterListPacketResponse()
         .setMessageOfTheDay(this.messageOfTheDay)
-        .setPremiumDaysLeft(10)
 
+        .setPremiumDaysLeft(10)
         .setCharacterOptions(Collections.singletonList(new CharacterOption()
           .setName("Maia")
           .setDetails("teste")
@@ -118,18 +116,19 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
 
       ;
     }
-    catch(AccountException aexc) {
-      return new LoadCharacterListPacketResponse().setErrorMessage(aexc.getMessage());
+    catch(AccountException accexc) {
+      return new LoadCharacterListPacketResponse().setErrorMessage(accexc.getMessage());
     }
   }
 
-  @Getter @lombok.Setter private class MOTD {
+  @Getter @Setter private class MOTD {
     public static final String DEFAULT_MOTD_MESSAGE = "Welcome!";
-    private String message; private Byte code;
-    public MOTD(String message) {
+    private String message; private Integer code;
+    public MOTD(String message, Integer code) {
       this.message = message == null || message.isBlank() ? DEFAULT_MOTD_MESSAGE : message;
-      this.code = 0x01;
+      this.code = code;
     }
+    public MOTD(String message) { this(message, BigInteger.ONE.intValue()); }
     @Override public String toString() { return String.format("%d\n%s", this.code, this.message); }
   }
 
