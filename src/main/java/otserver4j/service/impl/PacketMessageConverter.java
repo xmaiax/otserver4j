@@ -14,6 +14,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -106,11 +107,11 @@ public class PacketMessageConverter implements MessageConverter {
     }
   }
 
-  private Class<?> getClassToConvertFromQueueName(
+  private ObjectReader getObjectReaderFromQueueName(
       AbstractPacketFactory<?, ?> packetFactory, String queueName) throws IOException {
     switch(queueName) {
-      case AmqpConfiguration.PACKET_INPUT_QUEUE: return packetFactory.getRequestClass();
-      case AmqpConfiguration.PACKET_OUTPUT_QUEUE: return packetFactory.getResponseClass();
+      case AmqpConfiguration.PACKET_INPUT_QUEUE: return packetFactory.getRequestClassObjectReader();
+      case AmqpConfiguration.PACKET_OUTPUT_QUEUE: return packetFactory.getResponseClassObjectReader();
       default: throw new IOException(String.format(
         "Attemp to parse message from unknown queue '%s'.", queueName));
     }
@@ -120,8 +121,8 @@ public class PacketMessageConverter implements MessageConverter {
     try {
       final AbstractPacketFactory<?, ?> packetFactory = this.getPacketFactoryFromPacketType(
         PacketType.valueOf(message.getMessageProperties().getType()));
-      return this.objectMapper.readValue(message.getBody(), this.getClassToConvertFromQueueName(
-        packetFactory, message.getMessageProperties().getConsumerQueue()));
+      return this.getObjectReaderFromQueueName( packetFactory,
+        message.getMessageProperties().getConsumerQueue()).readValue(message.getBody());
     }
     catch(IOException ioex) {
       log.error("Failed to convert AMQP message to Object: {}", ioex.getMessage(), ioex);
@@ -138,8 +139,7 @@ public class PacketMessageConverter implements MessageConverter {
       .getPacketFactoryFromPacketType(packetResponse.getPacketType());
     final RawPacket rawPacket = packetFactory
       .convertPacketResponseToCustomPacketResponse(packetResponse);
-    if(rawPacket == null)
-      throw new RuntimeException("Invalid raw packet response.");
+    if(rawPacket == null) throw new RuntimeException("Null raw packet response.");
     packetFactory.sessionsToSendFrom(packetResponse.getSession()).stream().forEach(session -> {
       try {
         final SocketChannel socketChannel = this.sessionManager.getSocketChannelFromSession(session);

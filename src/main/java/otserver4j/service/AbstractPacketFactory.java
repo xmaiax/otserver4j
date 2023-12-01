@@ -5,6 +5,13 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.structure.PacketType;
@@ -57,6 +64,21 @@ public abstract class AbstractPacketFactory<
       )[BigInteger.ONE.intValue()];
     log.info("PacketFactory for type '{}' initialized (Request: {}, Response: {}).",
       this.getPacketType(), this.requestClass.getName(), this.responseClass.getName());
+  }
+
+  private ObjectMapper objectMapper;
+  @Getter private ObjectReader requestClassObjectReader;
+  @Getter private ObjectReader responseClassObjectReader;
+
+  @Autowired
+  public void setObjectMapper(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
+
+  @PostConstruct
+  public void initializeObjectReaders() {
+    this.requestClassObjectReader = this.objectMapper.readerFor(this.requestClass);
+    this.responseClassObjectReader = this.objectMapper.readerFor(this.responseClass);
   }
 
 }

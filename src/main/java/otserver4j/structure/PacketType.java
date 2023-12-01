@@ -1,7 +1,8 @@
 package otserver4j.structure;
 
-@lombok.Getter
+@lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE) @lombok.Getter
 public enum PacketType {
+
   LOAD_CHARACTER_LIST(0x01),
   LOGIN_SUCCESS(0x0a),
   LOGOFF(0x14),
@@ -60,8 +61,6 @@ public enum PacketType {
   INVALID(-1);
 
   private final Integer code;
-  PacketType(Integer code) { this.code = code; }
-
   public static PacketType fromCode(Integer code) {
     if(code == null) return INVALID;
     return java.util.Arrays.asList(PacketType.values()).stream()

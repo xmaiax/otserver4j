@@ -1,7 +1,9 @@
 package otserver4j.factory;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -9,13 +11,15 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.entity.AccountEntity;
 import otserver4j.exception.AccountException;
+import otserver4j.repository.SessionManager;
 import otserver4j.service.AbstractPacketFactory;
 import otserver4j.service.LoginService;
 import otserver4j.structure.PacketType;
@@ -31,29 +35,26 @@ import otserver4j.structure.RawPacket;
 
   private final Integer version;
   private final String messageOfTheDay;
-  private final String host;
-  private final Integer port;
 
   private final LoginService loginService;
+  private final SessionManager sessionManager;
 
-  public LoadCharacterListPacketFactory(LoginService loginService,
+  public LoadCharacterListPacketFactory(LoginService loginService, SessionManager sessionManager,
       @Value("${otserver.version}") Integer version,
-      @Value("${otserver.motd}") String messageOfTheDay,
-      @Value("${otserver.host}") String host,
-      @Value("${otserver.port}") Integer port) {
+      @Value("${otserver.motd}") String messageOfTheDay) {
     this.loginService = loginService;
+    this.sessionManager = sessionManager;
     this.version = version;
     this.messageOfTheDay = messageOfTheDay;
-    this.host = host;
-    this.port = port;
   }
 
   @Override public PacketType getPacketType() { return PacketType.LOAD_CHARACTER_LIST; }
   @Override public boolean thenDisconnect() { return Boolean.TRUE; }
 
-  @AllArgsConstructor @Getter private enum OperatingSystem {
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  @Getter private enum OperatingSystem {
     UNIX_LIKE("Unix-like"), WINDOWS("Windows"), OTHER("Other");
-    private String type; @Override public String toString() { return this.type; }
+    private final String type; @Override public String toString() { return this.type; }
     public static OperatingSystem fromCode(Integer code) {
       switch(code) {
         case 0x01: return UNIX_LIKE;
@@ -104,6 +105,9 @@ import otserver4j.structure.RawPacket;
         throw AccountException.WRONG_VERSION_NUMBER_EXCEPTION;
       final AccountEntity account = this.loginService.findAccountToLogin(
         request.getAccountNumber(), request.getPassword());
+
+      final SocketChannel socketChannel = this.sessionManager.getSocketChannelFromSession(request.getSession());
+
       return new LoadCharacterListPacketResponse()
         .setMessageOfTheDay(this.messageOfTheDay)
 
@@ -111,12 +115,12 @@ import otserver4j.structure.RawPacket;
         .setCharacterOptions(Collections.singletonList(new CharacterOption()
           .setName("Maia")
           .setDetails("teste")
-          .setHost(this.host)
-          .setPort(this.port)))
+          .setHost(socketChannel.getRemoteAddress().toString().split("/")[BigInteger.ZERO.intValue()])
+          .setPort(Integer.parseInt(socketChannel.getLocalAddress().toString().split(":")[BigInteger.ONE.intValue()]))))
 
       ;
     }
-    catch(AccountException accexc) {
+    catch(AccountException | IOException accexc) {
       return new LoadCharacterListPacketResponse().setErrorMessage(accexc.getMessage());
     }
   }
@@ -162,8 +166,7 @@ import otserver4j.structure.RawPacket;
       BigInteger.ZERO.intValue() : response.getPremiumDaysLeft());
   }
 
-  @Override
-  public Set<String> sessionsToSendFrom(String session) {
+  @Override public Set<String> sessionsToSendFrom(String session) {
     return Collections.singleton(session);
   }
 
