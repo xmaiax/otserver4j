@@ -22,7 +22,6 @@ public class DatabaseDummyConfiguration {
       final String defaultPassword = "abc";
       this.loginService.createNewAccount(defaultAccount, defaultPassword);
       this.loginService.addPremiumTimeInDays(defaultAccount, 20);
-      
     }
   }
 

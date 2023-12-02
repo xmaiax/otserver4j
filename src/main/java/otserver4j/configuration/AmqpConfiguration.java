@@ -81,7 +81,7 @@ import otserver4j.service.impl.PacketMessageConverter;
 
   @Bean public org.springframework.amqp.rabbit.connection.ConnectionFactory amqpConnectionFactory(
       ObjectMapper objectMapper, @Value("${amqp.embedded:false}") Boolean isEmbedded,
-      @Value("${amqp.host}") String host, @Value("${amqp.port:" + PORT + "}") Integer port,
+      @Value("${amqp.host:localhost}") String host, @Value("${amqp.port:" + PORT + "}") Integer port,
       @Value("${amqp.username}") String username, @Value("${amqp.password}") String password) {
     if(isEmbedded) try {
       final Path tempQpidConfigFile = Files.write(Files.createTempFile("qpid-config-", ".json"),
