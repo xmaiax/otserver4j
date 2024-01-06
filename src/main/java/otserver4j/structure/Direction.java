@@ -11,9 +11,9 @@ package otserver4j.structure;
   private final String dbCode;
   public static Direction fromCode(final Integer code) {
     return code == null ? null : java.util.Arrays.asList(Direction.values())
-      .stream().filter(dr -> dr.getCode().equals(code)).findFirst().get(); }
+      .stream().filter(dr -> dr.getCode().equals(code)).findFirst().orElse(SOUTH); }
   public static Direction fromDatabaseCode(final String dbCode) {
     return dbCode == null || dbCode.isBlank() ? null : java.util.Arrays.asList(
-      Direction.values()).stream().filter(dr -> dr.getDbCode().equalsIgnoreCase(dbCode) ||
-        SOUTH.equals(dr)).findFirst().get(); }
+      Direction.values()).stream().filter(dr -> dr.getDbCode().equalsIgnoreCase(dbCode))
+        .findFirst().orElse(SOUTH); }
 }

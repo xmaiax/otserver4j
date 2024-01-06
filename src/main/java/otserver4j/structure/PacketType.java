@@ -62,8 +62,8 @@ public enum PacketType {
   private final Integer code;
   public static PacketType fromCode(final Integer code) {
     return code == null ? null : java.util.Arrays.asList(PacketType.values())
-      .stream().filter(pt -> pt.getCode().equals(code) || INVALID.equals(pt))
-        .findFirst().get(); }
+      .stream().filter(pt -> pt.getCode().equals(code))
+        .findFirst().orElse(INVALID); }
   @Override public String toString() { return String.format(
     "%s (0x%02X)", this.name(), this.getCode()); }
 }

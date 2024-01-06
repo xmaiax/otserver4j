@@ -8,7 +8,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
 
 import javax.annotation.PostConstruct;
 
@@ -59,24 +58,19 @@ import otserver4j.structure.RawPacket;
         ioex.getMessage(), ioex);
       return;
     }
-    final Iterator<SelectionKey> selectedKeysIterator = selector.selectedKeys().iterator();
-    SocketChannel socketChannel = null;
-    while(selectedKeysIterator.hasNext()) {
-      final SelectionKey key = selectedKeysIterator.next(); 
-      selectedKeysIterator.remove();
-      if(key.isAcceptable()) {
-        try {
-          socketChannel = serverSocketChannel.accept();
-          socketChannel.configureBlocking(Boolean.FALSE);
-          socketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-        }
+    
+    selector.selectedKeys().forEach(selectionKey -> {
+      if(selectionKey.isAcceptable()) {
+        try { serverSocketChannel.accept().configureBlocking(Boolean.FALSE)
+          .register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE); }
         catch(IOException ioex) {
           log.error("Failed to accept / configure socket channel blocking / register the socket channel operations: {}",
             ioex.getMessage(), ioex);
           return;
         }
-      } else if(key.isReadable() || key.isWritable()) {
-        socketChannel = (SocketChannel) key.channel();
+      }
+      else if(selectionKey.isReadable() || selectionKey.isWritable()) {
+        final SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
         final ByteBuffer buffer = ByteBuffer.allocate(RawPacket.MAX_SIZE);
         try { socketChannel.read(buffer); }
         catch (IOException ioex) {
@@ -95,12 +89,12 @@ import otserver4j.structure.RawPacket;
             log.warn("Invalid packet!"); return;
           }
           this.amqpTemplate.convertAndSend(AmqpConfiguration.PACKET_INPUT_QUEUE,
-            new PacketMessageConverter.RawPacketAmqpMessage().setBuffer(buffer)
-              .setPacketSize(packetSize).setPacketType(packetType)
-              .setSession(this.sessionManager.getSession(key.attachment().toString())));
+            new PacketMessageConverter.RawPacketAmqpMessage()
+              .setBuffer(buffer).setPacketSize(packetSize).setPacketType(packetType)
+              .setSession(this.sessionManager.getSession(selectionKey.attachment().toString())));
         }
       }
-    }
+    });
   }
 
   @RabbitListener(queues = { AmqpConfiguration.PACKET_INPUT_QUEUE, })

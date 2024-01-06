@@ -1,17 +1,19 @@
 package otserver4j.factory;
 
+import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
 import java.io.IOException;
-
-import static java.math.BigInteger.ONE;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,34 +25,36 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.entity.AccountEntity;
+import otserver4j.entity.MessageOfTheDayEntity;
 import otserver4j.exception.AccountException;
+import otserver4j.repository.MessageOfTheDayRepository;
 import otserver4j.repository.SessionManager;
 import otserver4j.service.AbstractPacketFactory;
 import otserver4j.service.LoginService;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
-@Slf4j @Component public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
+@RequiredArgsConstructor @Slf4j @Component public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
     otserver4j.factory.LoadCharacterListPacketFactory.LoadCharacterListPacketRequest,
     otserver4j.factory.LoadCharacterListPacketFactory.LoadCharacterListPacketResponse> {
 
-  public static final Integer
-    SKIP_LOGIN_UNUSED_INFO = 0x0c, CHARACTERS_LIST_START = 0x64,
-    LOGIN_CODE_OK = 0x14, LOGIN_CODE_NOK = 0x0a;
+  static final String DEFAULT_MOTD_MESSAGE = "This is an Open Tibia Server fully written in Java.";
+  static final Integer SKIP_LOGIN_UNUSED_INFO = 0x0c,
+                       CHARACTERS_LIST_START = 0x64,
+                       LOGIN_CODE_OK = 0x14,
+                       LOGIN_CODE_NOK = 0x0a;
 
-  private final Integer version;
-  private final String messageOfTheDay;
+  @Value("${otserver.version}") private Integer version;
+  @Value("${otserver.motd:" + DEFAULT_MOTD_MESSAGE + "}") private String defaultMessageOfTheDay;
 
   private final LoginService loginService;
   private final SessionManager sessionManager;
+  private final MessageOfTheDayRepository motdRepository;
 
-  public LoadCharacterListPacketFactory(LoginService loginService, SessionManager sessionManager,
-      @Value("${otserver.version}") Integer version,
-      @Value("${otserver.motd}") String messageOfTheDay) {
-    this.loginService = loginService;
-    this.sessionManager = sessionManager;
-    this.version = version;
-    this.messageOfTheDay = messageOfTheDay;
+  @PostConstruct public void initializeMotD() {
+    if(this.motdRepository.count() < ONE.longValue()) {
+      this.motdRepository.save(new MessageOfTheDayEntity().setMessage(this.defaultMessageOfTheDay));
+    }
   }
 
   @Override public PacketType getPacketType() { return PacketType.LOAD_CHARACTER_LIST; }
@@ -98,9 +102,9 @@ import otserver4j.structure.RawPacket;
   @Accessors(chain = true) @Getter @Setter public static class LoadCharacterListPacketResponse
       extends otserver4j.service.AbstractPacketFactory.PacketResponse {
     private String errorMessage;
-    private String messageOfTheDay;
+    private MessageOfTheDayEntity messageOfTheDay;
     private List<CharacterOption> characterOptions;
-    private Integer premiumDaysLeft;
+    private Long premiumDaysLeft;
   }
 
   @Override
@@ -112,18 +116,19 @@ import otserver4j.structure.RawPacket;
         request.getAccountNumber(), request.getPassword());
       final SocketChannel socketChannel = this.sessionManager.getSocketChannelFromSession(request.getSession());
       return new LoadCharacterListPacketResponse()
-        .setMessageOfTheDay(this.messageOfTheDay)
-        .setPremiumDaysLeft(10)
+        .setMessageOfTheDay(this.motdRepository.findTopByOrderByCreationTimeDesc())
+        .setPremiumDaysLeft(ChronoUnit.DAYS.between(LocalDate.now(), account
+          .getPremiumExpiration() == null ? LocalDate.now() : account.getPremiumExpiration()))
         .setCharacterOptions(account.getCharacterList().stream().map(pc ->  {
           try {
             return new CharacterOption().setName(pc.getName()).setDetails(pc.getVocation().toString())
               .setHost(socketChannel.getRemoteAddress().toString().split("/")[ZERO.intValue()])
               .setPort(Integer.parseInt(socketChannel.getLocalAddress().toString().split(":")[ONE.intValue()]));
           }
-          catch(IOException | NumberFormatException e) {
-            e.printStackTrace();
+          catch(IOException | NumberFormatException ignore) {
+            log.warn("Failed to add player character as option: {}", ignore.getMessage(), ignore);
+            return null;
           }
-          return null;
         }).filter(java.util.Objects::nonNull).collect(Collectors.toList()));
     }
     catch(AccountException accexc) {
@@ -131,23 +136,24 @@ import otserver4j.structure.RawPacket;
     }
   }
 
-  @Getter @Setter private class MOTD {
-    public static final String DEFAULT_MOTD_MESSAGE = "Welcome!";
+  @Getter @Setter private class PacketMOTD {
     private String message; private Integer code;
-    public MOTD(String message, Integer code) {
-      this.message = message == null || message.isBlank() ? DEFAULT_MOTD_MESSAGE : message;
-      this.code = code;
+    public PacketMOTD(MessageOfTheDayEntity messageOfTheDayEntity) {
+      this.message = messageOfTheDayEntity == null || messageOfTheDayEntity.getMessage() == null ||
+        messageOfTheDayEntity.getMessage().isBlank() ? DEFAULT_MOTD_MESSAGE :
+          messageOfTheDayEntity.getMessage();
+      this.code = messageOfTheDayEntity == null || messageOfTheDayEntity.getIdentifier() == null ||
+        messageOfTheDayEntity.getIdentifier() < ONE.intValue() ?
+          ONE.intValue() : messageOfTheDayEntity.getIdentifier();
     }
-    public MOTD(String message) { this(message, ONE.intValue()); }
     @Override public String toString() { return String.format("%d\n%s", this.code, this.message); }
   }
 
-  @Override
-  public RawPacket generateRawPacketResponse(LoadCharacterListPacketResponse response) {
+  @Override public RawPacket generateRawPacketResponse(LoadCharacterListPacketResponse response) {
     if(response.getErrorMessage() != null && !response.getErrorMessage().isBlank())
       return new RawPacket().writeByte(LOGIN_CODE_NOK).writeString(response.getErrorMessage());
     final RawPacket rawPacket = new RawPacket().writeByte(LOGIN_CODE_OK)
-      .writeString(new MOTD(response.getMessageOfTheDay()).toString())
+      .writeString(new PacketMOTD(response.getMessageOfTheDay()).toString())
       .writeByte(CHARACTERS_LIST_START);
     if(response.getCharacterOptions() == null || response.getCharacterOptions().isEmpty())
       rawPacket.writeByte(ZERO.intValue());
@@ -169,7 +175,7 @@ import otserver4j.structure.RawPacket;
     }
     return rawPacket.writeInt16(response.getPremiumDaysLeft() == null ||
         response.getPremiumDaysLeft() < ZERO.intValue() ?
-      ZERO.intValue() : response.getPremiumDaysLeft());
+      ZERO.intValue() : response.getPremiumDaysLeft().intValue());
   }
 
   @Override public Set<String> sessionsToSendFrom(String session) {

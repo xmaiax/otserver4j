@@ -11,6 +11,7 @@ import static org.springframework.boot.SpringApplication.run;
   @org.springframework.context.annotation.Bean
   public com.fasterxml.jackson.databind.ObjectMapper objectMapper() {
     return new com.fasterxml.jackson.databind.ObjectMapper()
-      .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL);
+      .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+      .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
   }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -45,7 +46,9 @@ import otserver4j.utils.ExperienceUtils;
     @Parameter(name = "increment_size", value = "1"),
   }) private Long identifier;
   @Column(nullable = false, length = NAME_MAX_LENGTH) private String name;
-  @JoinColumn(name = "accountNumber", nullable = false) @ManyToOne
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "accountNumber", nullable = false)
   @JsonIgnore private AccountEntity account;
 
   private Position position;

@@ -13,8 +13,7 @@ package otserver4j.structure;
   @Override public String toString() { return this._name; }
   public static PlayerCharacterVocation fromCode(final Integer vocationCode) {
     return vocationCode == null ? null : java.util.Arrays.asList(PlayerCharacterVocation.values())
-      .stream().filter(v -> v.getCode().equals(vocationCode) ||
-        ROOKIE.equals(v)).findFirst().get(); }
+      .stream().filter(v -> v.getCode().equals(vocationCode)).findFirst().orElse(ROOKIE); }
 
   private final Integer code;
   private final String _name;

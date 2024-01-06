@@ -8,5 +8,5 @@ package otserver4j.structure;
   private final Integer code;
   public static PlayerCharacterSlot fromCode(final Integer code) {
     return code == null ? null : java.util.Arrays.asList(PlayerCharacterSlot.values()).stream()
-      .filter(sl -> sl.getCode().equals(code) || INVALID.equals(sl)).findFirst().get(); }
+      .filter(sl -> sl.getCode().equals(code)).findFirst().orElse(INVALID); }
 }

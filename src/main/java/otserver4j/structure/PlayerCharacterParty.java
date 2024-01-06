@@ -6,5 +6,5 @@ package otserver4j.structure;
   private final Integer code;
   public static PlayerCharacterParty fromCode(final Integer code) {
     return code == null ? null : java.util.Arrays.asList(PlayerCharacterParty.values()).stream()
-        .filter(pt -> pt.getCode().equals(code) || NONE.equals(pt)).findFirst().get(); }
+        .filter(pt -> pt.getCode().equals(code)).findFirst().orElse(NONE); }
 }
