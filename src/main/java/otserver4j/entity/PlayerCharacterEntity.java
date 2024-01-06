@@ -1,91 +1,175 @@
 package otserver4j.entity;
 
-import java.util.Arrays;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+
 import java.util.List;
 
 import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
-import lombok.AccessLevel;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import otserver4j.structure.Direction;
+import otserver4j.structure.PlayerCharacterCondition;
+import otserver4j.structure.PlayerCharacterSkull;
+import otserver4j.structure.PlayerCharacterVocation;
 import otserver4j.structure.Position;
+import otserver4j.utils.ExperienceUtils;
 
-@Entity @Data @Accessors(chain = true)
-public class PlayerCharacterEntity {
+@Table(name = PlayerCharacterEntity.TABLE_NAME, uniqueConstraints = {
+  @UniqueConstraint(name = "unique_player_name", columnNames = { "name", }),
+}) @Entity @NoArgsConstructor @Data @Accessors(chain = true) public class PlayerCharacterEntity {
 
-  @Id private Long identifier;
-  private String name;
+  static final String TABLE_NAME = "player_character";
+  static final int NAME_MAX_LENGTH = 16;
 
-  private Long experience;
-  public Integer getLevel() { return 1; }
-  public Integer getPercentNextLevel() { return 50; }
-  public Integer getSpeed() { return 10; }
+  @Column(name = TABLE_NAME + "_id") @javax.persistence.Id
+  @GeneratedValue(generator = TABLE_NAME + "_sequence")
+  @GenericGenerator(strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+      name = TABLE_NAME + "_sequence", parameters = {
+    @Parameter(name = "sequence_name", value = TABLE_NAME + "_sequence"),
+    @Parameter(name = "initial_value", value = "1"),
+    @Parameter(name = "increment_size", value = "1"),
+  }) private Long identifier;
+  @Column(nullable = false, length = NAME_MAX_LENGTH) private String name;
+  @JoinColumn(name = "accountNumber", nullable = false) @ManyToOne
+  @JsonIgnore private AccountEntity account;
 
-  public static final String ATTRIBUTE_VALUE_PROPERTY_NAME = "value";
-  public static final String ATTRIBUTE_MAX_PROPERTY_NAME = "maxValue";
-  public static final String ATTRIBUTE_MAX_PROPERTY_PREFIX = "max_";
+  private Position position;
+  @Column(nullable = false, length = 2) private Direction direction;
 
-  @Embeddable @Data @Accessors(chain = true)
-  public static class Attribute {
+  @JsonIgnore @Column(nullable = false) private Long experience;
+  @Column(nullable = false) private PlayerCharacterVocation vocation;
+
+  @Data @Accessors(chain = true) public static class AttributeWrapper {
     private Integer value;
     private Integer maxValue;
   }
 
-  public static final String ATTRIBUTE_LIFE_NAME = "life";
-  @Embedded @AttributeOverrides({
-    @AttributeOverride(name = ATTRIBUTE_VALUE_PROPERTY_NAME,
-      column = @Column(name = ATTRIBUTE_LIFE_NAME)),
-    @AttributeOverride(name = ATTRIBUTE_MAX_PROPERTY_NAME,
-      column = @Column(name = ATTRIBUTE_MAX_PROPERTY_PREFIX + ATTRIBUTE_LIFE_NAME)
-  )}) private Attribute life;
-
-  public static final String ATTRIBUTE_MANA_NAME = "mana";
-  @Embedded @AttributeOverrides({
-    @AttributeOverride(name = ATTRIBUTE_VALUE_PROPERTY_NAME,
-      column = @Column(name = ATTRIBUTE_MANA_NAME)),
-    @AttributeOverride(name = ATTRIBUTE_MAX_PROPERTY_NAME,
-      column = @Column(name = ATTRIBUTE_MAX_PROPERTY_PREFIX + ATTRIBUTE_MANA_NAME)
-  )}) private Attribute mana;
-
-  public static final String ATTRIBUTE_CAPACITY_NAME = "capacity";
-  @Embedded @AttributeOverrides({
-    @AttributeOverride(name = ATTRIBUTE_VALUE_PROPERTY_NAME,
-      column = @Column(name = ATTRIBUTE_CAPACITY_NAME)),
-    @AttributeOverride(name = ATTRIBUTE_MAX_PROPERTY_NAME,
-      column = @Column(name = ATTRIBUTE_MAX_PROPERTY_PREFIX + ATTRIBUTE_CAPACITY_NAME)
-  )}) private Attribute capacity;
-
-  public static final String ATTRIBUTE_SOUL_NAME = "soul";
-  @Embedded @AttributeOverrides({
-    @AttributeOverride(name = ATTRIBUTE_VALUE_PROPERTY_NAME,
-      column = @Column(name = ATTRIBUTE_SOUL_NAME)),
-    @AttributeOverride(name = ATTRIBUTE_MAX_PROPERTY_NAME,
-      column = @Column(name = ATTRIBUTE_MAX_PROPERTY_PREFIX + ATTRIBUTE_SOUL_NAME)
-  )}) private Attribute soul;
-
-  public static enum SkillType {
-    MAGIC, FIST, CLUB, SWORD, AXE, DISTANCE, SHIELD, FISHING;
-    @Override public String toString() { return this.name(); }
+  @Data @Accessors(chain = true) public static class Attributes {
+    private Long experience;
+    private Integer level;
+    private Integer nextLevelPercent;
+    private AttributeWrapper life;
+    private AttributeWrapper mana;
+    private AttributeWrapper soul;
+    private AttributeWrapper capacity;
   }
 
-  public static final String SKILL_ = "skill_";
+  @JsonIgnore @Column(nullable = false) private Integer currentLife;
+  @JsonIgnore @Column(nullable = false) private Integer currentMana;
+  @JsonIgnore @Column(nullable = false) private Integer currentSoul;
 
-  @Embeddable @Data @Accessors(chain = true)
+  @JsonIgnore public Integer getLevel() { return this.experience == null ? null :
+    ExperienceUtils.INSTANCE.calculateLevelFromExperience(this.experience); }
+  @JsonIgnore public Integer getNextLevelPercent() { return this.experience == null ? null :
+    ExperienceUtils.INSTANCE.calculateNextLevelPercentFromExperience(this.experience); }
+
+  private Integer maxLifeForLevel(Integer level) { return level == null ||
+    this.vocation == null ? null : this.vocation.getLifeBase() + this.vocation.getLifePerLevel() * level; }
+  @JsonIgnore public Integer getMaxLife() { return this.maxLifeForLevel(this.getLevel()); }
+
+  private Integer maxManaForLevel(Integer level) { return level == null ||
+    this.vocation == null ? null : this.vocation.getManaBase() + this.vocation.getManaPerLevel() * level; }
+  @JsonIgnore public Integer getMaxMana() { return this.maxManaForLevel(this.getLevel()); }
+
+  private Integer maxCapacityForLevel(Integer level) { return level == null ||
+    this.vocation == null ? null : this.vocation.getCapacityBase() + this.vocation.getCapacityPerLevel() * level; }
+  @JsonIgnore public Integer getMaxCapacity() { return this.maxCapacityForLevel(this.getLevel()); }
+
+  public Attributes getAttributes() {
+    if(this.vocation == null || this.experience == null) return null;
+    final Integer
+      currentLevel = this.getLevel(),
+      maxLife = this.maxLifeForLevel(currentLevel),
+      maxMana = this.maxManaForLevel(currentLevel),
+      maxCapacity = this.maxCapacityForLevel(currentLevel);
+    return new Attributes().setExperience(this.experience)
+      .setLevel(currentLevel).setNextLevelPercent(this.getNextLevelPercent())
+      .setLife(new AttributeWrapper().setValue(this.currentLife == null || this.currentLife > maxLife ?
+        maxLife : this.currentLife).setMaxValue(maxLife))
+      .setMana(new AttributeWrapper().setValue(this.currentMana == null || this.currentMana > maxMana ?
+        maxMana : this.currentMana).setMaxValue(maxMana))
+      .setSoul(new AttributeWrapper().setValue(this.currentSoul == null ||
+        this.currentSoul > this.vocation.getSoul() ? this.vocation.getSoul() :
+          this.currentSoul).setMaxValue(this.vocation.getSoul()))
+      .setCapacity(new AttributeWrapper().setMaxValue(maxCapacity).setValue(
+        //---- TODO: Calcular baseado no inventario
+        java.math.BigInteger.TEN.intValue()
+        //----
+      ));
+  }
+
+  public PlayerCharacterEntity setAttributes(final Attributes attributes) {
+    if(attributes != null) {
+      final Integer level = this.experience == null ? ONE.intValue() : this.getLevel();
+      this.currentLife = attributes.getLife() == null || attributes.getLife().getValue() == null ?
+        this.maxLifeForLevel(level) : attributes.getLife().getValue();
+      this.currentMana = attributes.getMana() == null || attributes.getMana().getValue() == null ?
+        this.maxManaForLevel(level) : attributes.getMana().getValue();
+      this.currentSoul = attributes.getSoul() == null || attributes.getSoul().getValue() == null ?
+        (this.vocation == null ? null : this.vocation.getSoul()) : attributes.getSoul().getValue(); 
+    }
+    return this;
+  }
+
+  public static enum PlayerSkillType {
+    MAGIC, FIST, CLUB, SWORD, AXE, DISTANCE, SHIELD, FISHING,
+  }
+
+  @Data @Accessors(chain = true)
   public static class Skill {
     private Integer level;
     private Integer percent;
   }
 
-  @Embeddable @Data @Accessors(chain = true)
-  public static class Outfit {
+  @JsonIgnore @Column(nullable = true) private Long totalManaSpent;
+  public Integer getMagicLevel() { return 0; }
+
+  @JsonIgnore @Column(nullable = true) private Long fistHitCount;
+  public Skill getFistSkill() { return null; }
+
+  @JsonIgnore @Column(nullable = true) private Long clubHitCount;
+  public Skill getClubSkill() { return null; }
+
+  @JsonIgnore @Column(nullable = true) private Long swordHitCount;
+  public Skill getSwordSkill() { return null; }
+
+  @JsonIgnore @Column(nullable = true) private Long axeHitCount;
+  public Skill axeSkill() { return null; }
+
+  @JsonIgnore @Column(nullable = true) private Long distanceHitCount;
+  public Skill distanceSkill() { return null; }
+
+  @JsonIgnore @Column(nullable = true) private Long blockedHitCount;
+  public Skill shieldSkill() { return null; }
+
+  @JsonIgnore @Column(nullable = true) private Long fishingTries;
+  public Skill fishingSkill() { return null; }
+
+  static final String OUTFIT_PREFIX = "outfit_";
+  @javax.persistence.AttributeOverrides({
+    @AttributeOverride(name = "type",  column = @Column(name = OUTFIT_PREFIX + "type",  nullable = true)),
+    @AttributeOverride(name = "head",  column = @Column(name = OUTFIT_PREFIX + "head",  nullable = true)),
+    @AttributeOverride(name = "body",  column = @Column(name = OUTFIT_PREFIX + "body",  nullable = true)),
+    @AttributeOverride(name = "legs",  column = @Column(name = OUTFIT_PREFIX + "legs",  nullable = true)),
+    @AttributeOverride(name = "feet",  column = @Column(name = OUTFIT_PREFIX + "feet",  nullable = true)),
+    @AttributeOverride(name = "extra", column = @Column(name = OUTFIT_PREFIX + "extra", nullable = true)),
+  }) @javax.persistence.Embeddable @Data @Accessors(chain = true)
+  public static class CharacterOutfit {
     private Integer type;
     private Integer head;
     private Integer body;
@@ -93,68 +177,16 @@ public class PlayerCharacterEntity {
     private Integer feet;
     private Integer extra;
   }
+  private CharacterOutfit outfit;
 
-  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter public static enum Slot {
-    HEAD(0x01), NECK(0x02), BACKPACK(0x03), CHEST(0x04),
-    RIGHT_HAND(0x05), LEFT_HAND(0x06), LEGS(0x07), RING(0x08),
-    FEET(0x09), AMMUNITION(0x0a), INVALID(-1);
-    private final Integer code;
-    public static Slot fromCode(Integer code) {
-      return Arrays.asList(Slot.values()).stream()
-        .filter(sl -> sl.getCode().equals(code) || INVALID.equals(sl)).findFirst().get();
-    }
+  private transient List<PlayerCharacterCondition> conditions;
+  private transient PlayerCharacterSkull skull;
+
+  public PlayerCharacterEntity(AccountEntity accountEntity,
+      String name, PlayerCharacterVocation vocation, Position position) {
+    this.setName(name).setPosition(position).setVocation(vocation)
+      .setDirection(Direction.SOUTH).setExperience(ZERO.longValue())
+      .setAttributes(new Attributes()).setAccount(accountEntity);
   }
-
-  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter public static enum Condition {
-    POISONED(0b00000001), ON_FIRE(0b00000010), STRUCK_BY_ENERGY(0b00000100),
-    DRUNK(0b00001000), MAGIC_SHIELD_BUFF(0b00010000), PARALYZED(0b00100000),
-    HASTE_BUFF(0b01000000), IN_BATTLE(0b10000000);
-    private final Integer code;
-    public static Integer getIconCodeFromStatuses(List<Condition> conditions) {
-      return conditions.stream().mapToInt(condition -> condition.getCode()).sum();
-    }
-  }
-
-  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter public static enum Skull {
-    NONE(0x00), YELLOW(0x01), GREEN(0x02), WHITE(0x03), RED(0x04);
-    private final Integer code;
-    public static Skull fromCode(Integer code) {
-      return Arrays.asList(Skull.values()).stream().filter(sk -> sk.getCode().equals(code) ||
-        NONE.equals(sk)).findFirst().get();
-    }
-  }
-
-  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter public static enum Party {
-    NONE(0x00), REQUESTED(0x02), ACCEPTED(0x03), LEADER(0x04);
-    private final Integer code;
-    public static Party fromCode(Integer code) {
-      return Arrays.asList(Party.values()).stream().filter(pt -> pt.getCode().equals(code) ||
-        NONE.equals(pt)).findFirst().get();
-    }
-  }
-
-//  private Profession profession;
-
-//  private Skill magicSkill;
-//  private Skill fistSkill;
-//  private Skill clubSkill;
-//  private Skill swordSkill;
-//  private Skill axeSkill;
-//  private Skill distanceSkill;
-//  private Skill shieldSkill;
-//  private Skill fishingSkill;
-
-//  private Outfit outfit;
-
-  private Position position;
-//  private Direction direction;
-  //private Map<Slot, Item.ItemWithQuantity> inventory;
-  //private transient List<Condition> conditions;
-  //private transient Skull skull;
 
 }
-

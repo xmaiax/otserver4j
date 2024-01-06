@@ -1,7 +1,7 @@
 package otserver4j.entity;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,5 +15,5 @@ public class AccountEntity {
   @Id private Integer accountNumber;
   private String passwordHash;
   private LocalDate premiumExpiration;
-  @OneToMany private List<PlayerCharacterEntity> characterList;
+  @OneToMany(mappedBy = "account") private Set<PlayerCharacterEntity> characterList;
 }

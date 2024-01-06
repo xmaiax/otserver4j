@@ -1,12 +1,17 @@
 package otserver4j.factory;
 
+import static java.math.BigInteger.ZERO;
+
 import java.io.IOException;
-import java.math.BigInteger;
+
+import static java.math.BigInteger.ONE;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -105,22 +110,23 @@ import otserver4j.structure.RawPacket;
         throw AccountException.WRONG_VERSION_NUMBER_EXCEPTION;
       final AccountEntity account = this.loginService.findAccountToLogin(
         request.getAccountNumber(), request.getPassword());
-
       final SocketChannel socketChannel = this.sessionManager.getSocketChannelFromSession(request.getSession());
-
       return new LoadCharacterListPacketResponse()
         .setMessageOfTheDay(this.messageOfTheDay)
-
         .setPremiumDaysLeft(10)
-        .setCharacterOptions(Collections.singletonList(new CharacterOption()
-          .setName("Maia")
-          .setDetails("teste")
-          .setHost(socketChannel.getRemoteAddress().toString().split("/")[BigInteger.ZERO.intValue()])
-          .setPort(Integer.parseInt(socketChannel.getLocalAddress().toString().split(":")[BigInteger.ONE.intValue()]))))
-
-      ;
+        .setCharacterOptions(account.getCharacterList().stream().map(pc ->  {
+          try {
+            return new CharacterOption().setName(pc.getName()).setDetails(pc.getVocation().toString())
+              .setHost(socketChannel.getRemoteAddress().toString().split("/")[ZERO.intValue()])
+              .setPort(Integer.parseInt(socketChannel.getLocalAddress().toString().split(":")[ONE.intValue()]));
+          }
+          catch(IOException | NumberFormatException e) {
+            e.printStackTrace();
+          }
+          return null;
+        }).filter(java.util.Objects::nonNull).collect(Collectors.toList()));
     }
-    catch(AccountException | IOException accexc) {
+    catch(AccountException accexc) {
       return new LoadCharacterListPacketResponse().setErrorMessage(accexc.getMessage());
     }
   }
@@ -132,7 +138,7 @@ import otserver4j.structure.RawPacket;
       this.message = message == null || message.isBlank() ? DEFAULT_MOTD_MESSAGE : message;
       this.code = code;
     }
-    public MOTD(String message) { this(message, BigInteger.ONE.intValue()); }
+    public MOTD(String message) { this(message, ONE.intValue()); }
     @Override public String toString() { return String.format("%d\n%s", this.code, this.message); }
   }
 
@@ -144,7 +150,7 @@ import otserver4j.structure.RawPacket;
       .writeString(new MOTD(response.getMessageOfTheDay()).toString())
       .writeByte(CHARACTERS_LIST_START);
     if(response.getCharacterOptions() == null || response.getCharacterOptions().isEmpty())
-      rawPacket.writeByte(BigInteger.ZERO.intValue());
+      rawPacket.writeByte(ZERO.intValue());
     else {
       rawPacket.writeByte(response.getCharacterOptions().size());
       response.getCharacterOptions().stream().forEach(characterOptions -> {
@@ -162,12 +168,11 @@ import otserver4j.structure.RawPacket;
       });
     }
     return rawPacket.writeInt16(response.getPremiumDaysLeft() == null ||
-        response.getPremiumDaysLeft() < BigInteger.ZERO.intValue() ?
-      BigInteger.ZERO.intValue() : response.getPremiumDaysLeft());
+        response.getPremiumDaysLeft() < ZERO.intValue() ?
+      ZERO.intValue() : response.getPremiumDaysLeft());
   }
 
   @Override public Set<String> sessionsToSendFrom(String session) {
-    return Collections.singleton(session);
-  }
+    return Collections.singleton(session); }
 
 }

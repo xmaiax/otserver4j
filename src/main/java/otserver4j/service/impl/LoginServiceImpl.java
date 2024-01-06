@@ -34,7 +34,7 @@ public class LoginServiceImpl implements LoginService {
     if(this.accountRepository.existsById(accountNumber))
       throw AccountException.ACCOUNT_DOES_EXIST_EXCEPTION;
     return this.accountRepository.save(new AccountEntity().setAccountNumber(accountNumber)
-      .setPasswordHash(MD5Utils.getInstance().str2md5(password))).setPasswordHash(null);
+      .setPasswordHash(MD5Utils.INSTANCE.str2md5(password))).setPasswordHash(null);
   }
 
   @Override public void addPremiumTimeInDays(Integer accountNumber, Integer days) {
@@ -48,13 +48,13 @@ public class LoginServiceImpl implements LoginService {
           .plusDays(days))).setPasswordHash(null);
   }
 
-  @Override
-  public AccountEntity findAccountToLogin(Integer accountNumber, String password) throws AccountException {
+  @Override public AccountEntity findAccountToLogin(Integer accountNumber, String password)
+      throws AccountException {
     this.validateAccountNumber(accountNumber);
     this.validatePassword(password);
     final Optional<AccountEntity> accountOpt = this.accountRepository.findById(accountNumber);
     if(accountOpt.isEmpty()) throw AccountException.ACCOUNT_DOES_NOT_EXIST_EXCEPTION;
-    if(!accountOpt.get().getPasswordHash().equals(MD5Utils.getInstance().str2md5(password)))
+    if(!accountOpt.get().getPasswordHash().equals(MD5Utils.INSTANCE.str2md5(password)))
       throw AccountException.INCORRECT_PASSWORD_EXCEPTION;
     return accountOpt.get().setPasswordHash(null);
   }
