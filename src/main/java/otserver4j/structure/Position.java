@@ -6,9 +6,9 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 
 @javax.persistence.AttributeOverrides({
-  @AttributeOverride(name = "x", column = @Column(name = "position_x")),
-  @AttributeOverride(name = "y", column = @Column(name = "position_y")),
-  @AttributeOverride(name = "z", column = @Column(name = "position_z")),
+  @AttributeOverride(name = "x", column = @Column(name = "position_x", nullable = false)),
+  @AttributeOverride(name = "y", column = @Column(name = "position_y", nullable = false)),
+  @AttributeOverride(name = "z", column = @Column(name = "position_z", nullable = false)),
 }) @javax.persistence.Embeddable @lombok.Data @lombok.experimental.Accessors(chain = true)
 public class Position {
   private Integer x; private Integer y; private Integer z;

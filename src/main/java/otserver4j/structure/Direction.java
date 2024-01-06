@@ -1,21 +1,19 @@
 package otserver4j.structure;
 
-import java.util.Arrays;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter public enum Direction {
-  NORTH(0x00, Boolean.TRUE), EAST(0x01, Boolean.TRUE),
-  SOUTH(0x02, Boolean.TRUE), WEST(0x03, Boolean.TRUE),
-  NORTHEAST(0x04, Boolean.FALSE), NORTHWEST(0x05, Boolean.FALSE),
-  SOUTHEAST(0x06, Boolean.FALSE), SOUTHWEST(0x07, Boolean.FALSE);
+@lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@lombok.Getter public enum Direction {
+  NORTH(0x00, Boolean.TRUE, "N"), EAST(0x01, Boolean.TRUE, "E"),
+  SOUTH(0x02, Boolean.TRUE, "S"), WEST(0x03, Boolean.TRUE, "W"),
+  NORTHEAST(0x04, Boolean.FALSE, "NE"), NORTHWEST(0x05, Boolean.FALSE, "NW"),
+  SOUTHEAST(0x06, Boolean.FALSE, "SE"), SOUTHWEST(0x07, Boolean.FALSE, "SW");
   private final Integer code;
   private final Boolean spawnable;
-  public static Direction fromCode(Integer code) {
-    return Arrays.asList(Direction.values()).stream().filter(dr -> dr.getCode()
-      .equals(code)).findFirst().get();
-  }
+  private final String dbCode;
+  public static Direction fromCode(final Integer code) {
+    return code == null ? null : java.util.Arrays.asList(Direction.values())
+      .stream().filter(dr -> dr.getCode().equals(code)).findFirst().orElse(SOUTH); }
+  public static Direction fromDatabaseCode(final String dbCode) {
+    return dbCode == null || dbCode.isBlank() ? null : java.util.Arrays.asList(
+      Direction.values()).stream().filter(dr -> dr.getDbCode().equalsIgnoreCase(dbCode))
+        .findFirst().orElse(SOUTH); }
 }

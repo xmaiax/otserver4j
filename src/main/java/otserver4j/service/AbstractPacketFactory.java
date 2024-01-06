@@ -13,11 +13,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
-@Slf4j @SuppressWarnings({ "unchecked", })
+@Slf4j @Setter @SuppressWarnings({ "unchecked", })
 public abstract class AbstractPacketFactory<
     Request extends otserver4j.service.AbstractPacketFactory.PacketRequest,
     Response extends otserver4j.service.AbstractPacketFactory.PacketResponse> {
@@ -63,20 +64,14 @@ public abstract class AbstractPacketFactory<
     this.responseClass = (Class<Response>) genericSuperclass.getActualTypeArguments(
       )[BigInteger.ONE.intValue()];
     log.info("PacketFactory for type '{}' initialized (Request: {}, Response: {}).",
-      this.getPacketType(), this.requestClass.getName(), this.responseClass.getName());
+      this.getPacketType(), this.requestClass.getSimpleName(), this.responseClass.getSimpleName());
   }
 
-  private ObjectMapper objectMapper;
+  @Autowired @Setter private ObjectMapper objectMapper;
   @Getter private ObjectReader requestClassObjectReader;
   @Getter private ObjectReader responseClassObjectReader;
 
-  @Autowired
-  public void setObjectMapper(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
-
-  @PostConstruct
-  public void initializeObjectReaders() {
+  @PostConstruct public void initializeObjectReaders() {
     this.requestClassObjectReader = this.objectMapper.readerFor(this.requestClass);
     this.responseClassObjectReader = this.objectMapper.readerFor(this.responseClass);
   }

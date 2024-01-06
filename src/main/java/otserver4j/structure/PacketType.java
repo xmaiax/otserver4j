@@ -2,7 +2,6 @@ package otserver4j.structure;
 
 @lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE) @lombok.Getter
 public enum PacketType {
-
   LOAD_CHARACTER_LIST(0x01),
   LOGIN_SUCCESS(0x0a),
   LOGOFF(0x14),
@@ -61,14 +60,10 @@ public enum PacketType {
   INVALID(-1);
 
   private final Integer code;
-  public static PacketType fromCode(Integer code) {
-    if(code == null) return INVALID;
-    return java.util.Arrays.asList(PacketType.values()).stream()
-      .filter(pt -> pt.getCode().equals(code) || INVALID.equals(pt)).findFirst().get(); }
-
-  @Override
-  public String toString() {
-    return String.format("%s (0x%02X)", this.name(), this.getCode());
-  }
-
+  public static PacketType fromCode(final Integer code) {
+    return code == null ? null : java.util.Arrays.asList(PacketType.values())
+      .stream().filter(pt -> pt.getCode().equals(code))
+        .findFirst().orElse(INVALID); }
+  @Override public String toString() { return String.format(
+    "%s (0x%02X)", this.name(), this.getCode()); }
 }

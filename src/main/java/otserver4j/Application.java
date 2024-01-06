@@ -2,31 +2,16 @@ package otserver4j;
 
 import static org.springframework.boot.SpringApplication.run;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j @SpringBootApplication public class Application {
-
+@org.springframework.boot.autoconfigure.SpringBootApplication
+@lombok.extern.slf4j.Slf4j public class Application {
   public static void main(String[] args) { run(Application.class, args); }
-
-  @Value("${server.port}") private Integer webServerPort;
-  
-  @PostConstruct
-  public void startedMessage() {
-    log.info("Rest service starting in port: {}", this.webServerPort);
+  @org.springframework.beans.factory.annotation.Value("${server.port}") private Integer webServerPort;
+  @javax.annotation.PostConstruct public void startedMessage() {
+    log.info("Rest service starting in port: {}", this.webServerPort); }
+  @org.springframework.context.annotation.Bean
+  public com.fasterxml.jackson.databind.ObjectMapper objectMapper() {
+    return new com.fasterxml.jackson.databind.ObjectMapper()
+      .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+      .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
   }
-
-  @Bean
-  public ObjectMapper objectMapper() {
-    return new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
-  }
-
 }
