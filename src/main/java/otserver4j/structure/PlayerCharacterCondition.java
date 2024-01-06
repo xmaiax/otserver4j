@@ -8,6 +8,7 @@ package otserver4j.structure;
   private final Integer code;
   public static Integer getIconCodeFromStatuses(
       final java.util.List<PlayerCharacterCondition> conditions) {
-    return conditions == null ? null : conditions.stream()
-      .mapToInt(condition -> condition.getCode()).sum(); }
+    return conditions == null ? null : (conditions.isEmpty() ?
+      java.math.BigInteger.ZERO.intValue() : conditions.stream()
+        .mapToInt(condition -> condition.getCode()).sum()); }
 }

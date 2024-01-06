@@ -6,5 +6,6 @@ package otserver4j.structure;
   private final Integer code;
   public static PlayerCharacterSkull fromCode(final Integer code) {
     return code == null ? null : java.util.Arrays.asList(PlayerCharacterSkull.values()).stream()
-      .filter(sk -> sk.getCode().equals(code)).findFirst().orElse(NONE); }
+      .filter(sk -> sk.getCode().equals(code)).findFirst().orElse(
+        PlayerCharacterSkull.values()[java.math.BigInteger.ZERO.intValue()]); }
 }

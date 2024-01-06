@@ -1,23 +1,24 @@
 package otserver4j.entity;
 
-import java.time.LocalDate;
-import java.util.Set;
+import javax.persistence.Column;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import org.hibernate.annotations.Parameter;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-
-@Entity @Getter @Setter @ToString @Accessors(chain = true)
-public class AccountEntity {
-  @Id private Integer accountNumber;
-  private String passwordHash;
-  private LocalDate premiumExpiration;
-  @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
-  private Set<PlayerCharacterEntity> characterList;
+@javax.persistence.Entity @javax.persistence.Table(name = AccountEntity.TABLE_NAME)
+@lombok.Getter @lombok.Setter @lombok.ToString
+@lombok.experimental.Accessors(chain = true) public class AccountEntity {
+  static final String TABLE_NAME = "account";
+  
+  @Column(name = TABLE_NAME + "_id") @javax.persistence.Id
+  @javax.persistence.GeneratedValue(generator = TABLE_NAME + "_sequence")
+  @org.hibernate.annotations.GenericGenerator(strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+      name = TABLE_NAME + "_sequence", parameters = {
+    @Parameter(name = "sequence_name", value = TABLE_NAME + "_sequence"),
+    @Parameter(name = "initial_value", value = "1"),
+    @Parameter(name = "increment_size", value = "1"),
+  }) private Integer accountNumber;
+  @Column(nullable = false, length = 32) private String passwordHash;
+  private java.time.LocalDate premiumExpiration;
+  @javax.persistence.OneToMany(mappedBy = "account", fetch = javax.persistence.FetchType.EAGER)
+  private java.util.Set<PlayerCharacterEntity> characterList;
 }

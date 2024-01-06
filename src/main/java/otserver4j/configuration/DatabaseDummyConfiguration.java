@@ -38,7 +38,7 @@ public class DatabaseDummyConfiguration {
         System.err.println(this.objectMapper.writeValueAsString(
           this.loginService.findAccountToLogin(defaultAccount, defaultPassword)));
       }
-      catch(Exception e) { /**/ }
+      catch(Exception e) { e.printStackTrace(); }
 
     }
   }

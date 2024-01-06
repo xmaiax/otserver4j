@@ -140,28 +140,28 @@ import otserver4j.utils.ExperienceUtils;
   }
 
   @JsonIgnore @Column(nullable = true) private Long totalManaSpent;
-  public Integer getMagicLevel() { return 0; }
+  @JsonIgnore public Integer getMagicLevel() { return 0; }
 
   @JsonIgnore @Column(nullable = true) private Long fistHitCount;
-  public Skill getFistSkill() { return null; }
+  @JsonIgnore public Skill getFistSkill() { return null; }
 
   @JsonIgnore @Column(nullable = true) private Long clubHitCount;
-  public Skill getClubSkill() { return null; }
+  @JsonIgnore public Skill getClubSkill() { return null; }
 
   @JsonIgnore @Column(nullable = true) private Long swordHitCount;
-  public Skill getSwordSkill() { return null; }
+  @JsonIgnore public Skill getSwordSkill() { return null; }
 
   @JsonIgnore @Column(nullable = true) private Long axeHitCount;
-  public Skill axeSkill() { return null; }
+  @JsonIgnore public Skill axeSkill() { return null; }
 
   @JsonIgnore @Column(nullable = true) private Long distanceHitCount;
-  public Skill distanceSkill() { return null; }
+  @JsonIgnore public Skill distanceSkill() { return null; }
 
   @JsonIgnore @Column(nullable = true) private Long blockedHitCount;
-  public Skill shieldSkill() { return null; }
+  @JsonIgnore public Skill shieldSkill() { return null; }
 
   @JsonIgnore @Column(nullable = true) private Long fishingTries;
-  public Skill fishingSkill() { return null; }
+  @JsonIgnore public Skill fishingSkill() { return null; }
 
   static final String OUTFIT_PREFIX = "outfit_";
   @javax.persistence.AttributeOverrides({
