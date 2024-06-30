@@ -10,6 +10,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -50,7 +51,8 @@ import otserver4j.utils.SkillUtils;
   @Column(nullable = false, length = NAME_MAX_LENGTH) private String name;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "accountNumber", nullable = false)
+  @JoinColumn(name = "accountNumber", nullable = false,
+    foreignKey = @ForeignKey(name = "player_character_account_fk"))
   @JsonIgnore private AccountEntity account;
 
   private Position position;
@@ -209,6 +211,18 @@ import otserver4j.utils.SkillUtils;
       .setDistance(this.getDistanceSkill()).setShield(this.getShieldSkill());
   }
 
+  public PlayerCharacterEntity setSkills(final AllSkills allSkills) {
+    return this
+      .setTotalManaSpent(allSkills.getMagic().getCount())
+      .setFistHitCount(allSkills.getFist().getCount())
+      .setClubHitCount(allSkills.getClub().getCount())
+      .setSwordHitCount(allSkills.getSword().getCount())
+      .setAxeHitCount(allSkills.getAxe().getCount())
+      .setDistanceHitCount(allSkills.getDistance().getCount())
+      .setBlockedHitCount(allSkills.getShield().getCount())
+      .setFishingTries(allSkills.getFishing().getCount());
+  }
+
   static final String OUTFIT_PREFIX = "outfit_";
   @javax.persistence.AttributeOverrides({
     @AttributeOverride(name = "type",  column = @Column(name = OUTFIT_PREFIX + "type",  nullable = true)),
@@ -234,7 +248,8 @@ import otserver4j.utils.SkillUtils;
   public PlayerCharacterEntity(AccountEntity accountEntity,
       String name, PlayerCharacterVocation vocation, Position position) {
     this.setName(name).setPosition(position).setVocation(vocation)
-      .setDirection(Direction.SOUTH).setAttributes(new Attributes()).setAccount(accountEntity);
+      .setDirection(Direction.SOUTH).setAttributes(new Attributes())
+        .setAccount(accountEntity);
   }
 
 }

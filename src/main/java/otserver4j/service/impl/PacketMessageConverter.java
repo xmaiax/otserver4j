@@ -121,7 +121,7 @@ public class PacketMessageConverter implements MessageConverter {
     try {
       final AbstractPacketFactory<?, ?> packetFactory = this.getPacketFactoryFromPacketType(
         PacketType.valueOf(message.getMessageProperties().getType()));
-      return this.getObjectReaderFromQueueName( packetFactory,
+      return this.getObjectReaderFromQueueName(packetFactory,
         message.getMessageProperties().getConsumerQueue()).readValue(message.getBody());
     }
     catch(IOException ioex) {

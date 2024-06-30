@@ -37,9 +37,13 @@ public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
     otserver4j.factory.SpawnPlayerCharacterPacketFactory.SpawnPlayerCharacterRequest, 
     otserver4j.factory.SpawnPlayerCharacterPacketFactory.SpawnPlayerCharacterResponse> {
 
+  static final Long PLAYER_IDENTIFIER_PREFIX = 0x0fffffffL;
+
   static final Integer
      PROCESSING_LOGIN_CODE_OK = 0x0a
     ,PROCESSING_LOGIN_CODE_NOK = 0x14
+    ,CLIENT_RENDER_CODE = 0x32
+    ,ERROR_REPORT_FLAG = 0x00
     ,CODE_ICONS = 0xa2
     ,CODE_SEND_MESSAGE = 0xb4
     ,CODE_CHARACTER_LIGHT = 0x8d
@@ -138,7 +142,9 @@ public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
     if(response.getErrorMessage() != null && !response.getErrorMessage().isBlank())
       return new RawPacket().writeByte(PROCESSING_LOGIN_CODE_NOK)
         .writeString(response.getErrorMessage());
-    return null;
+    return new RawPacket().writeByte(PROCESSING_LOGIN_CODE_OK)
+      .writeInt32(PLAYER_IDENTIFIER_PREFIX + response.getPlayerCharacter().getIdentifier())
+      .writeInt16(CLIENT_RENDER_CODE).writeByte(ERROR_REPORT_FLAG);
   }
 
 }

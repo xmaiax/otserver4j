@@ -10,11 +10,8 @@ import java.nio.ByteBuffer;
 
   public static final Integer MAX_SIZE = 0xffff,
     PROCESSING_LOGIN_CODE_OK = 0x0a, PROCESSING_LOGIN_CODE_NOK = 0x14,
-    CLIENT_RENDER_CODE = 0x32, ERROR_REPORT_FLAG = 0x00, CODE_MAP_INFO = 0x64,
-    CODE_INVENTORY_SLOT_FILLED = 0x78, CODE_INVENTORY_SLOT_EMPTY = 0x79,
-    CODE_STATS = 0xa0,
-    CODE_SPAWN_FX = 0x83,
-    SNAPBACK_CODE = 0xb5;
+    CODE_MAP_INFO = 0x64, CODE_INVENTORY_SLOT_FILLED = 0x78, CODE_INVENTORY_SLOT_EMPTY = 0x79,
+    CODE_STATS = 0xa0, CODE_SPAWN_FX = 0x83, SNAPBACK_CODE = 0xb5;
 
   public static Integer readByte(final ByteBuffer input) {
     return input.get() & 0xff;
