@@ -35,7 +35,7 @@ public class DatabaseDummyConfiguration {
         PlayerCharacterVocation.NECROMANCER, new Position().setX(40).setY(50).setZ(6)));
 
       try {
-        System.err.println(this.objectMapper.writeValueAsString(
+        System.err.println(this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
           this.loginService.findAccountToLogin(defaultAccount, defaultPassword)));
       }
       catch(Exception e) { e.printStackTrace(); }

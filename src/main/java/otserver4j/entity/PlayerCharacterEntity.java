@@ -3,6 +3,7 @@ package otserver4j.entity;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.AttributeOverride;
@@ -29,6 +30,7 @@ import otserver4j.structure.PlayerCharacterSkull;
 import otserver4j.structure.PlayerCharacterVocation;
 import otserver4j.structure.Position;
 import otserver4j.utils.ExperienceUtils;
+import otserver4j.utils.SkillUtils;
 
 @Table(name = PlayerCharacterEntity.TABLE_NAME, uniqueConstraints = {
   @UniqueConstraint(name = "unique_player_name", columnNames = { "name", }),
@@ -118,6 +120,7 @@ import otserver4j.utils.ExperienceUtils;
 
   public PlayerCharacterEntity setAttributes(final Attributes attributes) {
     if(attributes != null) {
+      this.experience = attributes.getExperience() == null ? ZERO.longValue() : attributes.getExperience();
       final Integer level = this.experience == null ? ONE.intValue() : this.getLevel();
       this.currentLife = attributes.getLife() == null || attributes.getLife().getValue() == null ?
         this.maxLifeForLevel(level) : attributes.getLife().getValue();
@@ -129,39 +132,82 @@ import otserver4j.utils.ExperienceUtils;
     return this;
   }
 
-  public static enum PlayerSkillType {
-    MAGIC, FIST, CLUB, SWORD, AXE, DISTANCE, SHIELD, FISHING,
-  }
-
   @Data @Accessors(chain = true)
   public static class Skill {
     private Integer level;
     private Integer percent;
+    private Long count;
   }
 
-  @JsonIgnore @Column(nullable = true) private Long totalManaSpent;
-  @JsonIgnore public Integer getMagicLevel() { return 0; }
+  private static final Skill EMPTY_SKILL = new Skill()
+    .setLevel(BigInteger.ZERO.intValue())
+    .setPercent(BigInteger.ZERO.intValue())
+    .setCount(BigInteger.ZERO.longValue());
 
-  @JsonIgnore @Column(nullable = true) private Long fistHitCount;
-  @JsonIgnore public Skill getFistSkill() { return null; }
+  @JsonIgnore @Column(nullable = false) private Long totalManaSpent = BigInteger.ZERO.longValue();
+  @JsonIgnore public Skill getMagicSkill() { return SkillUtils.INSTANCE.calculateSkillFromCount(
+    this.totalManaSpent, this.vocation.getMagicSkillFactor()); }
 
-  @JsonIgnore @Column(nullable = true) private Long clubHitCount;
-  @JsonIgnore public Skill getClubSkill() { return null; }
+  @JsonIgnore @Column(nullable = false) private Long fistHitCount = BigInteger.ZERO.longValue();
+  @JsonIgnore public Skill getFistSkill() {
+    return this.fistHitCount == null || this.vocation == null ? EMPTY_SKILL :
+      SkillUtils.INSTANCE.calculateSkillFromCount(this.fistHitCount,
+        this.vocation.getFistSkillFactor()); }
 
-  @JsonIgnore @Column(nullable = true) private Long swordHitCount;
-  @JsonIgnore public Skill getSwordSkill() { return null; }
+  @JsonIgnore @Column(nullable = false) private Long clubHitCount = BigInteger.ZERO.longValue();
+  @JsonIgnore public Skill getClubSkill() {
+    return this.clubHitCount == null || this.vocation == null ? EMPTY_SKILL :
+      SkillUtils.INSTANCE.calculateSkillFromCount(this.clubHitCount,
+        this.vocation.getClubSkillFactor()); }
 
-  @JsonIgnore @Column(nullable = true) private Long axeHitCount;
-  @JsonIgnore public Skill axeSkill() { return null; }
+  @JsonIgnore @Column(nullable = false) private Long swordHitCount = BigInteger.ZERO.longValue();
+  @JsonIgnore public Skill getSwordSkill() {
+    return this.swordHitCount == null || this.vocation == null ? EMPTY_SKILL :
+      SkillUtils.INSTANCE.calculateSkillFromCount(this.swordHitCount,
+        this.vocation.getSwordSkillFactor()); }
 
-  @JsonIgnore @Column(nullable = true) private Long distanceHitCount;
-  @JsonIgnore public Skill distanceSkill() { return null; }
+  @JsonIgnore @Column(nullable = true) private Long axeHitCount = BigInteger.ZERO.longValue();
+  @JsonIgnore public Skill getAxeSkill() {
+    return this.axeHitCount == null || this.vocation == null ? EMPTY_SKILL :
+      SkillUtils.INSTANCE.calculateSkillFromCount(this.axeHitCount,
+        this.vocation.getAxeSkillFactor()); }
 
-  @JsonIgnore @Column(nullable = true) private Long blockedHitCount;
-  @JsonIgnore public Skill shieldSkill() { return null; }
+  @JsonIgnore @Column(nullable = true) private Long distanceHitCount = BigInteger.ZERO.longValue();
+  @JsonIgnore public Skill getDistanceSkill() {
+    return this.distanceHitCount == null || this.vocation == null ? EMPTY_SKILL :
+      SkillUtils.INSTANCE.calculateSkillFromCount(this.distanceHitCount,
+        this.vocation.getDistanceSkillFactor()); }
 
-  @JsonIgnore @Column(nullable = true) private Long fishingTries;
-  @JsonIgnore public Skill fishingSkill() { return null; }
+  @JsonIgnore @Column(nullable = true) private Long blockedHitCount = BigInteger.ZERO.longValue();
+  @JsonIgnore public Skill getShieldSkill() {
+    return this.blockedHitCount == null || this.vocation == null ? EMPTY_SKILL :
+      SkillUtils.INSTANCE.calculateSkillFromCount(this.blockedHitCount,
+        this.vocation.getShieldingSkillFactor()); }
+
+  @JsonIgnore @Column(nullable = true) private Long fishingTries = BigInteger.ZERO.longValue();
+  @JsonIgnore public Skill getFishingSkill() {
+    return this.fishingTries == null || this.vocation == null ? EMPTY_SKILL :
+      SkillUtils.INSTANCE.calculateSkillFromCount(this.fishingTries,
+        this.vocation.getFishingSkillFactor()); }
+
+  @Data @Accessors(chain = true)
+  public static class AllSkills {
+    private Skill magic;
+    private Skill fist;
+    private Skill club;
+    private Skill sword;
+    private Skill axe;
+    private Skill distance;
+    private Skill shield;
+    private Skill fishing;
+  }
+
+  public AllSkills getSkills() {
+    return new AllSkills().setMagic(this.getMagicSkill()).setFishing(this.getFishingSkill())
+      .setFist(this.getFistSkill()).setClub(this.getClubSkill())
+      .setSword(this.getSwordSkill()).setAxe(this.getAxeSkill())
+      .setDistance(this.getDistanceSkill()).setShield(this.getShieldSkill());
+  }
 
   static final String OUTFIT_PREFIX = "outfit_";
   @javax.persistence.AttributeOverrides({
@@ -188,8 +234,7 @@ import otserver4j.utils.ExperienceUtils;
   public PlayerCharacterEntity(AccountEntity accountEntity,
       String name, PlayerCharacterVocation vocation, Position position) {
     this.setName(name).setPosition(position).setVocation(vocation)
-      .setDirection(Direction.SOUTH).setExperience(ZERO.longValue())
-      .setAttributes(new Attributes()).setAccount(accountEntity);
+      .setDirection(Direction.SOUTH).setAttributes(new Attributes()).setAccount(accountEntity);
   }
 
 }

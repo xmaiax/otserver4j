@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -34,7 +36,8 @@ import otserver4j.service.LoginService;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.RawPacket;
 
-@RequiredArgsConstructor @Slf4j @Component public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
+@RequiredArgsConstructor @Slf4j @Component
+public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
     otserver4j.factory.LoadCharacterListPacketFactory.LoadCharacterListPacketRequest,
     otserver4j.factory.LoadCharacterListPacketFactory.LoadCharacterListPacketResponse> {
 
@@ -44,12 +47,11 @@ import otserver4j.structure.RawPacket;
                        LOGIN_CODE_OK = 0x14,
                        LOGIN_CODE_NOK = 0x0a;
 
-  @Value("${otserver.version}") private Integer version;
-  @Value("${otserver.motd:" + DEFAULT_MOTD_MESSAGE + "}") private String defaultMessageOfTheDay;
-
   private final LoginService loginService;
   private final SessionManager sessionManager;
   private final MessageOfTheDayRepository motdRepository;
+
+  @Value("${otserver.motd:" + DEFAULT_MOTD_MESSAGE + "}") private String defaultMessageOfTheDay;
 
   @PostConstruct public void initializeMotD() {
     if(this.motdRepository.count() < ONE.longValue()) {
@@ -59,6 +61,8 @@ import otserver4j.structure.RawPacket;
 
   @Override public PacketType getPacketType() { return PacketType.LOAD_CHARACTER_LIST; }
   @Override public boolean thenDisconnect() { return Boolean.TRUE; }
+  @Override public Set<String> sessionsToSendFrom(String session) {
+    return Collections.singleton(session); }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   @Getter private enum OperatingSystem {
@@ -73,7 +77,7 @@ import otserver4j.structure.RawPacket;
     }
   }
 
-  @Accessors(chain = true) @Getter @Setter
+  @Data @EqualsAndHashCode(callSuper = false) @Accessors(chain = true)
   public static class LoadCharacterListPacketRequest
       extends otserver4j.service.AbstractPacketFactory.PacketRequest {
     private OperatingSystem operatingSystem;
@@ -82,8 +86,10 @@ import otserver4j.structure.RawPacket;
     private String password;
   }
 
-  @Override public LoadCharacterListPacketRequest newPacketRequest(ByteBuffer byteBuffer, Integer packetSize) {
-    final OperatingSystem operatingSystem = OperatingSystem.fromCode(RawPacket.readInt16(byteBuffer));
+  @Override public LoadCharacterListPacketRequest newPacketRequest(
+      ByteBuffer byteBuffer, Integer packetSize) {
+    final OperatingSystem operatingSystem = OperatingSystem
+      .fromCode(RawPacket.readInt16(byteBuffer));
     final Integer clientVersion = RawPacket.readInt16(byteBuffer);
     RawPacket.skip(byteBuffer, SKIP_LOGIN_UNUSED_INFO);
     return new LoadCharacterListPacketRequest()
@@ -99,7 +105,8 @@ import otserver4j.structure.RawPacket;
     private Integer port;
   }
 
-  @Accessors(chain = true) @Getter @Setter public static class LoadCharacterListPacketResponse
+  @Data @EqualsAndHashCode(callSuper = false) @Accessors(chain = true)
+  public static class LoadCharacterListPacketResponse
       extends otserver4j.service.AbstractPacketFactory.PacketResponse {
     private String errorMessage;
     private MessageOfTheDayEntity messageOfTheDay;
@@ -107,32 +114,45 @@ import otserver4j.structure.RawPacket;
     private Long premiumDaysLeft;
   }
 
-  @Override
-  public LoadCharacterListPacketResponse generatePacketResponse(LoadCharacterListPacketRequest request) {
+  @Value("${otserver.version}") private Integer version;
+
+  @Override public LoadCharacterListPacketResponse generatePacketResponse(
+      LoadCharacterListPacketRequest request) {
     try {
       if(!this.version.equals(request.getClientVersion()))
         throw AccountException.WRONG_VERSION_NUMBER_EXCEPTION;
       final AccountEntity account = this.loginService.findAccountToLogin(
         request.getAccountNumber(), request.getPassword());
-      final SocketChannel socketChannel = this.sessionManager.getSocketChannelFromSession(request.getSession());
+      final SocketChannel socketChannel = this.sessionManager
+        .getSocketChannelFromSession(request.getSession());
       return new LoadCharacterListPacketResponse()
         .setMessageOfTheDay(this.motdRepository.findTopByOrderByCreationTimeDesc())
         .setPremiumDaysLeft(ChronoUnit.DAYS.between(LocalDate.now(), account
           .getPremiumExpiration() == null ? LocalDate.now() : account.getPremiumExpiration()))
         .setCharacterOptions(account.getCharacterList().stream().map(pc ->  {
           try {
-            return new CharacterOption().setName(pc.getName()).setDetails(pc.getVocation().toString())
-              .setHost(socketChannel.getRemoteAddress().toString().split("/")[ZERO.intValue()])
-              .setPort(Integer.parseInt(socketChannel.getLocalAddress().toString().split(":")[ONE.intValue()]));
+            return new CharacterOption()
+              .setName(pc.getName())
+              .setDetails(pc.getVocation().toString())
+              .setHost(socketChannel.getRemoteAddress().toString()
+                .split("/")[ZERO.intValue()])
+              .setPort(Integer.parseInt(socketChannel.getLocalAddress().toString()
+                .split(":")[ONE.intValue()]));
           }
-          catch(IOException | NumberFormatException ignore) {
-            log.warn("Failed to add player character as option: {}", ignore.getMessage(), ignore);
+          catch(IOException | NumberFormatException neverGonnaHappen) {
+            log.warn("Failed to add player character as option: {}",
+              neverGonnaHappen.getMessage(), neverGonnaHappen);
             return null;
           }
         }).filter(java.util.Objects::nonNull).collect(Collectors.toList()));
     }
     catch(AccountException accexc) {
       return new LoadCharacterListPacketResponse().setErrorMessage(accexc.getMessage());
+    }
+    catch(Exception exc) {
+      log.error("Failed to login: {}", exc.getMessage(), exc);
+      return new LoadCharacterListPacketResponse().setErrorMessage(
+        String.format("Unexpected error: %s", exc.getMessage()));
     }
   }
 
@@ -177,8 +197,5 @@ import otserver4j.structure.RawPacket;
         response.getPremiumDaysLeft() < ZERO.intValue() ?
       ZERO.intValue() : response.getPremiumDaysLeft().intValue());
   }
-
-  @Override public Set<String> sessionsToSendFrom(String session) {
-    return Collections.singleton(session); }
 
 }
