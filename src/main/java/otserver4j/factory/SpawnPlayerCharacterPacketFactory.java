@@ -21,34 +21,40 @@ import otserver4j.entity.AccountEntity;
 import otserver4j.entity.PlayerCharacterEntity;
 import otserver4j.exception.AccountException;
 import otserver4j.service.AbstractPacketFactory;
+import otserver4j.service.GameMap;
 import otserver4j.service.LoginService;
 import otserver4j.structure.Light;
 import otserver4j.structure.MessageType;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.PlayerCharacterCondition;
+import otserver4j.structure.PlayerCharacterSlot;
 import otserver4j.structure.Position;
 import otserver4j.structure.RawPacket;
+import otserver4j.utils.ExperienceUtils;
 import otserver4j.utils.LightUtils;
-
-@SuppressWarnings("unused")
 
 @RequiredArgsConstructor @Slf4j @Component
 public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
     otserver4j.factory.SpawnPlayerCharacterPacketFactory.SpawnPlayerCharacterRequest, 
     otserver4j.factory.SpawnPlayerCharacterPacketFactory.SpawnPlayerCharacterResponse> {
 
-  static final Long PLAYER_IDENTIFIER_PREFIX = 0x0fffffffL;
+  public static final Long PLAYER_IDENTIFIER_PREFIX = 0x0fffffffL;
 
   static final Integer
      PROCESSING_LOGIN_CODE_OK = 0x0a
     ,PROCESSING_LOGIN_CODE_NOK = 0x14
     ,CLIENT_RENDER_CODE = 0x32
     ,ERROR_REPORT_FLAG = 0x00
+    ,CODE_MAP_INFO = 0x64
+    ,CODE_SPAWN_FX = 0x83
     ,CODE_ICONS = 0xa2
     ,CODE_SEND_MESSAGE = 0xb4
     ,CODE_CHARACTER_LIGHT = 0x8d
     ,CODE_WORLD_LIGHT = 0x82
     ,CODE_SKILLS = 0xa1
+    ,CODE_ATTRIBUTES = 0xa0
+    ,CODE_INVENTORY_SLOT_FILLED = 0x78
+    ,CODE_INVENTORY_SLOT_EMPTY = 0x79
     ;
 
   private final LoginService loginService;
@@ -111,7 +117,9 @@ public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
     }
   }
 
-  
+  private RawPacket writePosition(final Position position, RawPacket packet) {
+    return packet.writeInt16(position.getX()).writeInt16(position.getY()).writeByte(position.getZ());
+  }
 
   private RawPacket writeWorldLight(Position position, RawPacket packet) {
     final Light light = LightUtils.INSTANCE.fromWorld(null, position);
@@ -127,7 +135,6 @@ public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
   private RawPacket writeLoginMessages(PlayerCharacterEntity playerCharacter, RawPacket packet) {
     Arrays.stream(new String[] {
       String.format("Welcome, %s.", playerCharacter.getName()),
-      //String.format("Last login: %s", "today?"),
     }).forEach(msg -> packet.writeByte(CODE_SEND_MESSAGE)
       .writeByte(MessageType.STATUS.getCode()).writeString(msg));
     return packet;
@@ -137,14 +144,72 @@ public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
     return packet.writeByte(CODE_ICONS).writeByte(
       PlayerCharacterCondition.getIconCodeFromStatuses(playerCharacter.getConditions())); }
 
+  private RawPacket writeSpawnEffect(
+      PlayerCharacterEntity playerCharacter, RawPacket packet) {
+    return this.writePosition(playerCharacter.getPosition(),
+      packet.writeByte(CODE_SPAWN_FX)).writeByte(0x0a);
+  }
+
+  private RawPacket writeSkills(PlayerCharacterEntity playerCharacter, RawPacket packet) {
+    return packet.writeByte(CODE_SKILLS)
+      .writeByte(playerCharacter.getFistSkill().getLevel()).writeByte(playerCharacter.getFistSkill().getPercent())
+      .writeByte(playerCharacter.getClubSkill().getLevel()).writeByte(playerCharacter.getClubSkill().getPercent())
+      .writeByte(playerCharacter.getSwordSkill().getLevel()).writeByte(playerCharacter.getSwordSkill().getPercent())
+      .writeByte(playerCharacter.getAxeSkill().getLevel()).writeByte(playerCharacter.getAxeSkill().getPercent())
+      .writeByte(playerCharacter.getDistanceSkill().getLevel()).writeByte(playerCharacter.getDistanceSkill().getPercent())
+      .writeByte(playerCharacter.getShieldSkill().getLevel()).writeByte(playerCharacter.getShieldSkill().getPercent())
+      .writeByte(playerCharacter.getFishingSkill().getLevel()).writeByte(playerCharacter.getFishingSkill().getPercent());
+  }
+
+  private RawPacket writeInventorySlot(PlayerCharacterSlot slot, RawPacket packet) {
+    return packet.writeByte(CODE_INVENTORY_SLOT_EMPTY).writeByte(slot.getCode());
+  }
+
+  private RawPacket writeInventory(PlayerCharacterEntity playerCharacter, RawPacket packet) {
+    Arrays.asList(PlayerCharacterSlot.values()).stream()
+      .filter(pcs -> !PlayerCharacterSlot.INVALID.equals(pcs))
+      .forEach(pcs -> this.writeInventorySlot(pcs, packet));
+    return packet;
+  }
+
+  private RawPacket writeAttributes(PlayerCharacterEntity playerCharacter, RawPacket packet) {
+    return packet.writeByte(CODE_ATTRIBUTES)
+      .writeInt16(playerCharacter.getCurrentLife()).writeInt16(playerCharacter.getMaxLife())
+      .writeInt16(/*????*/playerCharacter.getMaxCapacity())
+      .writeInt32(playerCharacter.getExperience())
+      .writeInt16(ExperienceUtils.INSTANCE.calculateLevelFromExperience(playerCharacter.getExperience()))
+      .writeByte(ExperienceUtils.INSTANCE.calculateNextLevelPercentFromExperience(playerCharacter.getExperience()))
+      .writeInt16(playerCharacter.getCurrentMana()).writeInt16(playerCharacter.getMaxMana())
+      .writeByte(playerCharacter.getMagicSkill().getLevel()).writeByte(playerCharacter.getMagicSkill().getPercent())
+      .writeByte(playerCharacter.getCurrentSoul());
+  }
+
+  private final GameMap gameMap;
+  private RawPacket writePlayerMapInfo(PlayerCharacterEntity playerCharacter, RawPacket packet) {
+    return this.gameMap.writeSpawnMapInfo(playerCharacter,
+      this.writePosition(playerCharacter.getPosition(), packet.writeByte(CODE_MAP_INFO)));
+  }
+
   @Override public RawPacket generateRawPacketResponse(
       SpawnPlayerCharacterResponse response) {
     if(response.getErrorMessage() != null && !response.getErrorMessage().isBlank())
       return new RawPacket().writeByte(PROCESSING_LOGIN_CODE_NOK)
         .writeString(response.getErrorMessage());
-    return new RawPacket().writeByte(PROCESSING_LOGIN_CODE_OK)
-      .writeInt32(PLAYER_IDENTIFIER_PREFIX + response.getPlayerCharacter().getIdentifier())
-      .writeInt16(CLIENT_RENDER_CODE).writeByte(ERROR_REPORT_FLAG);
+    return
+      this.writeIcons(response.getPlayerCharacter(),
+      this.writeLoginMessages(response.getPlayerCharacter(),
+      this.writePlayerLight(response.getPlayerCharacter(),
+      this.writeWorldLight(response.getPlayerCharacter().getPosition(),
+      this.writeSpawnEffect(response.getPlayerCharacter(),
+      this.writeSkills(response.getPlayerCharacter(),
+      this.writeAttributes(response.getPlayerCharacter(),
+      this.writeInventory(response.getPlayerCharacter(),
+          
+      this.writePlayerMapInfo(response.getPlayerCharacter(), new RawPacket()
+        .writeByte(PROCESSING_LOGIN_CODE_OK)
+        .writeInt32(PLAYER_IDENTIFIER_PREFIX + response.getPlayerCharacter().getIdentifier())
+        .writeInt16(CLIENT_RENDER_CODE).writeByte(ERROR_REPORT_FLAG))))))))))
+      ;
   }
 
 }

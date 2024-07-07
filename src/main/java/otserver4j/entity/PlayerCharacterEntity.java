@@ -225,25 +225,25 @@ import otserver4j.utils.SkillUtils;
 
   static final String OUTFIT_PREFIX = "outfit_";
   @javax.persistence.AttributeOverrides({
-    @AttributeOverride(name = "type",  column = @Column(name = OUTFIT_PREFIX + "type",  nullable = true)),
-    @AttributeOverride(name = "head",  column = @Column(name = OUTFIT_PREFIX + "head",  nullable = true)),
-    @AttributeOverride(name = "body",  column = @Column(name = OUTFIT_PREFIX + "body",  nullable = true)),
-    @AttributeOverride(name = "legs",  column = @Column(name = OUTFIT_PREFIX + "legs",  nullable = true)),
-    @AttributeOverride(name = "feet",  column = @Column(name = OUTFIT_PREFIX + "feet",  nullable = true)),
-    @AttributeOverride(name = "extra", column = @Column(name = OUTFIT_PREFIX + "extra", nullable = true)),
+    @AttributeOverride(name = "type",  column = @Column(name = OUTFIT_PREFIX + "type",  nullable = false)),
+    @AttributeOverride(name = "head",  column = @Column(name = OUTFIT_PREFIX + "head",  nullable = false)),
+    @AttributeOverride(name = "body",  column = @Column(name = OUTFIT_PREFIX + "body",  nullable = false)),
+    @AttributeOverride(name = "legs",  column = @Column(name = OUTFIT_PREFIX + "legs",  nullable = false)),
+    @AttributeOverride(name = "feet",  column = @Column(name = OUTFIT_PREFIX + "feet",  nullable = false)),
+    @AttributeOverride(name = "extra", column = @Column(name = OUTFIT_PREFIX + "extra", nullable = false)),
   }) @javax.persistence.Embeddable @Data @Accessors(chain = true)
   public static class CharacterOutfit {
-    private Integer type;
-    private Integer head;
-    private Integer body;
-    private Integer legs;
-    private Integer feet;
-    private Integer extra;
+    private Integer type = 0x80;
+    private Integer head = 0x04;
+    private Integer body = 0x03;
+    private Integer legs = 0x02;
+    private Integer feet = 0x01;
+    private Integer extra = 0x00;
   }
-  private CharacterOutfit outfit;
+  private CharacterOutfit outfit = new CharacterOutfit();
 
   private transient List<PlayerCharacterCondition> conditions;
-  private transient PlayerCharacterSkull skull;
+  private transient PlayerCharacterSkull skull = PlayerCharacterSkull.NONE;
 
   public PlayerCharacterEntity(AccountEntity accountEntity,
       String name, PlayerCharacterVocation vocation, Position position) {

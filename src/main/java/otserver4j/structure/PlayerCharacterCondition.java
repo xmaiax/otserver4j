@@ -1,5 +1,7 @@
 package otserver4j.structure;
 
+import java.math.BigInteger;
+
 @lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @lombok.Getter public enum PlayerCharacterCondition {
   POISONED(0b00000001), ON_FIRE(0b00000010), STRUCK_BY_ENERGY(0b00000100),
@@ -8,7 +10,7 @@ package otserver4j.structure;
   private final Integer code;
   public static Integer getIconCodeFromStatuses(
       final java.util.List<PlayerCharacterCondition> conditions) {
-    return conditions == null ? null : (conditions.isEmpty() ?
-      java.math.BigInteger.ZERO.intValue() : conditions.stream()
-        .mapToInt(condition -> condition.getCode()).sum()); }
+    return conditions == null || conditions.isEmpty() ?
+      BigInteger.ZERO.intValue() : conditions.stream()
+        .mapToInt(condition -> condition.getCode()).sum(); }
 }
