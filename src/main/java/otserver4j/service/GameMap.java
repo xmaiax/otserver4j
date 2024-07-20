@@ -1,8 +1,10 @@
 package otserver4j.service;
 
-import otserver4j.structure.RawPacket;
-
 public interface GameMap {
-  RawPacket writeSpawnMapInfo(
-    final otserver4j.entity.PlayerCharacterEntity playerCharacter, final RawPacket packet);
+  void writeTileFromPosition(
+    final otserver4j.structure.Position position,
+    final otserver4j.structure.RawPacket packet);
+  void writeTileFromPosition(
+    final int x, final int y, final int z,
+    final otserver4j.structure.RawPacket packet);
 }

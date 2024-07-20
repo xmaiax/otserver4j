@@ -28,4 +28,16 @@ public class Position {
   public Position copy() {
     return new Position().setX(this.getX()).setY(this.getY()).setZ(this.getZ());
   }
+  public long toLong() {
+    return (((long) this.z) << 32) | (((long) this.y) << 16) | ((long) this.x);
+  }
+  public static long toLong(final long x, final long y, final long z) {
+    return (z << 32) | (y << 16) | x;
+  }
+  public static Position fromLong(final long input) {
+    return new Position()
+      .setX((int)(input & 0xffffl))
+      .setY((int)((input & 0xffff0000l) >> 16))
+      .setZ((int)((input & 0xff00000000l) >> 32));
+  }
 }

@@ -4,7 +4,7 @@ package otserver4j.structure;
 @lombok.Getter public enum PlayerCharacterVocation {
 
   /*Class       Code  Name            HP   HP/Lvl   MP  MP/Lvl   Cap  Cap/Lvl  Soul  Magic   Fist   Club   Swrd    Axe  Dstnc   Shld   Fish */
-    VAGABOND   (0x00, "Vagabond",    100,       5,  25,      5,  250,       5,  100, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d),
+    NO_CLASS   (0x00, "No class",    100,       5,  20,      5,  250,       5,  100, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d),
     NECROMANCER(0x01, "Necromancer", 100,      10,  50,     20,  300,      10,  150, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d),
     WARRIOR    (0x02, "Warrior",     200,      25,  20,      5,  450,      15,  100, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d),
     MONK       (0x03, "Monk",        175,      20,  25,     10,  400,      10,  125, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d, 1.00d),

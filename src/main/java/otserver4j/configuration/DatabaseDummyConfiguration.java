@@ -31,7 +31,7 @@ public class DatabaseDummyConfiguration {
       final AccountEntity account = this.loginService.createNewAccount(defaultAccount, defaultPassword);
       this.loginService.addPremiumTimeInDays(account.getAccountNumber(), 20);
       this.playerCharacterRepository.save(new PlayerCharacterEntity(account, "Maia",
-        PlayerCharacterVocation.NECROMANCER, new Position().setX(1245).setY(454).setZ(7)));
+        PlayerCharacterVocation.NECROMANCER, new Position().setX(50).setY(50).setZ(7)));
       try {
         System.err.println(this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
           this.loginService.findAccountToLogin(defaultAccount, defaultPassword)));

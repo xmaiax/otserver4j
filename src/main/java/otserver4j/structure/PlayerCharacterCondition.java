@@ -12,5 +12,5 @@ import java.math.BigInteger;
       final java.util.List<PlayerCharacterCondition> conditions) {
     return conditions == null || conditions.isEmpty() ?
       BigInteger.ZERO.intValue() : conditions.stream()
-        .mapToInt(condition -> condition.getCode()).sum(); }
+        .mapToInt(PlayerCharacterCondition::getCode).sum(); }
 }

@@ -23,10 +23,12 @@ import otserver4j.exception.AccountException;
 import otserver4j.service.AbstractPacketFactory;
 import otserver4j.service.GameMap;
 import otserver4j.service.LoginService;
+import otserver4j.structure.Direction;
 import otserver4j.structure.Light;
 import otserver4j.structure.MessageType;
 import otserver4j.structure.PacketType;
 import otserver4j.structure.PlayerCharacterCondition;
+import otserver4j.structure.PlayerCharacterParty;
 import otserver4j.structure.PlayerCharacterSlot;
 import otserver4j.structure.Position;
 import otserver4j.structure.RawPacket;
@@ -185,8 +187,59 @@ public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
   }
 
   private final GameMap gameMap;
+
+  private RawPacket writeSpawnMapInfo(
+      final PlayerCharacterEntity playerCharacter, final RawPacket packet) {
+    final Position bounds = new Position().setZ(playerCharacter.getPosition().getZ())
+      .setX(playerCharacter.getPosition().getX() + 9).setY(playerCharacter.getPosition().getY() + 7);
+    final Integer z = playerCharacter.getPosition().getZ();
+    for(Integer x = playerCharacter.getPosition().getX() - 8; x <= bounds.getX(); x++)
+      for(Integer y = playerCharacter.getPosition().getY() - 6; y <= bounds.getY(); y++) {
+        this.gameMap.writeTileFromPosition(x, y, z, packet);
+        if(playerCharacter.getPosition().getX().equals(x) && playerCharacter.getPosition().getY().equals(y)) {
+          packet.writeInt16(0x61); // Criatura desconhecida
+          packet.writeInt32(0x00L); // Cache de criatura?
+          packet.writeInt32(SpawnPlayerCharacterPacketFactory.PLAYER_IDENTIFIER_PREFIX + playerCharacter.getIdentifier());
+          packet.writeString(playerCharacter.getName());
+          packet.writeByte(playerCharacter.getCurrentLife() * 100 / playerCharacter.getMaxLife());
+          packet.writeByte((playerCharacter.getDirection() != null && playerCharacter.getDirection().getSpawnable() ?
+              playerCharacter.getDirection() : Direction.SOUTH).getCode());
+          
+          packet.writeByte(playerCharacter.getOutfit().getType());
+          packet.writeByte(playerCharacter.getOutfit().getHead());
+          packet.writeByte(playerCharacter.getOutfit().getBody());
+          packet.writeByte(playerCharacter.getOutfit().getLegs());
+          packet.writeByte(playerCharacter.getOutfit().getFeet());
+          packet.writeByte(playerCharacter.getOutfit().getExtra());
+          packet.writeInt16(0xff88); //playerCharacter.getSpeed()
+          packet.writeByte(0x00); // +Velocidade
+          packet.writeByte(playerCharacter.getSkull().getCode());
+          packet.writeByte(PlayerCharacterParty.NONE.getCode());
+          packet.writeByte(0x00);
+        }
+        else if(bounds.getX().equals(x) && bounds.getY().equals(y)) {
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+        }
+        else packet.writeByte(0);
+        packet.writeByte(0xff);
+      }
+    return packet;
+  }
+
   private RawPacket writePlayerMapInfo(PlayerCharacterEntity playerCharacter, RawPacket packet) {
-    return this.gameMap.writeSpawnMapInfo(playerCharacter,
+    return this.writeSpawnMapInfo(playerCharacter,
       this.writePosition(playerCharacter.getPosition(), packet.writeByte(CODE_MAP_INFO)));
   }
 
