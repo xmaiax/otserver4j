@@ -33,7 +33,7 @@ public class SpawnProtocol implements otserver4j.protocol.Protocol {
       .writeInt16(position.getY()).writeByte(position.getZ());
   }
 
-  private Packet writePlayerMapInfo(PlayerCharacter player, Packet packet) {
+  public Packet writePlayerMapInfo(PlayerCharacter player, Packet packet) {
     return this.gameMap.writeMapInfo(player, this.writePosition(player.getPosition(),
       packet.writeByte(Packet.CODE_MAP_INFO)));
   }
