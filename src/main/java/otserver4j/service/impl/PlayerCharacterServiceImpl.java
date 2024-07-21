@@ -33,7 +33,7 @@ import otserver4j.structure.Status.Skull;
       .setMana(new Attribute().setValue(80).setMaxValue(100))
       .setCapacity(new Attribute().setValue(30).setMaxValue(180))
       .setSoul(new Attribute().setValue(100).setMaxValue(100))
-      .setPosition(new Position().setX(50).setY(50).setZ(7))
+      .setPosition(new Position().setX(32).setY(32).setZ(7))
       .setDirection(otserver4j.structure.Direction.EAST)
       .setInventory(java.util.Map.of(
         Slot.BACKPACK, new ItemWithQuantity().setItem(Item.BACKPACK),

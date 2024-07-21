@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 
 import otserver4j.packet.Packet;
 import otserver4j.packet.PacketType;
 
 public class ClientFake {
 
-  private static final Long ACCOUNT_NUMBER = 2L;
-  private static final String PASSWORD = "2";
-  private static final String CHARACTER_NAME = "Stefane";
+  private static final Long ACCOUNT_NUMBER = 1L;
+  private static final String PASSWORD = "1";
+  private static final String CHARACTER_NAME = "Maia";
   private static final Integer PROTOCOL_VERSION = 760;
   
   public static void main(String[] args) throws IOException, InterruptedException {
@@ -29,12 +30,12 @@ public class ClientFake {
     while(clientSocket.isConnected()) {
       final ByteBuffer serverResponse = ByteBuffer.allocate(Packet.MAX_SIZE);
       clientSocket.read(serverResponse);
-      final String output = new String(serverResponse.array()).trim();
+      final String output = new String(serverResponse.array(), StandardCharsets.ISO_8859_1).trim();
       if(!output.isBlank()) {
         final ByteBuffer buffer = ByteBuffer.wrap(output.getBytes());
         final StringBuilder message = new StringBuilder();
         while(buffer.hasRemaining()) {
-          message.append(String.format("%d\t", buffer.get() /*Byte.toUnsignedInt(buffer.get())*/));
+          message.append(String.format("0x%02X\t", Packet.readByte(buffer) /*Byte.toUnsignedInt(buffer.get())*/));
         }
         System.out.println(message.toString().trim());
       }

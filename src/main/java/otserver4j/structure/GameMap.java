@@ -16,11 +16,10 @@ public class GameMap extends java.util.HashMap<String, TileWithItems> {
 
   public GameMap() {
     final Integer z = 7;
-    for(Integer x = 46; x < 55; x++)
-      for(Integer y = 46; y < 55; y++) {
-        final TileWithItems tile = new TileWithItems()
-          .setTile(y == x ? Tile.GROUND : Tile.GRASS);
-        if(x == 53 && y == 47) {
+    for(Integer x = 32 - 2; x <= 32 + 2; x++)
+      for(Integer y = 32 - 2; y <= 32 + 2; y++) {
+        final TileWithItems tile = new TileWithItems().setTile(Tile.GRASS);
+        /*if(x == 32 && y == 32) {
           tile.setItems(
             Arrays.asList(new ItemWithQuantity[] {
               new ItemWithQuantity().setItem(Item.CARLIN_SWORD),
@@ -40,7 +39,7 @@ public class GameMap extends java.util.HashMap<String, TileWithItems> {
               new ItemWithQuantity().setItem(Item.CROSSBOW),
             })
           );
-        }
+        }*/
         this.put(this.getTilePositionKey(x, y, z), tile);
       }
   }
@@ -51,8 +50,7 @@ public class GameMap extends java.util.HashMap<String, TileWithItems> {
   
   public TileWithItems getTileWithItemsFromPosition(Position position) {
     final String positionKey = this.getTilePositionKey(position.getX(), position.getY(), position.getZ());
-    return this.containsKey(positionKey) ? this.get(positionKey) : new TileWithItems()
-      .setTile(Tile.NOTHING).setItems(Collections.emptyList());
+    return this.containsKey(positionKey) ? this.get(positionKey) : null;
   }
 
   public Packet writeMapInfo(PlayerCharacter player, Packet packet) {
@@ -70,7 +68,6 @@ public class GameMap extends java.util.HashMap<String, TileWithItems> {
             });
         }
         else {
-          //...
         }
         if(player.getPosition().getX().equals(x) && player.getPosition().getY().equals(y)) {
           packet.writeInt16(0x61); // Criatura desconhecida
@@ -91,6 +88,41 @@ public class GameMap extends java.util.HashMap<String, TileWithItems> {
           packet.writeByte(player.getSkull().getCode());
           packet.writeByte(Party.NONE.getCode());
           packet.writeByte(0x00);
+        }
+        else if(bounds.getX().equals(x) && bounds.getY().equals(y)) {
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+          packet.writeByte(0xff);
+        }
+        else packet.writeByte(0);
+        packet.writeByte(0xff);
+      }
+    return packet;
+  }
+
+  public Packet writeMapInfo(Position position, Packet packet) {
+    final Position bounds = new Position().setZ(position.getZ())
+      .setX(position.getX() + 9).setY(position.getY() + 7);
+    for(Integer x = position.getX() - 8; x <= bounds.getX(); x++)
+      for(Integer y = position.getY() - 6; y <= bounds.getY(); y++) {
+        final TileWithItems tileWithItems = this.get(this.getTilePositionKey(x, y, 7));
+        if(tileWithItems != null) {
+          packet.writeInt16(tileWithItems.getTile().getCode());
+          if(tileWithItems.getItems() != null && !tileWithItems.getItems().isEmpty())
+            tileWithItems.getItems().forEach(item -> {
+              packet.writeInt16(item.getItem().getCode());
+              if(item.getItem().isStackable()) packet.writeByte(item.getQuantity());
+            });
         }
         else if(bounds.getX().equals(x) && bounds.getY().equals(y)) {
           packet.writeByte(0xff);
