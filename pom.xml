@@ -73,14 +73,14 @@
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
         <excludes>
-          <exclude>*/**.otbm</exclude>
+          <exclude>**/map/*.json</exclude>
         </excludes>
       </resource>
       <resource>
         <directory>src/main/resources</directory>
         <filtering>false</filtering>
         <includes>
-          <include>*/**.otbm</include>
+          <include>**/map/*.json</include>
         </includes>
       </resource>
     </resources>

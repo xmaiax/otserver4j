@@ -32,8 +32,7 @@ import otserver4j.service.AbstractPacketFactory.PacketResponse;
 @RequiredArgsConstructor @Slf4j @Component
 public class PacketMessageConverter implements MessageConverter {
 
-  @Data @Accessors(chain = true)
-  public static class RawPacketAmqpMessage {
+  @Data @Accessors(chain = true) public static class RawPacketAmqpMessage {
     private Integer packetSize;
     private PacketType packetType;
     private ByteBuffer buffer;
