@@ -1,4 +1,4 @@
-package otserver4j.structure;
+package otserver4j.packet;
 
 @lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE) @lombok.Getter
 public enum PacketType {
@@ -58,7 +58,6 @@ public enum PacketType {
   ADD_FRIEND(0xdc),
   REMOVE_FRIEND(0xdd),
   INVALID(-1);
-
   private final Integer code;
   public static PacketType fromCode(final Integer code) {
     return code == null ? null : java.util.Arrays.asList(PacketType.values())

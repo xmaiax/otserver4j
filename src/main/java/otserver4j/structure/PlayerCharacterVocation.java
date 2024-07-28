@@ -15,7 +15,6 @@ package otserver4j.structure;
     return vocationCode == null ? null : java.util.Arrays.asList(PlayerCharacterVocation.values())
       .stream().filter(v -> v.getCode().equals(vocationCode)).findFirst().orElse(
         PlayerCharacterVocation.values()[java.math.BigInteger.ZERO.intValue()]); }
-
   private final Integer code;
   private final String _name;
   private final Integer lifeBase;
@@ -33,5 +32,4 @@ package otserver4j.structure;
   private final Double distanceSkillFactor;
   private final Double shieldingSkillFactor;
   private final Double fishingSkillFactor;
-
 }

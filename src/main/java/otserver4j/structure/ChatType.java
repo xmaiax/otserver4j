@@ -9,8 +9,7 @@ package otserver4j.structure;
   PRIVATE_RED(0x0b), ORANGE_CHANNEL(0x0c),
   ANONYMOUS_RED(0x0d), MONSTER(0x10),
   SCREAMING_MONSTER(0x11), INVALID(-1);
-  private Integer code;
-  ChatType(Integer code) { this.code = code; }
+  private final Integer code;
   public static ChatType fromCode(final Integer code) {
     return code == null ? null : java.util.Arrays.asList(ChatType.values()).stream()
       .filter(ct -> ct.getCode().equals(code)).findFirst().orElse(INVALID);

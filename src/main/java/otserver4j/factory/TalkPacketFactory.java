@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import otserver4j.packet.PacketType;
+import otserver4j.packet.RawPacket;
 import otserver4j.service.AbstractPacketFactory;
 import otserver4j.structure.ChatType;
-import otserver4j.structure.PacketType;
-import otserver4j.structure.RawPacket;
 
 @Component public class TalkPacketFactory extends AbstractPacketFactory<
     otserver4j.factory.TalkPacketFactory.TalkPacketRequest,
@@ -21,7 +21,7 @@ import otserver4j.structure.RawPacket;
   public static final Integer TALK_SERVER_CODE = 0xaa;
 
   @Override public PacketType getPacketType() { return PacketType.TALK; }
-  @Override public boolean thenDisconnect() { return Boolean.FALSE; }
+  @Override public Boolean thenDisconnect() { return Boolean.FALSE; }
 
   @Data @EqualsAndHashCode(callSuper = false) @Accessors(chain = true)
   public static class TalkPacketRequest extends otserver4j.service.AbstractPacketFactory.PacketRequest {

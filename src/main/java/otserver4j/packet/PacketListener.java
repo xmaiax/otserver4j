@@ -1,4 +1,4 @@
-package otserver4j.configuration;
+package otserver4j.packet;
 
 import static java.math.BigInteger.ZERO;
 
@@ -20,17 +20,16 @@ import org.springframework.integration.ip.tcp.serializer.ByteArrayRawSerializer;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import otserver4j.configuration.AmqpConfiguration;
 import otserver4j.repository.SessionManager;
 import otserver4j.service.impl.PacketMessageConverter;
-import otserver4j.structure.PacketType;
-import otserver4j.structure.RawPacket;
 
-@Slf4j @Component public class TcpServerConfiguration extends TcpNioServerConnectionFactory {
+@Slf4j @Component public class PacketListener extends TcpNioServerConnectionFactory {
 
   private final AmqpTemplate amqpTemplate;
   private final SessionManager sessionManager;
 
-  public TcpServerConfiguration(@Value("${otserver.port}") Integer port,
+  public PacketListener(@Value("${otserver.port}") Integer port,
       SessionManager sessionManager, AmqpTemplate amqpTemplate) {
     super(port);
     this.amqpTemplate = amqpTemplate;

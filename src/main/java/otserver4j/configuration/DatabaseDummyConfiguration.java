@@ -23,8 +23,7 @@ public class DatabaseDummyConfiguration {
   private final PlayerCharacterRepository playerCharacterRepository;
   private final ObjectMapper objectMapper;
 
-  @javax.annotation.PostConstruct
-  public void initializeEmptyDatabase() {
+  @javax.annotation.PostConstruct public void initializeEmptyDatabase() {
     if(this.accountRepository.count() < BigInteger.ONE.longValue()) {
       final Integer defaultAccount = 123;
       final String defaultPassword = "abc";

@@ -1,4 +1,4 @@
-package otserver4j.structure;
+package otserver4j.packet;
 
 import static java.math.BigInteger.ZERO;
 import static java.math.BigInteger.ONE;
@@ -8,9 +8,7 @@ import java.nio.ByteBuffer;
 
 @lombok.Getter public class RawPacket {
 
-  public static final Integer MAX_SIZE = 0xffff,
-    PROCESSING_LOGIN_CODE_OK = 0x0a, PROCESSING_LOGIN_CODE_NOK = 0x14,
-    SNAPBACK_CODE = 0xb5;
+  public static final Integer MAX_SIZE = 0xffff, SNAPBACK_CODE = 0xb5;
 
   public static Integer readByte(final ByteBuffer input) {
     return input.get() & 0xff;

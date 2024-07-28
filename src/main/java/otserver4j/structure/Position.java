@@ -2,6 +2,8 @@ package otserver4j.structure;
 
 import static java.math.BigInteger.ONE;
 
+import java.math.BigInteger;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 
@@ -11,7 +13,9 @@ import javax.persistence.Column;
   @AttributeOverride(name = "z", column = @Column(name = "position_z", nullable = false)),
 }) @javax.persistence.Embeddable @lombok.Data @lombok.experimental.Accessors(chain = true)
 public class Position {
-  private Integer x; private Integer y; private Integer z;
+  private Integer x = BigInteger.ZERO.intValue();
+  private Integer y = BigInteger.ZERO.intValue();
+  private Integer z = BigInteger.ZERO.intValue();
   public Position move(Direction direction) {
     switch(direction) {
       case EAST: return this.setX(this.getX() + ONE.intValue());

@@ -5,16 +5,16 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import otserver4j.packet.PacketType;
+import otserver4j.packet.RawPacket;
 import otserver4j.service.AbstractPacketFactory;
-import otserver4j.structure.PacketType;
-import otserver4j.structure.RawPacket;
 
 @Component public class DummyPacketFactory extends AbstractPacketFactory<
     otserver4j.factory.DummyPacketFactory.DummyPacketRequest,
     otserver4j.factory.DummyPacketFactory.DummyPacketResponse> {
 
   @Override public PacketType getPacketType() { return PacketType.INVALID; }
-  @Override public boolean thenDisconnect() { return false; }
+  @Override public Boolean thenDisconnect() { return Boolean.FALSE; }
 
   public static class DummyPacketRequest
     extends otserver4j.service.AbstractPacketFactory.PacketRequest { }

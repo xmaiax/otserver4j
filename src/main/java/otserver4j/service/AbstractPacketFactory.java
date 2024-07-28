@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import otserver4j.structure.PacketType;
-import otserver4j.structure.RawPacket;
+import otserver4j.packet.PacketType;
+import otserver4j.packet.RawPacket;
 
 @Slf4j @Setter @SuppressWarnings({ "unchecked", })
 public abstract class AbstractPacketFactory<
@@ -24,7 +24,7 @@ public abstract class AbstractPacketFactory<
     Response extends otserver4j.service.AbstractPacketFactory.PacketResponse> {
 
   public abstract PacketType getPacketType();
-  public abstract boolean thenDisconnect();
+  public abstract Boolean thenDisconnect();
 
   public static abstract class PacketRequest {
     @Getter private String session;

@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
   private static final IllegalArgumentException
     INVALID_SESSION_EXCEPTION = new IllegalArgumentException("Invalid session.");
 
-  public SocketChannel getSocketChannelFromSession(String session) {
+  public SocketChannel getSocketChannelFromSession(final String session) {
     if(session == null || session.isBlank()) {
       log.error("Invalid session.");
       throw INVALID_SESSION_EXCEPTION;
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
     return socketChannel;
   }
 
-  public String getSession(String connectionId) {
+  public String getSession(final String connectionId) {
     if(connectionId == null || connectionId.isBlank()) throw new IllegalArgumentException("???");
     final String[] split = connectionId.split(this.portsRegexCapturingGroup);
     if(split.length > ONE.intValue()) return split[ONE.intValue()];
@@ -60,8 +60,7 @@ import lombok.extern.slf4j.Slf4j;
     }
   }
 
-  @Override
-  public void addNewConnection(TcpConnection tcpConnection) {
+  @Override public void addNewConnection(TcpConnection tcpConnection) {
     if(tcpConnection == null || tcpConnection.getConnectionId() == null ||
        tcpConnection.getConnectionId().isBlank()) {
       log.error("Invalid TCP connection.");
@@ -73,8 +72,7 @@ import lombok.extern.slf4j.Slf4j;
       ((TcpNioConnectionWithSocketChannel) tcpConnection).getSocketChannel());
   }
 
-  @Override
-  public void removeDeadConnection(TcpConnection tcpConnection) {
+  @Override public void removeDeadConnection(final TcpConnection tcpConnection) {
     if(tcpConnection == null || tcpConnection.getConnectionId() == null ||
         tcpConnection.getConnectionId().isBlank()) {
       log.error("Invalid TCP connection.");
@@ -85,11 +83,9 @@ import lombok.extern.slf4j.Slf4j;
     this.activeSessions.remove(session);
   }
 
-  @Override
-  public TcpNioConnection createNewConnection(SocketChannel socketChannel, boolean isServer,
-      boolean lookupHost, ApplicationEventPublisher applicationEventPublisher, String connectionFactoryName) {
-    return new TcpNioConnectionWithSocketChannel(socketChannel, isServer,
-      lookupHost, applicationEventPublisher, connectionFactoryName);
+  @Override public TcpNioConnection createNewConnection(final SocketChannel socketChannel, final boolean isServer,
+      final boolean lookupHost, final ApplicationEventPublisher applicationEventPublisher, final String connectionFactoryName) {
+    return new TcpNioConnectionWithSocketChannel(socketChannel, isServer, lookupHost, applicationEventPublisher, connectionFactoryName);
   }
 
 }

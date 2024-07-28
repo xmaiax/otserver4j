@@ -29,12 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 import otserver4j.entity.AccountEntity;
 import otserver4j.entity.MessageOfTheDayEntity;
 import otserver4j.exception.AccountException;
+import otserver4j.packet.PacketType;
+import otserver4j.packet.RawPacket;
 import otserver4j.repository.MessageOfTheDayRepository;
 import otserver4j.repository.SessionManager;
 import otserver4j.service.AbstractPacketFactory;
 import otserver4j.service.LoginService;
-import otserver4j.structure.PacketType;
-import otserver4j.structure.RawPacket;
 
 @RequiredArgsConstructor @Slf4j @Component
 public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
@@ -60,7 +60,7 @@ public class LoadCharacterListPacketFactory extends AbstractPacketFactory<
   }
 
   @Override public PacketType getPacketType() { return PacketType.LOAD_CHARACTER_LIST; }
-  @Override public boolean thenDisconnect() { return Boolean.TRUE; }
+  @Override public Boolean thenDisconnect() { return Boolean.TRUE; }
   @Override public Set<String> sessionsToSendFrom(String session) {
     return Collections.singleton(session); }
 

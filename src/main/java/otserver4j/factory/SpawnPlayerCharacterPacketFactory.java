@@ -20,18 +20,18 @@ import lombok.extern.slf4j.Slf4j;
 import otserver4j.entity.AccountEntity;
 import otserver4j.entity.PlayerCharacterEntity;
 import otserver4j.exception.AccountException;
+import otserver4j.packet.PacketType;
+import otserver4j.packet.RawPacket;
 import otserver4j.service.AbstractPacketFactory;
 import otserver4j.service.GameMap;
 import otserver4j.service.LoginService;
 import otserver4j.structure.Direction;
 import otserver4j.structure.Light;
 import otserver4j.structure.MessageType;
-import otserver4j.structure.PacketType;
 import otserver4j.structure.PlayerCharacterCondition;
 import otserver4j.structure.PlayerCharacterParty;
 import otserver4j.structure.PlayerCharacterSlot;
 import otserver4j.structure.Position;
-import otserver4j.structure.RawPacket;
 import otserver4j.utils.ExperienceUtils;
 import otserver4j.utils.LightUtils;
 
@@ -62,7 +62,7 @@ public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
   private final LoginService loginService;
 
   @Override public PacketType getPacketType() { return PacketType.LOGIN_SUCCESS; }
-  @Override public boolean thenDisconnect() { return Boolean.FALSE; }
+  @Override public Boolean thenDisconnect() { return Boolean.FALSE; }
   @Override public Set<String> sessionsToSendFrom(String session) {
     return Collections.singleton(session); }
 
@@ -257,7 +257,6 @@ public class SpawnPlayerCharacterPacketFactory  extends AbstractPacketFactory<
       this.writeSkills(response.getPlayerCharacter(),
       this.writeAttributes(response.getPlayerCharacter(),
       this.writeInventory(response.getPlayerCharacter(),
-          
       this.writePlayerMapInfo(response.getPlayerCharacter(), new RawPacket()
         .writeByte(PROCESSING_LOGIN_CODE_OK)
         .writeInt32(PLAYER_IDENTIFIER_PREFIX + response.getPlayerCharacter().getIdentifier())

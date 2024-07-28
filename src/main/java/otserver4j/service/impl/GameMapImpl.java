@@ -20,8 +20,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import otserver4j.packet.RawPacket;
 import otserver4j.structure.Position;
-import otserver4j.structure.RawPacket;
 import otserver4j.structure.TileType;
 
 @Slf4j @Getter @org.springframework.stereotype.Service
